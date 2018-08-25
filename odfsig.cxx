@@ -6,6 +6,8 @@
 
 #include <iostream>
 
+#include <zip.h>
+
 int main(int argc, char* argv[])
 {
     if (argc < 2)
@@ -14,7 +16,35 @@ int main(int argc, char* argv[])
         return 1;
     }
 
+    std::string odfPath(argv[1]);
+    int openFlags = 0;
+    int errorCode = 0;
+    zip_t* zipArchive = zip_open(odfPath.c_str(), openFlags, &errorCode);
+    if (!zipArchive)
+    {
+        zip_error_t zipError;
+        zip_error_init_with_code(&zipError, errorCode);
+        std::cerr << "Can't open zip archive '" << odfPath << "': " <<
+            zip_error_strerror(&zipError) << "." << std::endl;
+        zip_error_fini(&zipError);
+        return 1;
+    }
+
+    zip_flags_t locateFlags = 0;
+    zip_int64_t signatureZipIndex = zip_name_locate(
+        zipArchive, "META-INF/documentsignatures.xml", locateFlags);
+    if (signatureZipIndex < 0)
+    {
+        std::cerr << "File '" << odfPath << "' does not contain any signatures."
+                  << std::endl;
+        zip_close(zipArchive);
+        return 1;
+    }
+
     std::cerr << "todo, main: verify signatures" << std::endl;
+
+    zip_close(zipArchive);
+
     return 0;
 }
 
