@@ -55,7 +55,6 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    std::vector<char> signatureBuffer;
     std::unique_ptr<zip_file_t> zipFile(
         zip_fopen_index(zipArchive.get(), signatureZipIndex, 0));
     if (!zipFile)
@@ -63,6 +62,21 @@ int main(int argc, char* argv[])
         std::cerr << "error, main: can't open file at index "
                   << signatureZipIndex << ": " << zip_strerror(zipArchive.get())
                   << std::endl;
+        return 1;
+    }
+
+    char buf[8192];
+    std::vector<char> signaturesBytes;
+    zip_int64_t readSize;
+    while ((readSize = zip_fread(zipFile.get(), buf, sizeof(buf))) > 0)
+    {
+        signaturesBytes.insert(signaturesBytes.end(), buf, buf + readSize);
+    }
+    if (readSize == -1)
+    {
+        std::cerr << "error, main: can't read file at index "
+                  << signatureZipIndex << ": "
+                  << zip_file_strerror(zipFile.get()) << std::endl;
         return 1;
     }
 
