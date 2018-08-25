@@ -5,9 +5,18 @@
  */
 
 #include <iostream>
+#include <memory>
 #include <vector>
 
 #include <zip.h>
+
+namespace std
+{
+template <> struct default_delete<zip_t>
+{
+    void operator()(zip_t* ptr) { zip_close(ptr); }
+};
+}
 
 int main(int argc, char* argv[])
 {
@@ -20,7 +29,8 @@ int main(int argc, char* argv[])
     std::string odfPath(argv[1]);
     int openFlags = 0;
     int errorCode = 0;
-    zip_t* zipArchive = zip_open(odfPath.c_str(), openFlags, &errorCode);
+    std::unique_ptr<zip_t> zipArchive(
+        zip_open(odfPath.c_str(), openFlags, &errorCode));
     if (!zipArchive)
     {
         zip_error_t zipError;
@@ -33,29 +43,28 @@ int main(int argc, char* argv[])
 
     zip_flags_t locateFlags = 0;
     zip_int64_t signatureZipIndex = zip_name_locate(
-        zipArchive, "META-INF/documentsignatures.xml", locateFlags);
+        zipArchive.get(), "META-INF/documentsignatures.xml", locateFlags);
     if (signatureZipIndex < 0)
     {
         std::cerr << "File '" << odfPath << "' does not contain any signatures."
                   << std::endl;
-        zip_close(zipArchive);
         return 1;
     }
 
     std::vector<char> signatureBuffer;
-    zip_file_t* zipFile = zip_fopen_index(zipArchive, signatureZipIndex, 0);
+    zip_file_t* zipFile =
+        zip_fopen_index(zipArchive.get(), signatureZipIndex, 0);
     if (!zipFile)
     {
         std::cerr << "error, main: can't open file at index "
-                  << signatureZipIndex << ": " << zip_strerror(zipArchive)
+                  << signatureZipIndex << ": " << zip_strerror(zipArchive.get())
                   << std::endl;
-        zip_close(zipArchive);
         return 1;
     }
 
     std::cerr << "todo, main: verify signatures" << std::endl;
 
-    zip_close(zipArchive);
+    zip_fclose(zipFile);
 
     return 0;
 }
