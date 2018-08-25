@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 
+#include <libxml/parser.h>
 #include <zip.h>
 
 namespace std
@@ -19,6 +20,10 @@ template <> struct default_delete<zip_t>
 template <> struct default_delete<zip_file_t>
 {
     void operator()(zip_file_t* ptr) { zip_fclose(ptr); }
+};
+template <> struct default_delete<xmlDoc>
+{
+    void operator()(xmlDocPtr ptr) { xmlFreeDoc(ptr); }
 };
 }
 
@@ -79,6 +84,15 @@ int main(int argc, char* argv[])
         std::cerr << "error, main: can't read file at index "
                   << signatureZipIndex << ": "
                   << zip_file_strerror(zipFile.get()) << std::endl;
+        return 1;
+    }
+
+    std::unique_ptr<xmlDoc> signaturesDoc(
+        xmlParseDoc(reinterpret_cast<xmlChar*>(signaturesBytes.data())));
+    if (!signaturesDoc)
+    {
+        std::cerr << "error, main: parsing the signatures file failed"
+                  << std::endl;
         return 1;
     }
 
