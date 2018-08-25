@@ -5,6 +5,7 @@
  */
 
 #include <iostream>
+#include <vector>
 
 #include <zip.h>
 
@@ -24,8 +25,8 @@ int main(int argc, char* argv[])
     {
         zip_error_t zipError;
         zip_error_init_with_code(&zipError, errorCode);
-        std::cerr << "Can't open zip archive '" << odfPath << "': " <<
-            zip_error_strerror(&zipError) << "." << std::endl;
+        std::cerr << "Can't open zip archive '" << odfPath
+                  << "': " << zip_error_strerror(&zipError) << "." << std::endl;
         zip_error_fini(&zipError);
         return 1;
     }
@@ -36,6 +37,17 @@ int main(int argc, char* argv[])
     if (signatureZipIndex < 0)
     {
         std::cerr << "File '" << odfPath << "' does not contain any signatures."
+                  << std::endl;
+        zip_close(zipArchive);
+        return 1;
+    }
+
+    std::vector<char> signatureBuffer;
+    zip_file_t* zipFile = zip_fopen_index(zipArchive, signatureZipIndex, 0);
+    if (!zipFile)
+    {
+        std::cerr << "error, main: can't open file at index "
+                  << signatureZipIndex << ": " << zip_strerror(zipArchive)
                   << std::endl;
         zip_close(zipArchive);
         return 1;
