@@ -16,6 +16,10 @@ template <> struct default_delete<zip_t>
 {
     void operator()(zip_t* ptr) { zip_close(ptr); }
 };
+template <> struct default_delete<zip_file_t>
+{
+    void operator()(zip_file_t* ptr) { zip_fclose(ptr); }
+};
 }
 
 int main(int argc, char* argv[])
@@ -52,8 +56,8 @@ int main(int argc, char* argv[])
     }
 
     std::vector<char> signatureBuffer;
-    zip_file_t* zipFile =
-        zip_fopen_index(zipArchive.get(), signatureZipIndex, 0);
+    std::unique_ptr<zip_file_t> zipFile(
+        zip_fopen_index(zipArchive.get(), signatureZipIndex, 0));
     if (!zipFile)
     {
         std::cerr << "error, main: can't open file at index "
@@ -63,8 +67,6 @@ int main(int argc, char* argv[])
     }
 
     std::cerr << "todo, main: verify signatures" << std::endl;
-
-    zip_fclose(zipFile);
 
     return 0;
 }
