@@ -65,12 +65,14 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    char buf[8192];
+    char readBuffer[8192];
     std::vector<char> signaturesBytes;
     zip_int64_t readSize;
-    while ((readSize = zip_fread(zipFile.get(), buf, sizeof(buf))) > 0)
+    while ((readSize =
+                zip_fread(zipFile.get(), readBuffer, sizeof(readBuffer))) > 0)
     {
-        signaturesBytes.insert(signaturesBytes.end(), buf, buf + readSize);
+        signaturesBytes.insert(signaturesBytes.end(), readBuffer,
+                               readBuffer + readSize);
     }
     if (readSize == -1)
     {
