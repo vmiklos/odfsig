@@ -11,6 +11,7 @@
 #include <libxml/parser.h>
 // clang-format off
 #include <xmlsec/xmlsec.h>
+#include <xmlsec/app.h>
 #include <xmlsec/dl.h>
 // clang-format on
 #include <zip.h>
@@ -75,12 +76,47 @@ class XmlSecGuard
                       << std::endl;
             return;
         }
+
+        _good = xmlSecCryptoAppInit(nullptr) >= 0;
+        if (!_good)
+        {
+            std::cerr
+                << "error, XmlSecGuard ctor: xmlsec crypto app init failed"
+                << std::endl;
+            return;
+        }
+
+        _good = xmlSecCryptoInit() >= 0;
+        if (!_good)
+        {
+            std::cerr << "error, XmlSecGuard ctor: xmlsec crypto init failed"
+                      << std::endl;
+            return;
+        }
     }
 
     ~XmlSecGuard()
     {
         if (!_good)
             return;
+
+        _good = xmlSecCryptoShutdown() >= 0;
+        if (!_good)
+        {
+            std::cerr
+                << "error, XmlSecGuard dtor: xmlsec crypto shutdown failed"
+                << std::endl;
+            return;
+        }
+
+        _good = xmlSecCryptoAppShutdown() >= 0;
+        if (!_good)
+        {
+            std::cerr
+                << "error, XmlSecGuard dtor: xmlsec crypto app shutdown failed"
+                << std::endl;
+            return;
+        }
 
         _good = xmlSecShutdown() >= 0;
         if (!_good)
