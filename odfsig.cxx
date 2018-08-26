@@ -27,6 +27,21 @@ template <> struct default_delete<xmlDoc>
 };
 }
 
+namespace
+{
+/// Performs libxml init/deinit.
+class XmlGuard
+{
+  public:
+    explicit XmlGuard()
+    {
+        xmlInitParser();
+        LIBXML_TEST_VERSION;
+    }
+
+    ~XmlGuard() { xmlCleanupParser(); }
+};
+
 bool verifySignature(xmlNode* signature, size_t signatureIndex)
 {
     std::cerr << "Signature #" << (signatureIndex + 1) << ":" << std::endl;
@@ -34,6 +49,7 @@ bool verifySignature(xmlNode* signature, size_t signatureIndex)
     std::cerr << "todo, verifySignature: verify " << signature << std::endl;
 
     return false;
+}
 }
 
 int main(int argc, char* argv[])
@@ -96,6 +112,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
+    XmlGuard xmlGuard;
     std::unique_ptr<xmlDoc> signaturesDoc(
         xmlParseDoc(reinterpret_cast<xmlChar*>(signaturesBytes.data())));
     if (!signaturesDoc)
