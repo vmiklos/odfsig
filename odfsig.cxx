@@ -27,6 +27,15 @@ template <> struct default_delete<xmlDoc>
 };
 }
 
+bool verifySignature(xmlNode* signature, size_t signatureIndex)
+{
+    std::cerr << "Signature #" << (signatureIndex + 1) << ":" << std::endl;
+
+    std::cerr << "todo, verifySignature: verify " << signature << std::endl;
+
+    return false;
+}
+
 int main(int argc, char* argv[])
 {
     if (argc < 2)
@@ -96,7 +105,36 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    std::cerr << "todo, main: verify signatures" << std::endl;
+    xmlNode* signaturesRoot = xmlDocGetRootElement(signaturesDoc.get());
+    if (!signaturesRoot)
+    {
+        std::cerr << "error, main: could not get signatures root" << std::endl;
+        return 1;
+    }
+
+    std::vector<xmlNode*> signatures;
+    for (xmlNode* signature = signaturesRoot->children; signature;
+         signature = signature->next)
+    {
+        signatures.push_back(signature);
+    }
+    if (signatures.empty())
+    {
+        std::cerr << "File '" << odfPath << "' does not contain any signatures."
+                  << std::endl;
+        return 1;
+    }
+
+    std::cerr << "Digital Signature Info of: " << odfPath << std::endl;
+    for (size_t signatureIndex = 0; signatureIndex < signatures.size();
+         ++signatureIndex)
+    {
+        if (!verifySignature(signatures[signatureIndex], signatureIndex))
+        {
+            std::cerr << "error, main: signature verify failed" << std::endl;
+            return 1;
+        }
+    }
 
     return 0;
 }
