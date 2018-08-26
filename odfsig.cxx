@@ -13,6 +13,7 @@
 #include <xmlsec/xmlsec.h>
 #include <xmlsec/app.h>
 #include <xmlsec/dl.h>
+#include <xmlsec/xmldsig.h>
 // clang-format on
 #include <zip.h>
 
@@ -29,6 +30,10 @@ template <> struct default_delete<zip_file_t>
 template <> struct default_delete<xmlDoc>
 {
     void operator()(xmlDocPtr ptr) { xmlFreeDoc(ptr); }
+};
+template <> struct default_delete<xmlSecDSigCtx>
+{
+    void operator()(xmlSecDSigCtxPtr ptr) { xmlSecDSigCtxDestroy(ptr); }
 };
 }
 
@@ -136,6 +141,14 @@ class XmlSecGuard
 bool verifySignature(xmlNode* signature, size_t signatureIndex)
 {
     std::cerr << "Signature #" << (signatureIndex + 1) << ":" << std::endl;
+
+    std::unique_ptr<xmlSecDSigCtx> dsigCtx(xmlSecDSigCtxCreate(nullptr));
+    if (!dsigCtx)
+    {
+        std::cerr << "todo, verifySignature: ctx initialize failed"
+                  << std::endl;
+        return false;
+    }
 
     std::cerr << "todo, verifySignature: verify " << signature << std::endl;
 
