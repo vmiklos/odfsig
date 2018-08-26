@@ -15,7 +15,7 @@ the cmdline equivalent of the LibreOffice signature verifier GUI.
 
 ### Runtime
 
-- [libxml-2.0](http://xmlsoft.org/)
+- [xmlsec1-nss](https://www.aleksey.com/xmlsec/) (implies [libxml-2.0](http://xmlsoft.org/))
 - [libzip](https://libzip.org/)
 
 ## License

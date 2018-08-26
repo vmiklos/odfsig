@@ -9,6 +9,10 @@
 #include <vector>
 
 #include <libxml/parser.h>
+// clang-format off
+#include <xmlsec/xmlsec.h>
+#include <xmlsec/dl.h>
+// clang-format on
 #include <zip.h>
 
 namespace std
@@ -40,6 +44,57 @@ class XmlGuard
     }
 
     ~XmlGuard() { xmlCleanupParser(); }
+};
+
+/// Performs libxmlsec init/deinit.
+class XmlSecGuard
+{
+  public:
+    explicit XmlSecGuard()
+    {
+        _good = xmlSecInit() >= 0;
+        if (!_good)
+        {
+            std::cerr << "error, XmlSecGuard ctor: xmlsec init failed"
+                      << std::endl;
+            return;
+        }
+
+        _good = xmlSecCheckVersion() == 1;
+        if (!_good)
+        {
+            std::cerr << "error, XmlSecGuard ctor: xmlsec version check failed"
+                      << std::endl;
+            return;
+        }
+
+        _good = xmlSecCryptoDLLoadLibrary(BAD_CAST("nss")) >= 0;
+        if (!_good)
+        {
+            std::cerr << "error, XmlSecGuard ctor: xmlsec crypto load failed"
+                      << std::endl;
+            return;
+        }
+    }
+
+    ~XmlSecGuard()
+    {
+        if (!_good)
+            return;
+
+        _good = xmlSecShutdown() >= 0;
+        if (!_good)
+        {
+            std::cerr << "error, XmlSecGuard dtor: xmlsec shutdown failed"
+                      << std::endl;
+            return;
+        }
+    }
+
+    bool isGood() const { return _good; }
+
+  private:
+    bool _good = false;
 };
 
 bool verifySignature(xmlNode* signature, size_t signatureIndex)
@@ -143,6 +198,13 @@ int main(int argc, char* argv[])
     }
 
     std::cerr << "Digital Signature Info of: " << odfPath << std::endl;
+    XmlSecGuard xmlSecGuard;
+    if (!xmlSecGuard.isGood())
+    {
+        std::cerr << "error, main: xmlsec init failed" << std::endl;
+        return 1;
+    }
+
     for (size_t signatureIndex = 0; signatureIndex < signatures.size();
          ++signatureIndex)
     {
