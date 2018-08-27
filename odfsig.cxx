@@ -145,14 +145,25 @@ bool verifySignature(xmlNode* signature, size_t signatureIndex)
     std::unique_ptr<xmlSecDSigCtx> dsigCtx(xmlSecDSigCtxCreate(nullptr));
     if (!dsigCtx)
     {
-        std::cerr << "todo, verifySignature: ctx initialize failed"
+        std::cerr << "error, verifySignature: ctx initialize failed"
                   << std::endl;
         return false;
     }
 
-    std::cerr << "todo, verifySignature: verify " << signature << std::endl;
+    if (xmlSecDSigCtxVerify(dsigCtx.get(), signature) < 0)
+    {
+        std::cerr << "error, verifySignature: ctx verify failed" << std::endl;
+        return false;
+    }
 
-    return false;
+    if (dsigCtx->status != xmlSecDSigStatusSucceeded)
+    {
+        std::cerr << "error, verifySignature: verify status is not success"
+                  << std::endl;
+        return false;
+    }
+
+    return true;
 }
 }
 
