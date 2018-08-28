@@ -9,12 +9,10 @@
 #include <vector>
 
 #include <libxml/parser.h>
-// clang-format off
-#include <xmlsec/xmlsec.h>
-#include <xmlsec/app.h>
-#include <xmlsec/dl.h>
+#include <xmlsec/nss/app.h>
+#include <xmlsec/nss/crypto.h>
 #include <xmlsec/xmldsig.h>
-// clang-format on
+#include <xmlsec/xmlsec.h>
 #include <zip.h>
 
 namespace std
@@ -34,6 +32,10 @@ template <> struct default_delete<xmlDoc>
 template <> struct default_delete<xmlSecDSigCtx>
 {
     void operator()(xmlSecDSigCtxPtr ptr) { xmlSecDSigCtxDestroy(ptr); }
+};
+template <> struct default_delete<xmlSecKeysMngr>
+{
+    void operator()(xmlSecKeysMngrPtr ptr) { xmlSecKeysMngrDestroy(ptr); }
 };
 }
 
@@ -58,6 +60,16 @@ class XmlSecGuard
   public:
     explicit XmlSecGuard()
     {
+        // Initialize nss.
+        _good = xmlSecNssAppInit(nullptr) >= 0;
+        if (!_good)
+        {
+            std::cerr << "error, XmlSecGuard ctor: nss init failed"
+                      << std::endl;
+            return;
+        }
+
+        // Initialize xmlsec.
         _good = xmlSecInit() >= 0;
         if (!_good)
         {
@@ -66,35 +78,11 @@ class XmlSecGuard
             return;
         }
 
-        _good = xmlSecCheckVersion() == 1;
+        // Initialize the nss backend of xmlsec.
+        _good = xmlSecNssInit() >= 0;
         if (!_good)
         {
-            std::cerr << "error, XmlSecGuard ctor: xmlsec version check failed"
-                      << std::endl;
-            return;
-        }
-
-        _good = xmlSecCryptoDLLoadLibrary(BAD_CAST("nss")) >= 0;
-        if (!_good)
-        {
-            std::cerr << "error, XmlSecGuard ctor: xmlsec crypto load failed"
-                      << std::endl;
-            return;
-        }
-
-        _good = xmlSecCryptoAppInit(nullptr) >= 0;
-        if (!_good)
-        {
-            std::cerr
-                << "error, XmlSecGuard ctor: xmlsec crypto app init failed"
-                << std::endl;
-            return;
-        }
-
-        _good = xmlSecCryptoInit() >= 0;
-        if (!_good)
-        {
-            std::cerr << "error, XmlSecGuard ctor: xmlsec crypto init failed"
+            std::cerr << "error, XmlSecGuard ctor: xmlsec nss init failed"
                       << std::endl;
             return;
         }
@@ -105,21 +93,11 @@ class XmlSecGuard
         if (!_good)
             return;
 
-        _good = xmlSecCryptoShutdown() >= 0;
+        _good = xmlSecNssShutdown() >= 0;
         if (!_good)
         {
-            std::cerr
-                << "error, XmlSecGuard dtor: xmlsec crypto shutdown failed"
-                << std::endl;
-            return;
-        }
-
-        _good = xmlSecCryptoAppShutdown() >= 0;
-        if (!_good)
-        {
-            std::cerr
-                << "error, XmlSecGuard dtor: xmlsec crypto app shutdown failed"
-                << std::endl;
+            std::cerr << "error, XmlSecGuard dtor: xmlsec nss shutdown failed"
+                      << std::endl;
             return;
         }
 
@@ -127,6 +105,14 @@ class XmlSecGuard
         if (!_good)
         {
             std::cerr << "error, XmlSecGuard dtor: xmlsec shutdown failed"
+                      << std::endl;
+            return;
+        }
+
+        _good = xmlSecNssAppShutdown() >= 0;
+        if (!_good)
+        {
+            std::cerr << "error, XmlSecGuard dtor: nss shutdown failed"
                       << std::endl;
             return;
         }
@@ -142,13 +128,33 @@ bool verifySignature(xmlNode* signature, size_t signatureIndex)
 {
     std::cerr << "Signature #" << (signatureIndex + 1) << ":" << std::endl;
 
-    std::unique_ptr<xmlSecDSigCtx> dsigCtx(xmlSecDSigCtxCreate(nullptr));
+    std::unique_ptr<xmlSecKeysMngr> pKeysMngr(xmlSecKeysMngrCreate());
+    if (!pKeysMngr)
+    {
+        std::cerr << "error, verifySignature: keys manager creation failed"
+                  << std::endl;
+        return false;
+    }
+
+    if (xmlSecNssAppDefaultKeysMngrInit(pKeysMngr.get()) < 0)
+    {
+        std::cerr << "error, verifySignature: keys manager init failed"
+                  << std::endl;
+        return false;
+    }
+
+    std::unique_ptr<xmlSecDSigCtx> dsigCtx(
+        xmlSecDSigCtxCreate(pKeysMngr.get()));
     if (!dsigCtx)
     {
         std::cerr << "error, verifySignature: ctx initialize failed"
                   << std::endl;
         return false;
     }
+
+    std::cerr << "todo, verifySignature: not verifying certs" << std::endl;
+    dsigCtx->keyInfoReadCtx.flags |=
+        XMLSEC_KEYINFO_FLAGS_X509DATA_DONT_VERIFY_CERTS;
 
     if (xmlSecDSigCtxVerify(dsigCtx.get(), signature) < 0)
     {
