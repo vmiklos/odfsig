@@ -211,53 +211,55 @@ class XmlSecGuard
     bool _good = false;
 };
 
-bool verifySignature(xmlNode* signature, size_t signatureIndex)
+/// Represents one specific signature in the document.
+class Signature
 {
-    std::cerr << "Signature #" << (signatureIndex + 1) << ":" << std::endl;
-
-    std::unique_ptr<xmlSecKeysMngr> pKeysMngr(xmlSecKeysMngrCreate());
-    if (!pKeysMngr)
+  public:
+    explicit Signature(xmlNode* signatureNode) : _signatureNode(signatureNode)
     {
-        std::cerr << "error, verifySignature: keys manager creation failed"
-                  << std::endl;
-        return false;
     }
 
-    if (xmlSecNssAppDefaultKeysMngrInit(pKeysMngr.get()) < 0)
+    const std::string& getErrorString() const { return _errorString; }
+
+    bool verify()
     {
-        std::cerr << "error, verifySignature: keys manager init failed"
-                  << std::endl;
-        return false;
+        std::unique_ptr<xmlSecKeysMngr> pKeysMngr(xmlSecKeysMngrCreate());
+        if (!pKeysMngr)
+        {
+            _errorString = "Keys manager creation failed";
+            return false;
+        }
+
+        if (xmlSecNssAppDefaultKeysMngrInit(pKeysMngr.get()) < 0)
+        {
+            _errorString = "Keys manager init failed";
+            return false;
+        }
+
+        std::unique_ptr<xmlSecDSigCtx> dsigCtx(
+            xmlSecDSigCtxCreate(pKeysMngr.get()));
+        if (!dsigCtx)
+        {
+            _errorString = "DSig context initialize failed";
+            return false;
+        }
+
+        dsigCtx->keyInfoReadCtx.flags |=
+            XMLSEC_KEYINFO_FLAGS_X509DATA_DONT_VERIFY_CERTS;
+
+        if (xmlSecDSigCtxVerify(dsigCtx.get(), _signatureNode) < 0)
+        {
+            _errorString = "DSig context verify failed";
+            return false;
+        }
+
+        return dsigCtx->status == xmlSecDSigStatusSucceeded;
     }
 
-    std::unique_ptr<xmlSecDSigCtx> dsigCtx(
-        xmlSecDSigCtxCreate(pKeysMngr.get()));
-    if (!dsigCtx)
-    {
-        std::cerr << "error, verifySignature: ctx initialize failed"
-                  << std::endl;
-        return false;
-    }
-
-    dsigCtx->keyInfoReadCtx.flags |=
-        XMLSEC_KEYINFO_FLAGS_X509DATA_DONT_VERIFY_CERTS;
-
-    if (xmlSecDSigCtxVerify(dsigCtx.get(), signature) < 0)
-    {
-        std::cerr << "error, verifySignature: ctx verify failed" << std::endl;
-        return false;
-    }
-
-    if (dsigCtx->status != xmlSecDSigStatusSucceeded)
-    {
-        std::cerr << "  - Signature Validation: Failed." << std::endl;
-        return false;
-    }
-
-    std::cerr << "  - Signature Validation: Succeeded." << std::endl;
-    std::cerr << "  - Certificate Validation: Not Implemented." << std::endl;
-    return true;
-}
+  private:
+    std::string _errorString;
+    xmlNode* _signatureNode = nullptr;
+};
 
 /// Verifies signatures of an ODF document.
 class Verifier
@@ -339,14 +341,14 @@ class Verifier
             return false;
         }
 
-        for (xmlNode* signature = signaturesRoot->children; signature;
-             signature = signature->next)
-            _signatures.push_back(signature);
+        for (xmlNode* signatureNode = signaturesRoot->children; signatureNode;
+             signatureNode = signatureNode->next)
+            _signatures.push_back(Signature(signatureNode));
 
         return true;
     }
 
-    const std::vector<xmlNode*>& getSignatures() const { return _signatures; }
+    std::vector<Signature>& getSignatures() { return _signatures; }
 
   private:
     bool locateSignatures()
@@ -364,9 +366,9 @@ class Verifier
     std::unique_ptr<XmlGuard> _xmlGuard;
     std::unique_ptr<XmlSecGuard> _xmlSecGuard;
     std::unique_ptr<zip_file_t> _zipFile;
-    std::vector<xmlNode*> _signatures;
     std::vector<char> _signaturesBytes;
     std::unique_ptr<xmlDoc> _signaturesDoc;
+    std::vector<Signature> _signatures;
 };
 }
 
@@ -395,7 +397,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    const std::vector<xmlNode*>& signatures = verifier.getSignatures();
+    std::vector<odfsig::Signature>& signatures = verifier.getSignatures();
     if (signatures.empty())
     {
         std::cerr << "File '" << odfPath << "' does not contain any signatures."
@@ -404,13 +406,27 @@ int main(int argc, char* argv[])
     }
 
     std::cerr << "Digital Signature Info of: " << odfPath << std::endl;
-
     for (size_t signatureIndex = 0; signatureIndex < signatures.size();
          ++signatureIndex)
     {
-        if (!odfsig::verifySignature(signatures[signatureIndex],
-                                     signatureIndex))
+        odfsig::Signature& signature = signatures[signatureIndex];
+        std::cerr << "Signature #" << (signatureIndex + 1) << ":" << std::endl;
+        if (!signature.verify())
+        {
+            if (!signature.getErrorString().empty())
+            {
+                std::cerr << "Failed to verify signature: "
+                          << signature.getErrorString() << "." << std::endl;
+                return 1;
+            }
+
+            std::cerr << "  - Signature Validation: Failed." << std::endl;
             return 1;
+        }
+
+        std::cerr << "  - Signature Validation: Succeeded." << std::endl;
+        std::cerr << "  - Certificate Validation: Not Implemented."
+                  << std::endl;
     }
 
     return 0;
