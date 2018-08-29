@@ -4,11 +4,13 @@
  * found in the LICENSE file.
  */
 
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <vector>
 
 #include <libxml/parser.h>
+#include <xmlsec/io.h>
 #include <xmlsec/nss/app.h>
 #include <xmlsec/nss/crypto.h>
 #include <xmlsec/xmldsig.h>
@@ -54,11 +56,86 @@ class XmlGuard
     ~XmlGuard() { xmlCleanupParser(); }
 };
 
+/// Provides libxmlsec IO callbacks.
+namespace XmlSecIO
+{
+/// All callbacks work on this zip package.
+thread_local zip_t* zipArchive;
+
+int match(const char* uri)
+{
+    if (!zipArchive)
+    {
+        std::cerr << "error, XmlSecIO::match: no zip archive" << std::endl;
+        return 0;
+    }
+
+    zip_int64_t signatureZipIndex = zip_name_locate(zipArchive, uri, 0);
+    if (signatureZipIndex < 0)
+        return 0;
+
+    return 1;
+}
+
+void* open(const char* uri)
+{
+    if (!zipArchive)
+    {
+        std::cerr << "error, XmlSecIO::open: no zip archive" << std::endl;
+        return 0;
+    }
+
+    zip_int64_t signatureZipIndex = zip_name_locate(zipArchive, uri, 0);
+    if (signatureZipIndex < 0)
+    {
+        std::cerr << "error, XmlSecIO::open: can't find file: " << uri
+                  << std::endl;
+        return nullptr;
+    }
+
+    zip_file_t* zipFile(zip_fopen_index(zipArchive, signatureZipIndex, 0));
+    if (!zipFile)
+    {
+        std::cerr << "error, main: can't open file at index "
+                  << signatureZipIndex << ": " << zip_strerror(zipArchive)
+                  << std::endl;
+        return nullptr;
+    }
+
+    return zipFile;
+}
+
+int read(void* context, char* buffer, int len)
+{
+    auto zipFile = static_cast<zip_file_t*>(context);
+    if (!zipFile)
+    {
+        std::cerr << "error, XmlSecIO::read: no zip file" << std::endl;
+        return 0;
+    }
+
+    return zip_fread(zipFile, buffer, len);
+}
+
+int close(void* context)
+{
+    auto zipFile = static_cast<zip_file_t*>(context);
+    if (!zipFile)
+    {
+        std::cerr << "error, XmlSecIO::close: no zip file" << std::endl;
+        return 0;
+    }
+
+    zip_fclose(zipFile);
+    return 0;
+}
+};
+
 /// Performs libxmlsec init/deinit.
 class XmlSecGuard
 {
   public:
-    explicit XmlSecGuard()
+    explicit XmlSecGuard(zip_t* zipArchive)
     {
         // Initialize nss.
         _good = xmlSecNssAppInit(nullptr) >= 0;
@@ -86,12 +163,21 @@ class XmlSecGuard
                       << std::endl;
             return;
         }
+
+        XmlSecIO::zipArchive = zipArchive;
+        xmlSecIOCleanupCallbacks();
+        xmlSecIORegisterCallbacks(XmlSecIO::match, XmlSecIO::open,
+                                  XmlSecIO::read, XmlSecIO::close);
     }
 
     ~XmlSecGuard()
     {
         if (!_good)
             return;
+
+        xmlSecIOCleanupCallbacks();
+        xmlSecIORegisterDefaultCallbacks();
+        XmlSecIO::zipArchive = nullptr;
 
         _good = xmlSecNssShutdown() >= 0;
         if (!_good)
@@ -152,7 +238,6 @@ bool verifySignature(xmlNode* signature, size_t signatureIndex)
         return false;
     }
 
-    std::cerr << "todo, verifySignature: not verifying certs" << std::endl;
     dsigCtx->keyInfoReadCtx.flags |=
         XMLSEC_KEYINFO_FLAGS_X509DATA_DONT_VERIFY_CERTS;
 
@@ -164,11 +249,12 @@ bool verifySignature(xmlNode* signature, size_t signatureIndex)
 
     if (dsigCtx->status != xmlSecDSigStatusSucceeded)
     {
-        std::cerr << "error, verifySignature: verify status is not success"
-                  << std::endl;
+        std::cerr << "  - Signature Validation: Failed." << std::endl;
         return false;
     }
 
+    std::cerr << "  - Signature Validation: Succeeded." << std::endl;
+    std::cerr << "  - Certificate Validation: Not Implemented." << std::endl;
     return true;
 }
 }
@@ -264,7 +350,7 @@ int main(int argc, char* argv[])
     }
 
     std::cerr << "Digital Signature Info of: " << odfPath << std::endl;
-    XmlSecGuard xmlSecGuard;
+    XmlSecGuard xmlSecGuard(zipArchive.get());
     if (!xmlSecGuard.isGood())
     {
         std::cerr << "error, main: xmlsec init failed" << std::endl;
