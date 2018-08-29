@@ -298,6 +298,15 @@ class Verifier
 
     bool parseSignatures()
     {
+        _xmlGuard.reset(new XmlGuard());
+
+        _xmlSecGuard.reset(new XmlSecGuard(_zipArchive.get()));
+        if (!_xmlSecGuard->isGood())
+        {
+            _errorString = "Failed to initialize libxmlsec";
+            return false;
+        }
+
         _zipFile.reset(
             zip_fopen_index(_zipArchive.get(), _signaturesZipIndex, 0));
         if (!_zipFile)
@@ -349,14 +358,12 @@ class Verifier
 
     const std::vector<xmlNode*>& getSignatures() const { return _signatures; }
 
-    zip_int64_t getSignaturesZipIndex() const { return _signaturesZipIndex; }
-
-    zip_t* getZipArchive() const { return _zipArchive.get(); }
-
   private:
     std::unique_ptr<zip_t> _zipArchive;
     std::string _errorString;
     zip_int64_t _signaturesZipIndex = 0;
+    std::unique_ptr<XmlGuard> _xmlGuard;
+    std::unique_ptr<XmlSecGuard> _xmlSecGuard;
     std::unique_ptr<zip_file_t> _zipFile;
     std::vector<xmlNode*> _signatures;
     std::vector<char> _signaturesBytes;
@@ -389,11 +396,11 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    XmlGuard xmlGuard;
     if (!verifier.parseSignatures())
     {
         std::cerr << "Failed to parse signatures: " << verifier.getErrorString()
                   << "." << std::endl;
+        return 1;
     }
     const std::vector<xmlNode*>& signatures = verifier.getSignatures();
     if (signatures.empty())
@@ -404,12 +411,6 @@ int main(int argc, char* argv[])
     }
 
     std::cerr << "Digital Signature Info of: " << odfPath << std::endl;
-    XmlSecGuard xmlSecGuard(verifier.getZipArchive());
-    if (!xmlSecGuard.isGood())
-    {
-        std::cerr << "error, main: xmlsec init failed" << std::endl;
-        return 1;
-    }
 
     for (size_t signatureIndex = 0; signatureIndex < signatures.size();
          ++signatureIndex)
