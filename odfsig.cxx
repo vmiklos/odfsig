@@ -284,13 +284,25 @@ class Verifier
         return true;
     }
 
+    bool locateSignatures()
+    {
+        zip_flags_t locateFlags = 0;
+        _signatureZipIndex = zip_name_locate(
+            _zipArchive.get(), "META-INF/documentsignatures.xml", locateFlags);
+
+        return _signatureZipIndex >= 0;
+    }
+
     const std::string& getErrorString() const { return _errorString; }
+
+    zip_int64_t getSignatureZipIndex() const { return _signatureZipIndex; }
 
     zip_t* getZipArchive() const { return _zipArchive.get(); }
 
   private:
     std::unique_ptr<zip_t> _zipArchive;
     std::string _errorString;
+    zip_int64_t _signatureZipIndex = 0;
 };
 }
 
@@ -312,16 +324,14 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    zip_flags_t locateFlags = 0;
-    zip_int64_t signatureZipIndex =
-        zip_name_locate(verifier.getZipArchive(),
-                        "META-INF/documentsignatures.xml", locateFlags);
-    if (signatureZipIndex < 0)
+    if (!verifier.locateSignatures())
     {
         std::cerr << "File '" << odfPath << "' does not contain any signatures."
                   << std::endl;
         return 1;
     }
+
+    zip_int64_t signatureZipIndex = verifier.getSignatureZipIndex();
 
     std::unique_ptr<zip_file_t> zipFile(
         zip_fopen_index(verifier.getZipArchive(), signatureZipIndex, 0));
@@ -392,10 +402,7 @@ int main(int argc, char* argv[])
          ++signatureIndex)
     {
         if (!verifySignature(signatures[signatureIndex], signatureIndex))
-        {
-            std::cerr << "error, main: signature verify failed" << std::endl;
             return 1;
-        }
     }
 
     return 0;
