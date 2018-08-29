@@ -219,6 +219,8 @@ class Signature
     {
     }
 
+    ~Signature() = default;
+
     const std::string& getErrorString() const { return _errorString; }
 
     bool verify()
@@ -265,6 +267,8 @@ class Signature
 class Verifier
 {
   public:
+    Verifier() = default;
+    ~Verifier() = default;
     bool openZip(const std::string& path)
     {
         const int openFlags = 0;
