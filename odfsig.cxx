@@ -372,6 +372,46 @@ class Verifier
 };
 }
 
+namespace
+{
+bool printSignatures(const std::string& odfPath,
+                     std::vector<odfsig::Signature>& signatures)
+{
+    if (signatures.empty())
+    {
+        std::cerr << "File '" << odfPath << "' does not contain any signatures."
+                  << std::endl;
+        return false;
+    }
+
+    std::cerr << "Digital Signature Info of: " << odfPath << std::endl;
+    for (size_t signatureIndex = 0; signatureIndex < signatures.size();
+         ++signatureIndex)
+    {
+        odfsig::Signature& signature = signatures[signatureIndex];
+        std::cerr << "Signature #" << (signatureIndex + 1) << ":" << std::endl;
+        if (!signature.verify())
+        {
+            if (!signature.getErrorString().empty())
+            {
+                std::cerr << "Failed to verify signature: "
+                          << signature.getErrorString() << "." << std::endl;
+                return false;
+            }
+
+            std::cerr << "  - Signature Validation: Failed." << std::endl;
+            return false;
+        }
+
+        std::cerr << "  - Signature Validation: Succeeded." << std::endl;
+        std::cerr << "  - Certificate Validation: Not Implemented."
+                  << std::endl;
+    }
+
+    return true;
+}
+}
+
 int main(int argc, char* argv[])
 {
     if (argc < 2)
@@ -397,37 +437,8 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    std::vector<odfsig::Signature>& signatures = verifier.getSignatures();
-    if (signatures.empty())
-    {
-        std::cerr << "File '" << odfPath << "' does not contain any signatures."
-                  << std::endl;
+    if (!printSignatures(odfPath, verifier.getSignatures()))
         return 1;
-    }
-
-    std::cerr << "Digital Signature Info of: " << odfPath << std::endl;
-    for (size_t signatureIndex = 0; signatureIndex < signatures.size();
-         ++signatureIndex)
-    {
-        odfsig::Signature& signature = signatures[signatureIndex];
-        std::cerr << "Signature #" << (signatureIndex + 1) << ":" << std::endl;
-        if (!signature.verify())
-        {
-            if (!signature.getErrorString().empty())
-            {
-                std::cerr << "Failed to verify signature: "
-                          << signature.getErrorString() << "." << std::endl;
-                return 1;
-            }
-
-            std::cerr << "  - Signature Validation: Failed." << std::endl;
-            return 1;
-        }
-
-        std::cerr << "  - Signature Validation: Succeeded." << std::endl;
-        std::cerr << "  - Certificate Validation: Not Implemented."
-                  << std::endl;
-    }
 
     return 0;
 }
