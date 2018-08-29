@@ -259,6 +259,41 @@ bool verifySignature(xmlNode* signature, size_t signatureIndex)
 }
 }
 
+namespace odfsig
+{
+/// Verifies signatures of an ODF document.
+class Verifier
+{
+  public:
+    explicit Verifier() {}
+
+    bool openZip(const std::string& path)
+    {
+        const int openFlags = 0;
+        int errorCode = 0;
+        _zipArchive.reset(zip_open(path.c_str(), openFlags, &errorCode));
+        if (!_zipArchive)
+        {
+            zip_error_t zipError;
+            zip_error_init_with_code(&zipError, errorCode);
+            _errorString = zip_error_strerror(&zipError);
+            zip_error_fini(&zipError);
+            return false;
+        }
+
+        return true;
+    }
+
+    const std::string& getErrorString() const { return _errorString; }
+
+    zip_t* getZipArchive() const { return _zipArchive.get(); }
+
+  private:
+    std::unique_ptr<zip_t> _zipArchive;
+    std::string _errorString;
+};
+}
+
 int main(int argc, char* argv[])
 {
     if (argc < 2)
@@ -268,23 +303,19 @@ int main(int argc, char* argv[])
     }
 
     std::string odfPath(argv[1]);
-    int openFlags = 0;
-    int errorCode = 0;
-    std::unique_ptr<zip_t> zipArchive(
-        zip_open(odfPath.c_str(), openFlags, &errorCode));
-    if (!zipArchive)
+    odfsig::Verifier verifier;
+
+    if (!verifier.openZip(odfPath))
     {
-        zip_error_t zipError;
-        zip_error_init_with_code(&zipError, errorCode);
         std::cerr << "Can't open zip archive '" << odfPath
-                  << "': " << zip_error_strerror(&zipError) << "." << std::endl;
-        zip_error_fini(&zipError);
+                  << "': " << verifier.getErrorString() << "." << std::endl;
         return 1;
     }
 
     zip_flags_t locateFlags = 0;
-    zip_int64_t signatureZipIndex = zip_name_locate(
-        zipArchive.get(), "META-INF/documentsignatures.xml", locateFlags);
+    zip_int64_t signatureZipIndex =
+        zip_name_locate(verifier.getZipArchive(),
+                        "META-INF/documentsignatures.xml", locateFlags);
     if (signatureZipIndex < 0)
     {
         std::cerr << "File '" << odfPath << "' does not contain any signatures."
@@ -293,12 +324,12 @@ int main(int argc, char* argv[])
     }
 
     std::unique_ptr<zip_file_t> zipFile(
-        zip_fopen_index(zipArchive.get(), signatureZipIndex, 0));
+        zip_fopen_index(verifier.getZipArchive(), signatureZipIndex, 0));
     if (!zipFile)
     {
         std::cerr << "error, main: can't open file at index "
-                  << signatureZipIndex << ": " << zip_strerror(zipArchive.get())
-                  << std::endl;
+                  << signatureZipIndex << ": "
+                  << zip_strerror(verifier.getZipArchive()) << std::endl;
         return 1;
     }
 
@@ -350,7 +381,7 @@ int main(int argc, char* argv[])
     }
 
     std::cerr << "Digital Signature Info of: " << odfPath << std::endl;
-    XmlSecGuard xmlSecGuard(zipArchive.get());
+    XmlSecGuard xmlSecGuard(verifier.getZipArchive());
     if (!xmlSecGuard.isGood())
     {
         std::cerr << "error, main: xmlsec init failed" << std::endl;
