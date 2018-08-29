@@ -42,7 +42,7 @@ template <> struct default_delete<xmlSecKeysMngr>
 };
 }
 
-namespace
+namespace odfsig
 {
 /// Performs libxml init/deinit.
 class XmlGuard
@@ -258,10 +258,7 @@ bool verifySignature(xmlNode* signature, size_t signatureIndex)
     std::cerr << "  - Certificate Validation: Not Implemented." << std::endl;
     return true;
 }
-}
 
-namespace odfsig
-{
 /// Verifies signatures of an ODF document.
 class Verifier
 {
@@ -411,7 +408,8 @@ int main(int argc, char* argv[])
     for (size_t signatureIndex = 0; signatureIndex < signatures.size();
          ++signatureIndex)
     {
-        if (!verifySignature(signatures[signatureIndex], signatureIndex))
+        if (!odfsig::verifySignature(signatures[signatureIndex],
+                                     signatureIndex))
             return 1;
     }
 
