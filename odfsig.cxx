@@ -7,6 +7,7 @@
 #include <functional>
 #include <iostream>
 #include <memory>
+#include <sstream>
 #include <vector>
 
 #include <libxml/parser.h>
@@ -287,22 +288,79 @@ class Verifier
     bool locateSignatures()
     {
         zip_flags_t locateFlags = 0;
-        _signatureZipIndex = zip_name_locate(
+        _signaturesZipIndex = zip_name_locate(
             _zipArchive.get(), "META-INF/documentsignatures.xml", locateFlags);
 
-        return _signatureZipIndex >= 0;
+        return _signaturesZipIndex >= 0;
     }
 
     const std::string& getErrorString() const { return _errorString; }
 
-    zip_int64_t getSignatureZipIndex() const { return _signatureZipIndex; }
+    bool parseSignatures()
+    {
+        _zipFile.reset(
+            zip_fopen_index(_zipArchive.get(), _signaturesZipIndex, 0));
+        if (!_zipFile)
+        {
+            std::stringstream ss;
+            ss << "Can't open file at index " << _signaturesZipIndex << ":"
+               << zip_strerror(_zipArchive.get());
+            _errorString = ss.str();
+            return false;
+        }
+
+        char readBuffer[8192];
+        zip_int64_t readSize;
+        while ((readSize = zip_fread(_zipFile.get(), readBuffer,
+                                     sizeof(readBuffer))) > 0)
+        {
+            _signaturesBytes.insert(_signaturesBytes.end(), readBuffer,
+                                    readBuffer + readSize);
+        }
+        if (readSize == -1)
+        {
+            std::stringstream ss;
+            ss << "Can't read file at index " << _signaturesZipIndex << ": "
+               << zip_file_strerror(_zipFile.get());
+            return false;
+        }
+
+        _signaturesDoc.reset(
+            xmlParseDoc(reinterpret_cast<xmlChar*>(_signaturesBytes.data())));
+        if (!_signaturesDoc)
+        {
+            _errorString = "Parsing the signatures file failed";
+            return false;
+        }
+
+        xmlNode* signaturesRoot = xmlDocGetRootElement(_signaturesDoc.get());
+        if (!signaturesRoot)
+        {
+            _errorString = "Could not get the signatures root";
+            return false;
+        }
+
+        for (xmlNode* signature = signaturesRoot->children; signature;
+             signature = signature->next)
+            _signatures.push_back(signature);
+
+        return true;
+    }
+
+    const std::vector<xmlNode*>& getSignatures() const { return _signatures; }
+
+    zip_int64_t getSignaturesZipIndex() const { return _signaturesZipIndex; }
 
     zip_t* getZipArchive() const { return _zipArchive.get(); }
 
   private:
     std::unique_ptr<zip_t> _zipArchive;
     std::string _errorString;
-    zip_int64_t _signatureZipIndex = 0;
+    zip_int64_t _signaturesZipIndex = 0;
+    std::unique_ptr<zip_file_t> _zipFile;
+    std::vector<xmlNode*> _signatures;
+    std::vector<char> _signaturesBytes;
+    std::unique_ptr<xmlDoc> _signaturesDoc;
 };
 }
 
@@ -331,58 +389,13 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    zip_int64_t signatureZipIndex = verifier.getSignatureZipIndex();
-
-    std::unique_ptr<zip_file_t> zipFile(
-        zip_fopen_index(verifier.getZipArchive(), signatureZipIndex, 0));
-    if (!zipFile)
-    {
-        std::cerr << "error, main: can't open file at index "
-                  << signatureZipIndex << ": "
-                  << zip_strerror(verifier.getZipArchive()) << std::endl;
-        return 1;
-    }
-
-    char readBuffer[8192];
-    std::vector<char> signaturesBytes;
-    zip_int64_t readSize;
-    while ((readSize =
-                zip_fread(zipFile.get(), readBuffer, sizeof(readBuffer))) > 0)
-    {
-        signaturesBytes.insert(signaturesBytes.end(), readBuffer,
-                               readBuffer + readSize);
-    }
-    if (readSize == -1)
-    {
-        std::cerr << "error, main: can't read file at index "
-                  << signatureZipIndex << ": "
-                  << zip_file_strerror(zipFile.get()) << std::endl;
-        return 1;
-    }
-
     XmlGuard xmlGuard;
-    std::unique_ptr<xmlDoc> signaturesDoc(
-        xmlParseDoc(reinterpret_cast<xmlChar*>(signaturesBytes.data())));
-    if (!signaturesDoc)
+    if (!verifier.parseSignatures())
     {
-        std::cerr << "error, main: parsing the signatures file failed"
-                  << std::endl;
-        return 1;
+        std::cerr << "Failed to parse signatures: " << verifier.getErrorString()
+                  << "." << std::endl;
     }
-
-    xmlNode* signaturesRoot = xmlDocGetRootElement(signaturesDoc.get());
-    if (!signaturesRoot)
-    {
-        std::cerr << "error, main: could not get signatures root" << std::endl;
-        return 1;
-    }
-
-    std::vector<xmlNode*> signatures;
-    for (xmlNode* signature = signaturesRoot->children; signature;
-         signature = signature->next)
-    {
-        signatures.push_back(signature);
-    }
+    const std::vector<xmlNode*>& signatures = verifier.getSignatures();
     if (signatures.empty())
     {
         std::cerr << "File '" << odfPath << "' does not contain any signatures."
