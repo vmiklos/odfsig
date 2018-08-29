@@ -266,8 +266,6 @@ namespace odfsig
 class Verifier
 {
   public:
-    explicit Verifier() {}
-
     bool openZip(const std::string& path)
     {
         const int openFlags = 0;
@@ -285,19 +283,14 @@ class Verifier
         return true;
     }
 
-    bool locateSignatures()
-    {
-        zip_flags_t locateFlags = 0;
-        _signaturesZipIndex = zip_name_locate(
-            _zipArchive.get(), "META-INF/documentsignatures.xml", locateFlags);
-
-        return _signaturesZipIndex >= 0;
-    }
-
     const std::string& getErrorString() const { return _errorString; }
 
     bool parseSignatures()
     {
+        if (!locateSignatures())
+            // No problem, later getSignatures() will return an empty list.
+            return true;
+
         _xmlGuard.reset(new XmlGuard());
 
         _xmlSecGuard.reset(new XmlSecGuard(_zipArchive.get()));
@@ -359,6 +352,15 @@ class Verifier
     const std::vector<xmlNode*>& getSignatures() const { return _signatures; }
 
   private:
+    bool locateSignatures()
+    {
+        zip_flags_t locateFlags = 0;
+        _signaturesZipIndex = zip_name_locate(
+            _zipArchive.get(), "META-INF/documentsignatures.xml", locateFlags);
+
+        return _signaturesZipIndex >= 0;
+    }
+
     std::unique_ptr<zip_t> _zipArchive;
     std::string _errorString;
     zip_int64_t _signaturesZipIndex = 0;
@@ -379,20 +381,13 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    std::string odfPath(argv[1]);
     odfsig::Verifier verifier;
 
+    std::string odfPath(argv[1]);
     if (!verifier.openZip(odfPath))
     {
         std::cerr << "Can't open zip archive '" << odfPath
                   << "': " << verifier.getErrorString() << "." << std::endl;
-        return 1;
-    }
-
-    if (!verifier.locateSignatures())
-    {
-        std::cerr << "File '" << odfPath << "' does not contain any signatures."
-                  << std::endl;
         return 1;
     }
 
@@ -402,6 +397,7 @@ int main(int argc, char* argv[])
                   << "." << std::endl;
         return 1;
     }
+
     const std::vector<xmlNode*>& signatures = verifier.getSignatures();
     if (signatures.empty())
     {
