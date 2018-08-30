@@ -27,6 +27,7 @@ pkg_check_modules(LIBZIP REQUIRED libzip)
 # xmlsec external.
 pkg_check_modules(XMLSEC1NSS REQUIRED xmlsec1-nss)
 
+# odfsig library.
 add_library(odfsigcore core/source/odfsig.cxx)
 target_include_directories(odfsigcore PRIVATE
     ${LIBZIP_INCLUDE_DIRS}
@@ -39,6 +40,21 @@ target_link_libraries(odfsigcore
     )
 target_compile_options(odfsigcore PRIVATE ${XMLSEC1NSS_CFLAGS_OTHER})
 
+# odfsig tests.
+enable_testing()
+find_package(GTest REQUIRED)
+add_executable(odfsigtest core/qa/odfsigtest.cxx)
+target_link_libraries(odfsigtest odfsigcore GTest::GTest GTest::Main)
+add_test(NAME odfsig
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMAND odfsigtest
+    )
+
+set(CMAKE_CTEST_COMMAND ctest -V)
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
+add_dependencies(check odfsigtest)
+
+# odfsig cmdline app.
 add_executable(odfsig app/source/main.cxx)
 target_link_libraries(odfsig odfsigcore)
 
