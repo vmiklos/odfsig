@@ -9,5 +9,6 @@ mkdir workdir
 cd workdir
 cmake -DCMAKE_BUILD_TYPE=Debug -DODFSIG_ENABLE_WERROR=ON ..
 make -j$(getconf _NPROCESSORS_ONLN)
+make check
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
