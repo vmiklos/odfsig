@@ -1,4 +1,7 @@
 # odfsig
+
+[![Build Status](https://travis-ci.com/vmiklos/odfsig.svg?branch=master)](https://travis-ci.com/vmiklos/odfsig)
+
 Open Document Format (ODF) digital signatures tool
 
 ## Description
