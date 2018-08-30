@@ -25,20 +25,21 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBZIP REQUIRED libzip)
 
 # xmlsec external.
-pkg_check_modules(LIBXML2 REQUIRED libxml-2.0)
 pkg_check_modules(XMLSEC1NSS REQUIRED xmlsec1-nss)
 
-add_executable(odfsig main.cxx odfsig.cxx)
-target_include_directories(odfsig PRIVATE
+add_library(odfsigcore core/source/odfsig.cxx)
+target_include_directories(odfsigcore PRIVATE
     ${LIBZIP_INCLUDE_DIRS}
-    ${LIBXML2_INCLUDE_DIRS}
     ${XMLSEC1NSS_INCLUDE_DIRS}
     )
-target_link_libraries(odfsig
+target_include_directories(odfsigcore PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/core/include")
+target_link_libraries(odfsigcore
     ${LIBZIP_LIBRARIES}
-    ${LIBXML2_LIBRARIES}
     ${XMLSEC1NSS_LIBRARIES}
     )
-target_compile_options(odfsig PRIVATE ${XMLSEC1NSS_CFLAGS_OTHER})
+target_compile_options(odfsigcore PRIVATE ${XMLSEC1NSS_CFLAGS_OTHER})
+
+add_executable(odfsig app/source/main.cxx)
+target_link_libraries(odfsig odfsigcore)
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
