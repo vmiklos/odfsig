@@ -10,8 +10,8 @@ the cmdline equivalent of the LibreOffice signature verifier GUI.
 
 ### Build-time
 
-- C++ toolchain, obviously.
 - [cmake](https://cmake.org/)
+- [googletest](https://github.com/google/googletest)
 
 ### Runtime
 

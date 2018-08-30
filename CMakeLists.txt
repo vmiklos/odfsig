@@ -18,6 +18,9 @@ if (ODFSIG_ENABLE_WERROR)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 endif (ODFSIG_ENABLE_WERROR)
 
+# Testing.
+enable_testing()
+
 # Externals.
 find_package(PkgConfig REQUIRED)
 
@@ -26,6 +29,9 @@ pkg_check_modules(LIBZIP REQUIRED libzip)
 
 # xmlsec external.
 pkg_check_modules(XMLSEC1NSS REQUIRED xmlsec1-nss)
+
+# googletest external.
+find_package(GTest REQUIRED)
 
 # odfsig library.
 add_library(odfsigcore core/source/odfsig.cxx)
@@ -41,8 +47,6 @@ target_link_libraries(odfsigcore
 target_compile_options(odfsigcore PRIVATE ${XMLSEC1NSS_CFLAGS_OTHER})
 
 # odfsig tests.
-enable_testing()
-find_package(GTest REQUIRED)
 add_executable(odfsigtest core/qa/odfsigtest.cxx)
 target_link_libraries(odfsigtest odfsigcore GTest::GTest GTest::Main)
 add_test(NAME odfsig
