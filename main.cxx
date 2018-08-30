@@ -10,8 +10,9 @@
 
 namespace
 {
-bool printSignatures(const std::string& odfPath,
-                     std::vector<odfsig::Signature>& signatures)
+bool printSignatures(
+    const std::string& odfPath,
+    std::vector<std::unique_ptr<odfsig::Signature>>& signatures)
 {
     if (signatures.empty())
     {
@@ -24,14 +25,14 @@ bool printSignatures(const std::string& odfPath,
     for (size_t signatureIndex = 0; signatureIndex < signatures.size();
          ++signatureIndex)
     {
-        odfsig::Signature& signature = signatures[signatureIndex];
+        odfsig::Signature* signature = signatures[signatureIndex].get();
         std::cerr << "Signature #" << (signatureIndex + 1) << ":" << std::endl;
-        if (!signature.verify())
+        if (!signature->verify())
         {
-            if (!signature.getErrorString().empty())
+            if (!signature->getErrorString().empty())
             {
                 std::cerr << "Failed to verify signature: "
-                          << signature.getErrorString() << "." << std::endl;
+                          << signature->getErrorString() << "." << std::endl;
                 return false;
             }
 
@@ -56,24 +57,24 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    odfsig::Verifier verifier;
+    std::unique_ptr<odfsig::Verifier> verifier(odfsig::Verifier::create());
 
     std::string odfPath(argv[1]);
-    if (!verifier.openZip(odfPath))
+    if (!verifier->openZip(odfPath))
     {
         std::cerr << "Can't open zip archive '" << odfPath
-                  << "': " << verifier.getErrorString() << "." << std::endl;
+                  << "': " << verifier->getErrorString() << "." << std::endl;
         return 1;
     }
 
-    if (!verifier.parseSignatures())
+    if (!verifier->parseSignatures())
     {
-        std::cerr << "Failed to parse signatures: " << verifier.getErrorString()
-                  << "." << std::endl;
+        std::cerr << "Failed to parse signatures: "
+                  << verifier->getErrorString() << "." << std::endl;
         return 1;
     }
 
-    if (!printSignatures(odfPath, verifier.getSignatures()))
+    if (!printSignatures(odfPath, verifier->getSignatures()))
         return 1;
 
     return 0;

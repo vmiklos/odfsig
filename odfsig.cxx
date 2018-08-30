@@ -12,6 +12,32 @@
 #include <xmlsec/io.h>
 #include <xmlsec/nss/app.h>
 #include <xmlsec/nss/crypto.h>
+#include <xmlsec/xmldsig.h>
+#include <zip.h>
+
+namespace std
+{
+template <> struct default_delete<zip_t>
+{
+    void operator()(zip_t* ptr) { zip_close(ptr); }
+};
+template <> struct default_delete<zip_file_t>
+{
+    void operator()(zip_file_t* ptr) { zip_fclose(ptr); }
+};
+template <> struct default_delete<xmlDoc>
+{
+    void operator()(xmlDocPtr ptr) { xmlFreeDoc(ptr); }
+};
+template <> struct default_delete<xmlSecDSigCtx>
+{
+    void operator()(xmlSecDSigCtxPtr ptr) { xmlSecDSigCtxDestroy(ptr); }
+};
+template <> struct default_delete<xmlSecKeysMngr>
+{
+    void operator()(xmlSecKeysMngrPtr ptr) { xmlSecKeysMngrDestroy(ptr); }
+};
+}
 
 namespace odfsig
 {
@@ -182,13 +208,33 @@ class XmlSecGuard
     bool _good = false;
 };
 
-Signature::Signature(xmlNode* signatureNode) : _signatureNode(signatureNode) {}
+/// Implementation of Signature using libxml.
+class XmlSignature : public Signature
+{
+  public:
+    explicit XmlSignature(xmlNode* signatureNode);
+    virtual ~XmlSignature();
 
-Signature::~Signature() = default;
+    const std::string& getErrorString() const override;
 
-const std::string& Signature::getErrorString() const { return _errorString; }
+    bool verify() override;
 
-bool Signature::verify()
+  private:
+    std::string _errorString;
+
+    xmlNode* _signatureNode = nullptr;
+};
+
+XmlSignature::XmlSignature(xmlNode* signatureNode)
+    : _signatureNode(signatureNode)
+{
+}
+
+XmlSignature::~XmlSignature() = default;
+
+const std::string& XmlSignature::getErrorString() const { return _errorString; }
+
+bool XmlSignature::verify()
 {
     std::unique_ptr<xmlSecKeysMngr> pKeysMngr(xmlSecKeysMngrCreate());
     if (!pKeysMngr)
@@ -223,9 +269,38 @@ bool Signature::verify()
     return dsigCtx->status == xmlSecDSigStatusSucceeded;
 }
 
-Verifier::Verifier() = default;
-Verifier::~Verifier() = default;
-bool Verifier::openZip(const std::string& path)
+/// Implementation of Verifier using libzip.
+class ZipVerifier : public Verifier
+{
+  public:
+    bool openZip(const std::string& path) override;
+
+    const std::string& getErrorString() const override;
+
+    bool parseSignatures() override;
+
+    std::vector<std::unique_ptr<Signature>>& getSignatures() override;
+
+  private:
+    bool locateSignatures();
+
+    std::unique_ptr<zip_t> _zipArchive;
+    std::string _errorString;
+    zip_int64_t _signaturesZipIndex = 0;
+    std::unique_ptr<XmlGuard> _xmlGuard;
+    std::unique_ptr<XmlSecGuard> _xmlSecGuard;
+    std::unique_ptr<zip_file_t> _zipFile;
+    std::vector<char> _signaturesBytes;
+    std::unique_ptr<xmlDoc> _signaturesDoc;
+    std::vector<std::unique_ptr<Signature>> _signatures;
+};
+
+std::unique_ptr<Verifier> Verifier::create()
+{
+    return std::unique_ptr<Verifier>(new ZipVerifier());
+}
+
+bool ZipVerifier::openZip(const std::string& path)
 {
     const int openFlags = 0;
     int errorCode = 0;
@@ -242,9 +317,9 @@ bool Verifier::openZip(const std::string& path)
     return true;
 }
 
-const std::string& Verifier::getErrorString() const { return _errorString; }
+const std::string& ZipVerifier::getErrorString() const { return _errorString; }
 
-bool Verifier::parseSignatures()
+bool ZipVerifier::parseSignatures()
 {
     if (!locateSignatures())
         // No problem, later getSignatures() will return an empty list.
@@ -302,14 +377,18 @@ bool Verifier::parseSignatures()
 
     for (xmlNode* signatureNode = signaturesRoot->children; signatureNode;
          signatureNode = signatureNode->next)
-        _signatures.push_back(Signature(signatureNode));
+        _signatures.push_back(
+            std::unique_ptr<Signature>(new XmlSignature(signatureNode)));
 
     return true;
 }
 
-std::vector<Signature>& Verifier::getSignatures() { return _signatures; }
+std::vector<std::unique_ptr<Signature>>& ZipVerifier::getSignatures()
+{
+    return _signatures;
+}
 
-bool Verifier::locateSignatures()
+bool ZipVerifier::locateSignatures()
 {
     zip_flags_t locateFlags = 0;
     _signaturesZipIndex = zip_name_locate(
