@@ -17,13 +17,13 @@
 
 namespace std
 {
-template <> struct default_delete<zip_t>
+template <> struct default_delete<zip>
 {
-    void operator()(zip_t* ptr) { zip_close(ptr); }
+    void operator()(zip* ptr) { zip_close(ptr); }
 };
-template <> struct default_delete<zip_file_t>
+template <> struct default_delete<zip_file>
 {
-    void operator()(zip_file_t* ptr) { zip_fclose(ptr); }
+    void operator()(zip_file* ptr) { zip_fclose(ptr); }
 };
 template <> struct default_delete<xmlDoc>
 {
@@ -58,7 +58,7 @@ class XmlGuard
 namespace XmlSecIO
 {
 /// All callbacks work on this zip package.
-thread_local zip_t* zipArchive;
+thread_local zip* zipArchive;
 
 int match(const char* uri)
 {
@@ -91,7 +91,7 @@ void* open(const char* uri)
         return nullptr;
     }
 
-    zip_file_t* zipFile(zip_fopen_index(zipArchive, signatureZipIndex, 0));
+    zip_file* zipFile(zip_fopen_index(zipArchive, signatureZipIndex, 0));
     if (!zipFile)
     {
         std::cerr << "error, main: can't open file at index "
@@ -105,7 +105,7 @@ void* open(const char* uri)
 
 int read(void* context, char* buffer, int len)
 {
-    auto zipFile = static_cast<zip_file_t*>(context);
+    auto zipFile = static_cast<zip_file*>(context);
     if (!zipFile)
     {
         std::cerr << "error, XmlSecIO::read: no zip file" << std::endl;
@@ -117,7 +117,7 @@ int read(void* context, char* buffer, int len)
 
 int close(void* context)
 {
-    auto zipFile = static_cast<zip_file_t*>(context);
+    auto zipFile = static_cast<zip_file*>(context);
     if (!zipFile)
     {
         std::cerr << "error, XmlSecIO::close: no zip file" << std::endl;
@@ -133,7 +133,7 @@ int close(void* context)
 class XmlSecGuard
 {
   public:
-    explicit XmlSecGuard(zip_t* zipArchive)
+    explicit XmlSecGuard(zip* zipArchive)
     {
         // Initialize nss.
         _good = xmlSecNssAppInit(nullptr) >= 0;
@@ -284,12 +284,12 @@ class ZipVerifier : public Verifier
   private:
     bool locateSignatures();
 
-    std::unique_ptr<zip_t> _zipArchive;
+    std::unique_ptr<zip> _zipArchive;
     std::string _errorString;
     zip_int64_t _signaturesZipIndex = 0;
     std::unique_ptr<XmlGuard> _xmlGuard;
     std::unique_ptr<XmlSecGuard> _xmlSecGuard;
-    std::unique_ptr<zip_file_t> _zipFile;
+    std::unique_ptr<zip_file> _zipFile;
     std::vector<char> _signaturesBytes;
     std::unique_ptr<xmlDoc> _signaturesDoc;
     std::vector<std::unique_ptr<Signature>> _signatures;
@@ -307,10 +307,9 @@ bool ZipVerifier::openZip(const std::string& path)
     _zipArchive.reset(zip_open(path.c_str(), openFlags, &errorCode));
     if (!_zipArchive)
     {
-        zip_error_t zipError;
-        zip_error_init_with_code(&zipError, errorCode);
-        _errorString = zip_error_strerror(&zipError);
-        zip_error_fini(&zipError);
+        char buf[100];
+        zip_error_to_str(buf, sizeof(buf), errorCode, errno);
+        _errorString = buf;
         return false;
     }
 
@@ -390,7 +389,7 @@ std::vector<std::unique_ptr<Signature>>& ZipVerifier::getSignatures()
 
 bool ZipVerifier::locateSignatures()
 {
-    zip_flags_t locateFlags = 0;
+    int locateFlags = 0;
     _signaturesZipIndex = zip_name_locate(
         _zipArchive.get(), "META-INF/documentsignatures.xml", locateFlags);
 

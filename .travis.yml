@@ -1,0 +1,14 @@
+language: cpp
+sudo: required
+script:
+    - scripts/travis.sh
+addons:
+    apt:
+        sources:
+            - ubuntu-toolchain-r-test
+        packages:
+            - g++-7
+            - cmake
+            - libgtest-dev
+            - libxmlsec1-dev
+            - libzip-dev
