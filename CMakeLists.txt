@@ -3,6 +3,7 @@ project(odfsig)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(ODFSIG_ENABLE_WERROR "Fail and stop if a warning is triggered." OFF)
+option(ODFSIG_ENABLE_GCOV "Measure code coverage of tests." OFF)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
@@ -17,6 +18,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Woverloaded-virtual")
 if (ODFSIG_ENABLE_WERROR)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 endif (ODFSIG_ENABLE_WERROR)
+if (ODFSIG_ENABLE_GCOV)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+endif (ODFSIG_ENABLE_GCOV)
 
 # Testing.
 enable_testing()
