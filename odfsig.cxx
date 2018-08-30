@@ -4,43 +4,14 @@
  * found in the LICENSE file.
  */
 
-#include <functional>
-#include <iostream>
-#include <memory>
-#include <sstream>
-#include <vector>
+#include "odfsig.hxx"
 
-#include <libxml/parser.h>
+#include <iostream>
+#include <sstream>
+
 #include <xmlsec/io.h>
 #include <xmlsec/nss/app.h>
 #include <xmlsec/nss/crypto.h>
-#include <xmlsec/xmldsig.h>
-#include <xmlsec/xmlsec.h>
-#include <zip.h>
-
-namespace std
-{
-template <> struct default_delete<zip_t>
-{
-    void operator()(zip_t* ptr) { zip_close(ptr); }
-};
-template <> struct default_delete<zip_file_t>
-{
-    void operator()(zip_file_t* ptr) { zip_fclose(ptr); }
-};
-template <> struct default_delete<xmlDoc>
-{
-    void operator()(xmlDocPtr ptr) { xmlFreeDoc(ptr); }
-};
-template <> struct default_delete<xmlSecDSigCtx>
-{
-    void operator()(xmlSecDSigCtxPtr ptr) { xmlSecDSigCtxDestroy(ptr); }
-};
-template <> struct default_delete<xmlSecKeysMngr>
-{
-    void operator()(xmlSecKeysMngrPtr ptr) { xmlSecKeysMngrDestroy(ptr); }
-};
-}
 
 namespace odfsig
 {
@@ -211,240 +182,141 @@ class XmlSecGuard
     bool _good = false;
 };
 
-/// Represents one specific signature in the document.
-class Signature
+Signature::Signature(xmlNode* signatureNode) : _signatureNode(signatureNode) {}
+
+Signature::~Signature() = default;
+
+const std::string& Signature::getErrorString() const { return _errorString; }
+
+bool Signature::verify()
 {
-  public:
-    explicit Signature(xmlNode* signatureNode) : _signatureNode(signatureNode)
+    std::unique_ptr<xmlSecKeysMngr> pKeysMngr(xmlSecKeysMngrCreate());
+    if (!pKeysMngr)
     {
-    }
-
-    ~Signature() = default;
-
-    const std::string& getErrorString() const { return _errorString; }
-
-    bool verify()
-    {
-        std::unique_ptr<xmlSecKeysMngr> pKeysMngr(xmlSecKeysMngrCreate());
-        if (!pKeysMngr)
-        {
-            _errorString = "Keys manager creation failed";
-            return false;
-        }
-
-        if (xmlSecNssAppDefaultKeysMngrInit(pKeysMngr.get()) < 0)
-        {
-            _errorString = "Keys manager init failed";
-            return false;
-        }
-
-        std::unique_ptr<xmlSecDSigCtx> dsigCtx(
-            xmlSecDSigCtxCreate(pKeysMngr.get()));
-        if (!dsigCtx)
-        {
-            _errorString = "DSig context initialize failed";
-            return false;
-        }
-
-        dsigCtx->keyInfoReadCtx.flags |=
-            XMLSEC_KEYINFO_FLAGS_X509DATA_DONT_VERIFY_CERTS;
-
-        if (xmlSecDSigCtxVerify(dsigCtx.get(), _signatureNode) < 0)
-        {
-            _errorString = "DSig context verify failed";
-            return false;
-        }
-
-        return dsigCtx->status == xmlSecDSigStatusSucceeded;
-    }
-
-  private:
-    std::string _errorString;
-    xmlNode* _signatureNode = nullptr;
-};
-
-/// Verifies signatures of an ODF document.
-class Verifier
-{
-  public:
-    Verifier() = default;
-    ~Verifier() = default;
-    bool openZip(const std::string& path)
-    {
-        const int openFlags = 0;
-        int errorCode = 0;
-        _zipArchive.reset(zip_open(path.c_str(), openFlags, &errorCode));
-        if (!_zipArchive)
-        {
-            zip_error_t zipError;
-            zip_error_init_with_code(&zipError, errorCode);
-            _errorString = zip_error_strerror(&zipError);
-            zip_error_fini(&zipError);
-            return false;
-        }
-
-        return true;
-    }
-
-    const std::string& getErrorString() const { return _errorString; }
-
-    bool parseSignatures()
-    {
-        if (!locateSignatures())
-            // No problem, later getSignatures() will return an empty list.
-            return true;
-
-        _xmlGuard.reset(new XmlGuard());
-
-        _xmlSecGuard.reset(new XmlSecGuard(_zipArchive.get()));
-        if (!_xmlSecGuard->isGood())
-        {
-            _errorString = "Failed to initialize libxmlsec";
-            return false;
-        }
-
-        _zipFile.reset(
-            zip_fopen_index(_zipArchive.get(), _signaturesZipIndex, 0));
-        if (!_zipFile)
-        {
-            std::stringstream ss;
-            ss << "Can't open file at index " << _signaturesZipIndex << ":"
-               << zip_strerror(_zipArchive.get());
-            _errorString = ss.str();
-            return false;
-        }
-
-        char readBuffer[8192];
-        zip_int64_t readSize;
-        while ((readSize = zip_fread(_zipFile.get(), readBuffer,
-                                     sizeof(readBuffer))) > 0)
-        {
-            _signaturesBytes.insert(_signaturesBytes.end(), readBuffer,
-                                    readBuffer + readSize);
-        }
-        if (readSize == -1)
-        {
-            std::stringstream ss;
-            ss << "Can't read file at index " << _signaturesZipIndex << ": "
-               << zip_file_strerror(_zipFile.get());
-            return false;
-        }
-
-        _signaturesDoc.reset(
-            xmlParseDoc(reinterpret_cast<xmlChar*>(_signaturesBytes.data())));
-        if (!_signaturesDoc)
-        {
-            _errorString = "Parsing the signatures file failed";
-            return false;
-        }
-
-        xmlNode* signaturesRoot = xmlDocGetRootElement(_signaturesDoc.get());
-        if (!signaturesRoot)
-        {
-            _errorString = "Could not get the signatures root";
-            return false;
-        }
-
-        for (xmlNode* signatureNode = signaturesRoot->children; signatureNode;
-             signatureNode = signatureNode->next)
-            _signatures.push_back(Signature(signatureNode));
-
-        return true;
-    }
-
-    std::vector<Signature>& getSignatures() { return _signatures; }
-
-  private:
-    bool locateSignatures()
-    {
-        zip_flags_t locateFlags = 0;
-        _signaturesZipIndex = zip_name_locate(
-            _zipArchive.get(), "META-INF/documentsignatures.xml", locateFlags);
-
-        return _signaturesZipIndex >= 0;
-    }
-
-    std::unique_ptr<zip_t> _zipArchive;
-    std::string _errorString;
-    zip_int64_t _signaturesZipIndex = 0;
-    std::unique_ptr<XmlGuard> _xmlGuard;
-    std::unique_ptr<XmlSecGuard> _xmlSecGuard;
-    std::unique_ptr<zip_file_t> _zipFile;
-    std::vector<char> _signaturesBytes;
-    std::unique_ptr<xmlDoc> _signaturesDoc;
-    std::vector<Signature> _signatures;
-};
-}
-
-namespace
-{
-bool printSignatures(const std::string& odfPath,
-                     std::vector<odfsig::Signature>& signatures)
-{
-    if (signatures.empty())
-    {
-        std::cerr << "File '" << odfPath << "' does not contain any signatures."
-                  << std::endl;
+        _errorString = "Keys manager creation failed";
         return false;
     }
 
-    std::cerr << "Digital Signature Info of: " << odfPath << std::endl;
-    for (size_t signatureIndex = 0; signatureIndex < signatures.size();
-         ++signatureIndex)
+    if (xmlSecNssAppDefaultKeysMngrInit(pKeysMngr.get()) < 0)
     {
-        odfsig::Signature& signature = signatures[signatureIndex];
-        std::cerr << "Signature #" << (signatureIndex + 1) << ":" << std::endl;
-        if (!signature.verify())
-        {
-            if (!signature.getErrorString().empty())
-            {
-                std::cerr << "Failed to verify signature: "
-                          << signature.getErrorString() << "." << std::endl;
-                return false;
-            }
+        _errorString = "Keys manager init failed";
+        return false;
+    }
 
-            std::cerr << "  - Signature Validation: Failed." << std::endl;
-            return false;
-        }
+    std::unique_ptr<xmlSecDSigCtx> dsigCtx(
+        xmlSecDSigCtxCreate(pKeysMngr.get()));
+    if (!dsigCtx)
+    {
+        _errorString = "DSig context initialize failed";
+        return false;
+    }
 
-        std::cerr << "  - Signature Validation: Succeeded." << std::endl;
-        std::cerr << "  - Certificate Validation: Not Implemented."
-                  << std::endl;
+    dsigCtx->keyInfoReadCtx.flags |=
+        XMLSEC_KEYINFO_FLAGS_X509DATA_DONT_VERIFY_CERTS;
+
+    if (xmlSecDSigCtxVerify(dsigCtx.get(), _signatureNode) < 0)
+    {
+        _errorString = "DSig context verify failed";
+        return false;
+    }
+
+    return dsigCtx->status == xmlSecDSigStatusSucceeded;
+}
+
+Verifier::Verifier() = default;
+Verifier::~Verifier() = default;
+bool Verifier::openZip(const std::string& path)
+{
+    const int openFlags = 0;
+    int errorCode = 0;
+    _zipArchive.reset(zip_open(path.c_str(), openFlags, &errorCode));
+    if (!_zipArchive)
+    {
+        zip_error_t zipError;
+        zip_error_init_with_code(&zipError, errorCode);
+        _errorString = zip_error_strerror(&zipError);
+        zip_error_fini(&zipError);
+        return false;
     }
 
     return true;
 }
+
+const std::string& Verifier::getErrorString() const { return _errorString; }
+
+bool Verifier::parseSignatures()
+{
+    if (!locateSignatures())
+        // No problem, later getSignatures() will return an empty list.
+        return true;
+
+    _xmlGuard.reset(new XmlGuard());
+
+    _xmlSecGuard.reset(new XmlSecGuard(_zipArchive.get()));
+    if (!_xmlSecGuard->isGood())
+    {
+        _errorString = "Failed to initialize libxmlsec";
+        return false;
+    }
+
+    _zipFile.reset(zip_fopen_index(_zipArchive.get(), _signaturesZipIndex, 0));
+    if (!_zipFile)
+    {
+        std::stringstream ss;
+        ss << "Can't open file at index " << _signaturesZipIndex << ":"
+           << zip_strerror(_zipArchive.get());
+        _errorString = ss.str();
+        return false;
+    }
+
+    char readBuffer[8192];
+    zip_int64_t readSize;
+    while ((readSize =
+                zip_fread(_zipFile.get(), readBuffer, sizeof(readBuffer))) > 0)
+    {
+        _signaturesBytes.insert(_signaturesBytes.end(), readBuffer,
+                                readBuffer + readSize);
+    }
+    if (readSize == -1)
+    {
+        std::stringstream ss;
+        ss << "Can't read file at index " << _signaturesZipIndex << ": "
+           << zip_file_strerror(_zipFile.get());
+        return false;
+    }
+
+    _signaturesDoc.reset(
+        xmlParseDoc(reinterpret_cast<xmlChar*>(_signaturesBytes.data())));
+    if (!_signaturesDoc)
+    {
+        _errorString = "Parsing the signatures file failed";
+        return false;
+    }
+
+    xmlNode* signaturesRoot = xmlDocGetRootElement(_signaturesDoc.get());
+    if (!signaturesRoot)
+    {
+        _errorString = "Could not get the signatures root";
+        return false;
+    }
+
+    for (xmlNode* signatureNode = signaturesRoot->children; signatureNode;
+         signatureNode = signatureNode->next)
+        _signatures.push_back(Signature(signatureNode));
+
+    return true;
 }
 
-int main(int argc, char* argv[])
+std::vector<Signature>& Verifier::getSignatures() { return _signatures; }
+
+bool Verifier::locateSignatures()
 {
-    if (argc < 2)
-    {
-        std::cerr << "Usage: " << argv[0] << " <ODF-file>" << std::endl;
-        return 1;
-    }
+    zip_flags_t locateFlags = 0;
+    _signaturesZipIndex = zip_name_locate(
+        _zipArchive.get(), "META-INF/documentsignatures.xml", locateFlags);
 
-    odfsig::Verifier verifier;
-
-    std::string odfPath(argv[1]);
-    if (!verifier.openZip(odfPath))
-    {
-        std::cerr << "Can't open zip archive '" << odfPath
-                  << "': " << verifier.getErrorString() << "." << std::endl;
-        return 1;
-    }
-
-    if (!verifier.parseSignatures())
-    {
-        std::cerr << "Failed to parse signatures: " << verifier.getErrorString()
-                  << "." << std::endl;
-        return 1;
-    }
-
-    if (!printSignatures(odfPath, verifier.getSignatures()))
-        return 1;
-
-    return 0;
+    return _signaturesZipIndex >= 0;
+}
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

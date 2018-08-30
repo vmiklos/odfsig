@@ -28,7 +28,7 @@ pkg_check_modules(LIBZIP REQUIRED libzip)
 pkg_check_modules(LIBXML2 REQUIRED libxml-2.0)
 pkg_check_modules(XMLSEC1NSS REQUIRED xmlsec1-nss)
 
-add_executable(odfsig odfsig.cxx)
+add_executable(odfsig main.cxx odfsig.cxx)
 target_include_directories(odfsig PRIVATE
     ${LIBZIP_INCLUDE_DIRS}
     ${LIBXML2_INCLUDE_DIRS}
