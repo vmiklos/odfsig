@@ -6,6 +6,8 @@
 
 #include "odfsig.hxx"
 
+#include <assert.h>
+
 #include <iostream>
 #include <sstream>
 
@@ -62,11 +64,7 @@ thread_local zip* zipArchive;
 
 int match(const char* uri)
 {
-    if (!zipArchive)
-    {
-        std::cerr << "error, XmlSecIO::match: no zip archive" << std::endl;
-        return 0;
-    }
+    assert(zipArchive);
 
     zip_int64_t signatureZipIndex = zip_name_locate(zipArchive, uri, 0);
     if (signatureZipIndex < 0)
@@ -77,11 +75,7 @@ int match(const char* uri)
 
 void* open(const char* uri)
 {
-    if (!zipArchive)
-    {
-        std::cerr << "error, XmlSecIO::open: no zip archive" << std::endl;
-        return 0;
-    }
+    assert(zipArchive);
 
     zip_int64_t signatureZipIndex = zip_name_locate(zipArchive, uri, 0);
     if (signatureZipIndex < 0)
@@ -106,11 +100,7 @@ void* open(const char* uri)
 int read(void* context, char* buffer, int len)
 {
     auto zipFile = static_cast<zip_file*>(context);
-    if (!zipFile)
-    {
-        std::cerr << "error, XmlSecIO::read: no zip file" << std::endl;
-        return 0;
-    }
+    assert(zipFile);
 
     return zip_fread(zipFile, buffer, len);
 }
@@ -118,11 +108,7 @@ int read(void* context, char* buffer, int len)
 int close(void* context)
 {
     auto zipFile = static_cast<zip_file*>(context);
-    if (!zipFile)
-    {
-        std::cerr << "error, XmlSecIO::close: no zip file" << std::endl;
-        return 0;
-    }
+    assert(zipFile);
 
     zip_fclose(zipFile);
     return 0;
