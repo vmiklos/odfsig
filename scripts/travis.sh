@@ -3,6 +3,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+# Baseline: Ubuntu Trusty 14.04.
+
 # Fix up libgtest-dev.
 cd /usr/src/gtest
 sudo cmake CMakeLists.txt
@@ -10,12 +12,22 @@ sudo make
 sudo cp *.a /usr/lib
 cd -
 
-# xmlsec1-1.2.18 is too old to disable cert verification properly.
+# xmlsec1 is too old to disable cert verification properly.
 xmlsec_ver=1.2.26
 wget http://www.aleksey.com/xmlsec/download/xmlsec1-$xmlsec_ver.tar.gz
 tar xvf xmlsec1-$xmlsec_ver.tar.gz
 cd xmlsec1-$xmlsec_ver
 ./configure --prefix=/usr --without-gnutls --without-gcrypt --without-openssl --disable-apps --disable-docs --disable-crypto-dl
+make -j$(getconf _NPROCESSORS_ONLN)
+sudo make install
+cd -
+
+# libzip is too old to provide zip_error_strerror().
+zip_ver=1.5.1
+wget https://libzip.org/download/libzip-$zip_ver.tar.gz
+tar xvf libzip-$zip_ver.tar.gz
+cd libzip-$zip_ver
+cmake -DCMAKE_INSTALL_PREFIX=/usr
 make -j$(getconf _NPROCESSORS_ONLN)
 sudo make install
 cd -
