@@ -33,4 +33,16 @@ TEST(OdfsigTest, testParseSignaturesNoStream)
     ASSERT_TRUE(verifier->getSignatures().empty());
 }
 
+TEST(OdfsigTest, testGood)
+{
+    // XmlSignature::verify(), positive testing.
+    std::unique_ptr<odfsig::Verifier> verifier(odfsig::Verifier::create());
+    ASSERT_TRUE(verifier->openZip("core/qa/data/good.odt"));
+    ASSERT_TRUE(verifier->parseSignatures());
+    std::vector<std::unique_ptr<odfsig::Signature>>& signatures =
+        verifier->getSignatures();
+    ASSERT_EQ(1, signatures.size());
+    ASSERT_TRUE(signatures[0]->verify());
+}
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
