@@ -1,0 +1,29 @@
+= odfsig
+
+image:https://travis-ci.com/vmiklos/odfsig.svg?branch=master["Build Status", link="https://travis-ci.com/vmiklos/odfsig"]
+
+Open Document Format (ODF) digital signatures tool
+
+== Description
+
+odfsig verifies the digital signatures in an ODF document. It is more or less
+the cmdline equivalent of the LibreOffice signature verifier GUI.
+
+== Dependencies
+
+=== Build-time
+
+- https://cmake.org/[cmake]
+- https://github.com/google/googletest[googletest]
+
+=== Runtime
+
+- https://www.aleksey.com/xmlsec/[xmlsec1-nss] (implies
+  http://xmlsoft.org/[libxml-2.0] and
+  https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS[nss])
+- https://libzip.org/[libzip]
+
+== License
+
+Use of this source code is governed by a BSD-style license that can be found in
+the LICENSE file.
