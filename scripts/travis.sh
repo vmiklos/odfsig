@@ -10,6 +10,16 @@ sudo make
 sudo cp *.a /usr/lib
 cd -
 
+# xmlsec1-1.2.18 is too old to disable cert verification properly.
+xmlsec_ver=1.2.26
+wget http://www.aleksey.com/xmlsec/download/xmlsec1-$xmlsec_ver.tar.gz
+tar xvf xmlsec1-$xmlsec_ver.tar.gz
+cd xmlsec1-$xmlsec_ver
+./configure --prefix=/usr --without-gnutls --without-gcrypt --without-openssl --disable-apps --disable-docs --disable-crypto-dl
+make -j$(getconf _NPROCESSORS_ONLN)
+sudo make install
+cd -
+
 mkdir workdir
 cd workdir
 CC=gcc-7 CXX=g++-7 cmake -DCMAKE_BUILD_TYPE=Debug -DODFSIG_ENABLE_WERROR=ON ..
