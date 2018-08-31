@@ -359,6 +359,8 @@ bool ZipVerifier::parseSignatures()
         return false;
     }
 
+    // xmlParseDoc() expects a zero-terminated string.
+    _signaturesBytes.push_back(0);
     _signaturesDoc.reset(
         xmlParseDoc(reinterpret_cast<xmlChar*>(_signaturesBytes.data())));
     if (!_signaturesDoc)
