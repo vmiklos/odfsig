@@ -15,4 +15,13 @@ TEST(OdfsigTest, testOpenZip)
     ASSERT_EQ(false, verifier->openZip("non-existent.odt"));
 }
 
+TEST(OdfsigTest, testParseSignaturesEmptyStream)
+{
+    // ZipVerifier::parseSignatures(), empty signatures stream.
+    std::unique_ptr<odfsig::Verifier> verifier(odfsig::Verifier::create());
+    ASSERT_TRUE(verifier->openZip("core/qa/data/empty-stream.odt"));
+    ASSERT_TRUE(verifier->parseSignatures());
+    ASSERT_TRUE(verifier->getSignatures().empty());
+}
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
