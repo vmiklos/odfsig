@@ -4,6 +4,7 @@
 # found in the LICENSE file.
 
 # Baseline: Ubuntu Trusty 14.04.
+CWD=$PWD
 
 # Fix up libgtest-dev.
 cd /usr/src/gtest
@@ -31,6 +32,17 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr
 make -j$(getconf _NPROCESSORS_ONLN)
 sudo make install
 cd -
+
+# Setup a dummy Firefox profile.
+mkdir -p ~/.mozilla/firefox
+cd ~/.mozilla/firefox
+echo -e "[Profile0]\nPath=odfsig.default\nDefault=1" > profiles.ini
+mkdir odfsig.default
+cd odfsig.default
+echo odfsig > pwdfile.txt
+certutil -N -f pwdfile.txt -d .
+certutil -A -n "odfsig ca" -t "C,C,C" -i $CWD/core/qa/keys/ca-chain.cert.pem -d .
+cd $CWD
 
 mkdir workdir
 cd workdir

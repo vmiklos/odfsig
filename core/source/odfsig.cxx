@@ -8,6 +8,7 @@
 
 #include <assert.h>
 
+#include <fstream>
 #include <iostream>
 #include <sstream>
 
@@ -39,6 +40,52 @@ template <> struct default_delete<xmlSecKeysMngr>
 {
     void operator()(xmlSecKeysMngrPtr ptr) { xmlSecKeysMngrDestroy(ptr); }
 };
+}
+
+namespace
+{
+/// Checks if `big` begins with `small`.
+bool starts_with(const std::string& big, const std::string& small)
+{
+    return big.compare(0, small.length(), small) == 0;
+}
+
+/**
+ * Finds the default Firefox profile.
+ *
+ * Expected profiles.ini format is something like:
+ *
+ * [Profile0]
+ * Path=...
+ * Default=...
+ */
+std::string getFirefoxProfile()
+{
+    std::stringstream ss;
+    const char* home = getenv("HOME");
+    if (home)
+        ss << home;
+    ss << "/.mozilla/firefox/";
+    const std::string firefoxPath = ss.str();
+
+    std::ifstream profilesIni(firefoxPath + "profiles.ini");
+    if (!profilesIni.good())
+        return std::string();
+
+    std::string profilePath;
+    const std::string pathPrefix("Path=");
+    std::string line;
+    while (std::getline(profilesIni, line))
+    {
+        if (starts_with(line, pathPrefix))
+            // Path= is expected to be before Default=.
+            profilePath = line.substr(pathPrefix.size());
+        else if (line == "Default=1")
+            return firefoxPath + profilePath;
+    }
+
+    return std::string();
+}
 }
 
 namespace odfsig
@@ -122,7 +169,11 @@ class XmlSecGuard
     explicit XmlSecGuard(zip_t* zipArchive)
     {
         // Initialize nss.
-        _good = xmlSecNssAppInit(nullptr) >= 0;
+        std::string firefoxProfile = getFirefoxProfile();
+        const char* nssDb = nullptr;
+        if (!firefoxProfile.empty())
+            nssDb = firefoxProfile.c_str();
+        _good = xmlSecNssAppInit(nssDb) >= 0;
         if (!_good)
         {
             std::cerr << "error, XmlSecGuard ctor: nss init failed"
@@ -242,9 +293,6 @@ bool XmlSignature::verify()
         _errorString = "DSig context initialize failed";
         return false;
     }
-
-    dsigCtx->keyInfoReadCtx.flags |=
-        XMLSEC_KEYINFO_FLAGS_X509DATA_DONT_VERIFY_CERTS;
 
     if (xmlSecDSigCtxVerify(dsigCtx.get(), _signatureNode) < 0)
     {

@@ -41,8 +41,6 @@ bool printSignatures(
         }
 
         std::cerr << "  - Signature Validation: Succeeded." << std::endl;
-        std::cerr << "  - Certificate Validation: Not Implemented."
-                  << std::endl;
     }
 
     return true;
