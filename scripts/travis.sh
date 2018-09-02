@@ -23,16 +23,6 @@ make -j$(getconf _NPROCESSORS_ONLN)
 sudo make install
 cd -
 
-# libzip is too old to provide zip_error_strerror().
-zip_ver=1.5.1
-wget https://libzip.org/download/libzip-$zip_ver.tar.gz
-tar xvf libzip-$zip_ver.tar.gz
-cd libzip-$zip_ver
-cmake -DCMAKE_INSTALL_PREFIX=/usr
-make -j$(getconf _NPROCESSORS_ONLN)
-sudo make install
-cd -
-
 # Setup a dummy Firefox profile.
 mkdir -p ~/.mozilla/firefox
 cd ~/.mozilla/firefox
@@ -46,7 +36,7 @@ cd $CWD
 
 mkdir workdir
 cd workdir
-CC=gcc-7 CXX=g++-7 cmake -DCMAKE_BUILD_TYPE=Debug -DODFSIG_ENABLE_WERROR=ON ..
+CC=gcc-7 CXX=g++-7 cmake -DCMAKE_BUILD_TYPE=Debug -DODFSIG_ENABLE_WERROR=ON -DODFSIG_INTERNAL_LIBZIP=ON ..
 make -j$(getconf _NPROCESSORS_ONLN)
 make check
 

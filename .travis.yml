@@ -13,6 +13,7 @@ addons:
             - cmake
             - libgtest-dev
             - libxmlsec1-dev
-            - libzip-dev
+            # libzip dependency
+            - libbz2-dev
             # Needed by scripts/travis.sh only.
             - libnss3-tools
