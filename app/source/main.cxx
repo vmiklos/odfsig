@@ -27,6 +27,11 @@ bool printSignatures(
     {
         odfsig::Signature* signature = signatures[signatureIndex].get();
         std::cerr << "Signature #" << (signatureIndex + 1) << ":" << std::endl;
+        std::string subjectName = signature->getSubjectName();
+        if (!subjectName.empty())
+            std::cerr << "  - Signing Certificate Subject Name: " << subjectName
+                      << std::endl;
+
         if (!signature->verify())
         {
             if (!signature->getErrorString().empty())
@@ -36,11 +41,11 @@ bool printSignatures(
                 return false;
             }
 
-            std::cerr << "  - Signature Validation: Failed." << std::endl;
+            std::cerr << "  - Signature Verification: Failed." << std::endl;
             return false;
         }
 
-        std::cerr << "  - Signature Validation: Succeeded." << std::endl;
+        std::cerr << "  - Signature Verification: Succeeded." << std::endl;
     }
 
     return true;

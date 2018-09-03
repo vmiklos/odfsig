@@ -21,6 +21,8 @@ class Signature
     virtual const std::string& getErrorString() const = 0;
 
     virtual bool verify() = 0;
+
+    virtual std::string getSubjectName() const = 0;
 };
 
 /// Verifies signatures of an ODF document.

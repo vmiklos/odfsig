@@ -43,6 +43,8 @@ TEST(OdfsigTest, testGood)
         verifier->getSignatures();
     ASSERT_EQ(1, signatures.size());
     ASSERT_TRUE(signatures[0]->verify());
+    ASSERT_EQ("CN=odfsig test example alice,O=odfsig test,ST=Budapest,C=HU",
+              signatures[0]->getSubjectName());
 }
 
 TEST(OdfsigTest, testBad)

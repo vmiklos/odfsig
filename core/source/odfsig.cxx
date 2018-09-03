@@ -12,10 +12,13 @@
 #include <iostream>
 #include <sstream>
 
+#include <cert.h>
+#include <xmlsec/base64.h>
 #include <xmlsec/io.h>
 #include <xmlsec/nss/app.h>
 #include <xmlsec/nss/crypto.h>
 #include <xmlsec/xmldsig.h>
+#include <xmlsec/xmltree.h>
 #include <zip.h>
 
 namespace std
@@ -39,6 +42,14 @@ template <> struct default_delete<xmlSecDSigCtx>
 template <> struct default_delete<xmlSecKeysMngr>
 {
     void operator()(xmlSecKeysMngrPtr ptr) { xmlSecKeysMngrDestroy(ptr); }
+};
+template <> struct default_delete<xmlChar>
+{
+    void operator()(xmlChar* ptr) { xmlFree(ptr); }
+};
+template <> struct default_delete<CERTCertificate>
+{
+    void operator()(CERTCertificate* ptr) { CERT_DestroyCertificate(ptr); }
 };
 }
 
@@ -256,6 +267,8 @@ class XmlSignature : public Signature
 
     bool verify() override;
 
+    std::string getSubjectName() const override;
+
   private:
     std::string _errorString;
 
@@ -301,6 +314,68 @@ bool XmlSignature::verify()
     }
 
     return dsigCtx->status == xmlSecDSigStatusSucceeded;
+}
+
+std::string XmlSignature::getSubjectName() const
+{
+    xmlNode* keyInfo = nullptr;
+    for (xmlNode* signatureChild = _signatureNode->children; signatureChild;
+         signatureChild = signatureChild->next)
+    {
+        if (!xmlStrcmp(signatureChild->name, BAD_CAST("KeyInfo")))
+        {
+            keyInfo = signatureChild;
+            break;
+        }
+    }
+    if (!keyInfo)
+        return std::string();
+
+    xmlNode* x509Data = nullptr;
+    for (xmlNode* keyInfoChild = keyInfo->children; keyInfoChild;
+         keyInfoChild = keyInfoChild->next)
+    {
+        if (!xmlStrcmp(keyInfoChild->name, BAD_CAST("X509Data")))
+        {
+            x509Data = keyInfoChild;
+            break;
+        }
+    }
+    if (!x509Data)
+        return std::string();
+
+    xmlNode* x509Certificate = nullptr;
+    for (xmlNode* x509DataChild = x509Data->children; x509DataChild;
+         x509DataChild = x509DataChild->next)
+    {
+        if (!xmlStrcmp(x509DataChild->name, BAD_CAST("X509Certificate")))
+        {
+            x509Certificate = x509DataChild;
+            break;
+        }
+    }
+    if (!x509Certificate)
+        return std::string();
+
+    std::unique_ptr<xmlChar> content(xmlNodeGetContent(x509Certificate));
+    if (!content || xmlSecIsEmptyString(content.get()))
+        return std::string();
+
+    // Base64 decode in-place.
+    int size = xmlSecBase64Decode(content.get(), (xmlSecByte*)content.get(),
+                                  xmlStrlen(content.get()));
+    if (size < 0)
+        return std::string();
+
+    SECItem certItem;
+    certItem.data = content.get();
+    certItem.len = size;
+    std::unique_ptr<CERTCertificate> cert(CERT_NewTempCertificate(
+        CERT_GetDefaultCertDB(), &certItem, NULL, PR_FALSE, PR_TRUE));
+    if (!cert || !cert->subjectName)
+        return std::string();
+
+    return std::string(cert->subjectName);
 }
 
 /// Implementation of Verifier using libzip.
