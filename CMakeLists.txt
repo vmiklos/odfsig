@@ -6,7 +6,12 @@ option(ODFSIG_ENABLE_WERROR "Fail and stop if a warning is triggered." OFF)
 option(ODFSIG_ENABLE_GCOV "Measure code coverage of tests." OFF)
 option(ODFSIG_INTERNAL_LIBZIP "Use internal libzip." OFF)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+find_program(CCACHE_PROGRAM ccache)
+if (CCACHE_PROGRAM)
+    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+endif ()
+
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor")
