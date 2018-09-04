@@ -61,6 +61,9 @@ bool starts_with(const std::string& big, const std::string& small)
     return big.compare(0, small.length(), small) == 0;
 }
 
+/// Converts from libxml char to normal char.
+char* fromXmlChar(xmlChar* s) { return reinterpret_cast<char*>(s); }
+
 /**
  * Finds the default Firefox profile.
  *
@@ -269,7 +272,18 @@ class XmlSignature : public Signature
 
     std::string getSubjectName() const override;
 
+    std::string getDate() const override;
+
   private:
+    std::string getObjectDate(xmlNode* objectNode) const;
+
+    std::string
+    getSignaturePropertiesDate(xmlNode* signaturePropertiesNode) const;
+
+    std::string getSignaturePropertyDate(xmlNode* signaturePropertyNode) const;
+
+    std::string getDateContent(xmlNode* dateNode) const;
+
     std::string _errorString;
 
     xmlNode* _signatureNode = nullptr;
@@ -318,42 +332,12 @@ bool XmlSignature::verify()
 
 std::string XmlSignature::getSubjectName() const
 {
-    xmlNode* keyInfo = nullptr;
-    for (xmlNode* signatureChild = _signatureNode->children; signatureChild;
-         signatureChild = signatureChild->next)
-    {
-        if (!xmlStrcmp(signatureChild->name, BAD_CAST("KeyInfo")))
-        {
-            keyInfo = signatureChild;
-            break;
-        }
-    }
-    if (!keyInfo)
-        return std::string();
-
-    xmlNode* x509Data = nullptr;
-    for (xmlNode* keyInfoChild = keyInfo->children; keyInfoChild;
-         keyInfoChild = keyInfoChild->next)
-    {
-        if (!xmlStrcmp(keyInfoChild->name, BAD_CAST("X509Data")))
-        {
-            x509Data = keyInfoChild;
-            break;
-        }
-    }
-    if (!x509Data)
-        return std::string();
-
-    xmlNode* x509Certificate = nullptr;
-    for (xmlNode* x509DataChild = x509Data->children; x509DataChild;
-         x509DataChild = x509DataChild->next)
-    {
-        if (!xmlStrcmp(x509DataChild->name, BAD_CAST("X509Certificate")))
-        {
-            x509Certificate = x509DataChild;
-            break;
-        }
-    }
+    xmlNode* keyInfoNode =
+        xmlSecFindChild(_signatureNode, xmlSecNodeKeyInfo, xmlSecDSigNs);
+    xmlNode* x509Data =
+        xmlSecFindChild(keyInfoNode, xmlSecNodeX509Data, xmlSecDSigNs);
+    xmlNode* x509Certificate =
+        xmlSecFindChild(x509Data, xmlSecNodeX509Certificate, xmlSecDSigNs);
     if (!x509Certificate)
         return std::string();
 
@@ -376,6 +360,84 @@ std::string XmlSignature::getSubjectName() const
         return std::string();
 
     return std::string(cert->subjectName);
+}
+
+std::string XmlSignature::getDate() const
+{
+    for (xmlNode* signatureChild = _signatureNode->children; signatureChild;
+         signatureChild = signatureChild->next)
+    {
+        if (!xmlSecCheckNodeName(signatureChild, xmlSecNodeObject,
+                                 xmlSecDSigNs))
+            continue;
+
+        std::string date = getObjectDate(signatureChild);
+        if (!date.empty())
+            return date;
+    }
+
+    return std::string();
+}
+
+std::string XmlSignature::getObjectDate(xmlNode* objectNode) const
+{
+    for (xmlNode* objectChild = objectNode->children; objectChild;
+         objectChild = objectChild->next)
+    {
+        if (!xmlSecCheckNodeName(objectChild, xmlSecNodeSignatureProperties,
+                                 xmlSecDSigNs))
+            continue;
+
+        std::string date = getSignaturePropertiesDate(objectChild);
+        if (!date.empty())
+            return date;
+    }
+
+    return std::string();
+}
+
+std::string XmlSignature::getDateContent(xmlNode* dateNode) const
+{
+    std::unique_ptr<xmlChar> content(xmlNodeGetContent(dateNode));
+    if (!content)
+        return std::string();
+
+    return std::string(fromXmlChar(content.get()));
+}
+
+std::string
+XmlSignature::getSignaturePropertiesDate(xmlNode* signaturePropertiesNode) const
+{
+    const xmlChar signaturePropertyNodeName[] = "SignatureProperty";
+
+    for (xmlNode* signaturePropertiesChild = signaturePropertiesNode->children;
+         signaturePropertiesChild;
+         signaturePropertiesChild = signaturePropertiesChild->next)
+    {
+        if (!xmlSecCheckNodeName(signaturePropertiesChild,
+                                 signaturePropertyNodeName, xmlSecDSigNs))
+            continue;
+
+        std::string date = getSignaturePropertyDate(signaturePropertiesChild);
+        if (!date.empty())
+            return date;
+    }
+
+    return std::string();
+}
+
+std::string
+XmlSignature::getSignaturePropertyDate(xmlNode* signaturePropertyNode) const
+{
+    const xmlChar dateNodeName[] = "date";
+    const xmlChar dateNsName[] = "http://purl.org/dc/elements/1.1/";
+
+    xmlNode* dateNode =
+        xmlSecFindChild(signaturePropertyNode, dateNodeName, dateNsName);
+    if (!dateNode)
+        return std::string();
+
+    return getDateContent(dateNode);
 }
 
 /// Implementation of Verifier using libzip.

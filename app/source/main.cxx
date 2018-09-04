@@ -27,10 +27,15 @@ bool printSignatures(
     {
         odfsig::Signature* signature = signatures[signatureIndex].get();
         std::cerr << "Signature #" << (signatureIndex + 1) << ":" << std::endl;
+
         std::string subjectName = signature->getSubjectName();
         if (!subjectName.empty())
             std::cerr << "  - Signing Certificate Subject Name: " << subjectName
                       << std::endl;
+
+        std::string date = signature->getDate();
+        if (!date.empty())
+            std::cerr << "  - Signing Date: " << date << std::endl;
 
         if (!signature->verify())
         {

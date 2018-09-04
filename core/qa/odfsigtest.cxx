@@ -42,9 +42,11 @@ TEST(OdfsigTest, testGood)
     std::vector<std::unique_ptr<odfsig::Signature>>& signatures =
         verifier->getSignatures();
     ASSERT_EQ(1, signatures.size());
-    ASSERT_TRUE(signatures[0]->verify());
+    std::unique_ptr<odfsig::Signature>& signature = signatures[0];
+    ASSERT_TRUE(signature->verify());
     ASSERT_EQ("CN=odfsig test example alice,O=odfsig test,ST=Budapest,C=HU",
-              signatures[0]->getSubjectName());
+              signature->getSubjectName());
+    ASSERT_EQ("2018-08-31T22:38:51.034635578", signature->getDate());
 }
 
 TEST(OdfsigTest, testBad)
