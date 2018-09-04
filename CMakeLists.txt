@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
+include(ExternalProject)
+include(GNUInstallDirs)
 project(odfsig)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -36,7 +38,6 @@ enable_testing()
 
 # Externals.
 find_package(PkgConfig REQUIRED)
-include(ExternalProject)
 
 # libzip external.
 if (NOT ODFSIG_INTERNAL_LIBZIP)
@@ -57,12 +58,9 @@ else ()
         INSTALL_COMMAND make install
         )
     add_library(zip STATIC IMPORTED)
-    set_property(TARGET zip PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/external/libzip-source/lib/libzip.a)
+    set_property(TARGET zip PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/external/libzip-install/${CMAKE_INSTALL_LIBDIR}/libzip.a)
     add_dependencies(zip externalzip)
-    # Header must be picked up from the install dir, as zipconf.h is generated.
     set(LIBZIP_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/external/libzip-install/include ${ZLIB_INCLUDE_DIRS})
-    # Library is easier to pick up from the source dir, as that location is
-    # platform-independent.
     # bz2 may not provide a pkg-config file, so just hardcode its name.
     set(LIBZIP_LIBRARIES zip ${ZLIB_LIBRARIES} bz2)
 endif ()
