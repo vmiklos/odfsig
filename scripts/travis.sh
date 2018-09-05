@@ -31,7 +31,7 @@ mkdir odfsig.default
 cd odfsig.default
 echo odfsig > pwdfile.txt
 certutil -N -f pwdfile.txt -d .
-certutil -A -n "odfsig ca" -t "C,C,C" -i $CWD/core/qa/keys/ca-chain.cert.pem -d .
+certutil -A -n "odfsig ca" -t "C,C,C" -i $CWD/tests/keys/ca-chain.cert.pem -d .
 cd $CWD
 
 mkdir workdir

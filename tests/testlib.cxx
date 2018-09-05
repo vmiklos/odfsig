@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-#include "odfsig.hxx"
+#include <odfsig/lib.hxx>
 
 TEST(OdfsigTest, testOpenZip)
 {
@@ -19,7 +19,7 @@ TEST(OdfsigTest, testParseSignaturesEmptyStream)
 {
     // ZipVerifier::parseSignatures(), empty signatures stream.
     std::unique_ptr<odfsig::Verifier> verifier(odfsig::Verifier::create());
-    ASSERT_TRUE(verifier->openZip("core/qa/data/empty-stream.odt"));
+    ASSERT_TRUE(verifier->openZip("tests/data/empty-stream.odt"));
     ASSERT_TRUE(verifier->parseSignatures());
     ASSERT_TRUE(verifier->getSignatures().empty());
 }
@@ -28,7 +28,7 @@ TEST(OdfsigTest, testParseSignaturesNoStream)
 {
     // ZipVerifier::parseSignatures(), no signatures stream.
     std::unique_ptr<odfsig::Verifier> verifier(odfsig::Verifier::create());
-    ASSERT_TRUE(verifier->openZip("core/qa/data/no-stream.odt"));
+    ASSERT_TRUE(verifier->openZip("tests/data/no-stream.odt"));
     ASSERT_TRUE(verifier->parseSignatures());
     ASSERT_TRUE(verifier->getSignatures().empty());
 }
@@ -37,7 +37,7 @@ TEST(OdfsigTest, testGood)
 {
     // XmlSignature::verify(), positive testing.
     std::unique_ptr<odfsig::Verifier> verifier(odfsig::Verifier::create());
-    ASSERT_TRUE(verifier->openZip("core/qa/data/good.odt"));
+    ASSERT_TRUE(verifier->openZip("tests/data/good.odt"));
     ASSERT_TRUE(verifier->parseSignatures());
     std::vector<std::unique_ptr<odfsig::Signature>>& signatures =
         verifier->getSignatures();
@@ -54,7 +54,7 @@ TEST(OdfsigTest, testBad)
 {
     // XmlSignature::verify(), negative testing.
     std::unique_ptr<odfsig::Verifier> verifier(odfsig::Verifier::create());
-    ASSERT_TRUE(verifier->openZip("core/qa/data/bad.odt"));
+    ASSERT_TRUE(verifier->openZip("tests/data/bad.odt"));
     ASSERT_TRUE(verifier->parseSignatures());
     std::vector<std::unique_ptr<odfsig::Signature>>& signatures =
         verifier->getSignatures();

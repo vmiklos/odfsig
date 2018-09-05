@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#include "odfsig.hxx"
+#include <odfsig/lib.hxx>
 
 namespace
 {

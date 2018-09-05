@@ -4,7 +4,7 @@
  * found in the LICENSE file.
  */
 
-#include "odfsig.hxx"
+#include <odfsig/lib.hxx>
 
 #include <assert.h>
 

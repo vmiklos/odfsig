@@ -57,12 +57,12 @@ pkg_check_modules(XMLSEC1NSS REQUIRED xmlsec1-nss)
 find_package(GTest REQUIRED)
 
 # odfsig library.
-add_library(odfsigcore core/source/odfsig.cxx)
+add_library(odfsigcore src/lib.cxx)
 target_include_directories(odfsigcore PRIVATE
     ${LIBZIP_INCLUDE_DIRS}
     ${XMLSEC1NSS_INCLUDE_DIRS}
     )
-target_include_directories(odfsigcore PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/core/include")
+target_include_directories(odfsigcore PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(odfsigcore
     ${LIBZIP_LIBRARIES}
     ${XMLSEC1NSS_LIBRARIES}
@@ -70,7 +70,7 @@ target_link_libraries(odfsigcore
 target_compile_options(odfsigcore PRIVATE ${XMLSEC1NSS_CFLAGS_OTHER})
 
 # odfsig tests.
-add_executable(odfsigtest core/qa/odfsigtest.cxx)
+add_executable(odfsigtest tests/testlib.cxx)
 target_link_libraries(odfsigtest odfsigcore GTest::GTest GTest::Main)
 add_test(NAME odfsig
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -82,7 +82,7 @@ add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
 add_dependencies(check odfsigtest)
 
 # odfsig cmdline app.
-add_executable(odfsig app/source/main.cxx)
+add_executable(odfsig apps/app.cxx)
 target_link_libraries(odfsig odfsigcore)
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:

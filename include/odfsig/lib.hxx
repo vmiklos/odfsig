@@ -1,5 +1,5 @@
-#ifndef _HAD_ODFSIG_H
-#define _HAD_ODFSIG_H
+#ifndef _HAD_ODFSIG__LIB_H
+#define _HAD_ODFSIG__LIB_H
 /*
  * Copyright 2018 Miklos Vajna. All rights reserved.
  * Use of this source code is governed by a BSD-style license that can be
@@ -46,6 +46,6 @@ class Verifier
     static std::unique_ptr<Verifier> create();
 };
 }
-#endif /* _HAD_ODFSIG_H */
+#endif /* _HAD_ODFSIG_LIB_H */
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
