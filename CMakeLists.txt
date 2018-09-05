@@ -15,6 +15,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 option(ODFSIG_ENABLE_WERROR "Fail and stop if a warning is triggered." OFF)
 option(ODFSIG_ENABLE_GCOV "Measure code coverage of tests." OFF)
 option(ODFSIG_INTERNAL_LIBZIP "Use internal libzip." OFF)
+option(ODFSIG_INTERNAL_LIBGTEST "Use internal libgtest." OFF)
 
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)
@@ -26,12 +27,14 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wendif-labels")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wundef")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunreachable-code")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused-macros")
 if (NOT ODFSIG_INTERNAL_LIBZIP)
     # libzip has a zip_stat that is both a struct and a function name.
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wshadow")
+endif ()
+if (NOT ODFSIG_INTERNAL_LIBGTEST)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wundef")
 endif ()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Woverloaded-virtual")
 if (ODFSIG_ENABLE_WERROR)
@@ -54,7 +57,31 @@ include(FindZip)
 pkg_check_modules(XMLSEC1NSS REQUIRED xmlsec1-nss)
 
 # googletest external.
-find_package(GTest REQUIRED)
+include(ExternalProject)
+include(GNUInstallDirs)
+
+if (NOT ODFSIG_INTERNAL_LIBGTEST)
+    find_package(GTest REQUIRED)
+    set(LIBGTEST_LIBRARIES GTest::GTest GTest::Main)
+else ()
+    ExternalProject_Add(externalgtest
+        URL https://github.com/google/googletest/archive/release-1.8.1.tar.gz
+        SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/external/libgtest-source
+        BUILD_IN_SOURCE ON
+        CONFIGURE_COMMAND cmake
+            -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external/libgtest-install
+        BUILD_COMMAND make
+        INSTALL_COMMAND make install
+        )
+    add_library(GTest::GTest STATIC IMPORTED)
+    set_property(TARGET GTest::GTest PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/external/libgtest-install/${CMAKE_INSTALL_LIBDIR}/libgtest.a)
+    add_dependencies(GTest::GTest externalgtest)
+    add_library(GTest::Main STATIC IMPORTED)
+    set_property(TARGET GTest::Main PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/external/libgtest-install/${CMAKE_INSTALL_LIBDIR}/libgtest_main.a)
+    add_dependencies(GTest::Main externalgtest)
+    set(LIBGTEST_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/external/libgtest-install/include)
+    set(LIBGTEST_LIBRARIES GTest::GTest GTest::Main pthread)
+endif ()
 
 # odfsig library.
 add_library(odfsigcore src/lib.cxx)
@@ -71,7 +98,13 @@ target_compile_options(odfsigcore PRIVATE ${XMLSEC1NSS_CFLAGS_OTHER})
 
 # odfsig tests.
 add_executable(odfsigtest tests/testlib.cxx)
-target_link_libraries(odfsigtest odfsigcore GTest::GTest GTest::Main)
+target_link_libraries(odfsigtest
+    odfsigcore
+    ${LIBGTEST_LIBRARIES}
+    )
+target_include_directories(odfsigtest PRIVATE
+    ${LIBGTEST_INCLUDE_DIRS}
+    )
 add_test(NAME odfsig
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMAND odfsigtest

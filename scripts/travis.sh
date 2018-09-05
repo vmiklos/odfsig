@@ -6,13 +6,6 @@
 # Baseline: Ubuntu Trusty 14.04.
 CWD=$PWD
 
-# Fix up libgtest-dev.
-cd /usr/src/gtest
-sudo cmake CMakeLists.txt
-sudo make
-sudo cp *.a /usr/lib
-cd -
-
 # xmlsec1 is too old to disable cert verification properly.
 xmlsec_ver=1.2.26
 wget http://www.aleksey.com/xmlsec/download/xmlsec1-$xmlsec_ver.tar.gz
@@ -36,7 +29,12 @@ cd $CWD
 
 mkdir workdir
 cd workdir
-CC=gcc-7 CXX=g++-7 cmake -DCMAKE_BUILD_TYPE=Debug -DODFSIG_ENABLE_WERROR=ON -DODFSIG_INTERNAL_LIBZIP=ON ..
+CC=gcc-7 CXX=g++-7 cmake \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DODFSIG_ENABLE_WERROR=ON \
+    -DODFSIG_INTERNAL_LIBZIP=ON \
+    -DODFSIG_INTERNAL_LIBGTEST=ON \
+        ..
 make -j$(getconf _NPROCESSORS_ONLN)
 make check
 

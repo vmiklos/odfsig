@@ -41,7 +41,7 @@ TEST(OdfsigTest, testGood)
     ASSERT_TRUE(verifier->parseSignatures());
     std::vector<std::unique_ptr<odfsig::Signature>>& signatures =
         verifier->getSignatures();
-    ASSERT_EQ(1, signatures.size());
+    ASSERT_EQ(static_cast<size_t>(1), signatures.size());
     std::unique_ptr<odfsig::Signature>& signature = signatures[0];
     ASSERT_TRUE(signature->verify());
     ASSERT_EQ("CN=odfsig test example alice,O=odfsig test,ST=Budapest,C=HU",
@@ -58,7 +58,7 @@ TEST(OdfsigTest, testBad)
     ASSERT_TRUE(verifier->parseSignatures());
     std::vector<std::unique_ptr<odfsig::Signature>>& signatures =
         verifier->getSignatures();
-    ASSERT_EQ(1, signatures.size());
+    ASSERT_EQ(static_cast<size_t>(1), signatures.size());
     ASSERT_FALSE(signatures[0]->verify());
 }
 
