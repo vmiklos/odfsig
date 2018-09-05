@@ -37,6 +37,11 @@ bool printSignatures(
         if (!date.empty())
             std::cerr << "  - Signing Date: " << date << std::endl;
 
+        std::string method = signature->getMethod();
+        if (!method.empty())
+            std::cerr << "  - Signature Method Algorithm: " << method
+                      << std::endl;
+
         if (!signature->verify())
         {
             if (!signature->getErrorString().empty())

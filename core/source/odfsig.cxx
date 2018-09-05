@@ -62,7 +62,10 @@ bool starts_with(const std::string& big, const std::string& small)
 }
 
 /// Converts from libxml char to normal char.
-char* fromXmlChar(xmlChar* s) { return reinterpret_cast<char*>(s); }
+const char* fromXmlChar(const xmlChar* s)
+{
+    return reinterpret_cast<const char*>(s);
+}
 
 /**
  * Finds the default Firefox profile.
@@ -274,6 +277,8 @@ class XmlSignature : public Signature
 
     std::string getDate() const override;
 
+    std::string getMethod() const override;
+
   private:
     std::string getObjectDate(xmlNode* objectNode) const;
 
@@ -360,6 +365,27 @@ std::string XmlSignature::getSubjectName() const
         return std::string();
 
     return std::string(cert->subjectName);
+}
+
+std::string XmlSignature::getMethod() const
+{
+    xmlNode* signedInfoNode =
+        xmlSecFindChild(_signatureNode, xmlSecNodeSignedInfo, xmlSecDSigNs);
+    xmlNode* signatureMethodNode = xmlSecFindChild(
+        signedInfoNode, xmlSecNodeSignatureMethod, xmlSecDSigNs);
+    if (!signatureMethodNode)
+        return std::string();
+
+    xmlChar* href = xmlGetProp(signatureMethodNode, xmlSecAttrAlgorithm);
+    if (!href)
+        return std::string();
+
+    xmlSecTransformId id = xmlSecTransformIdListFindByHref(
+        xmlSecTransformIdsGet(), href, xmlSecTransformUsageSignatureMethod);
+    if (id == xmlSecTransformIdUnknown)
+        return fromXmlChar(href);
+
+    return std::string(fromXmlChar(xmlSecTransformKlassGetName(id)));
 }
 
 std::string XmlSignature::getDate() const

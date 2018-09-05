@@ -47,6 +47,7 @@ TEST(OdfsigTest, testGood)
     ASSERT_EQ("CN=odfsig test example alice,O=odfsig test,ST=Budapest,C=HU",
               signature->getSubjectName());
     ASSERT_EQ("2018-08-31T22:38:51.034635578", signature->getDate());
+    ASSERT_EQ("rsa-sha256", signature->getMethod());
 }
 
 TEST(OdfsigTest, testBad)

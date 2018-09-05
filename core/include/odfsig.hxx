@@ -25,6 +25,8 @@ class Signature
     virtual std::string getSubjectName() const = 0;
 
     virtual std::string getDate() const = 0;
+
+    virtual std::string getMethod() const = 0;
 };
 
 /// Verifies signatures of an ODF document.
