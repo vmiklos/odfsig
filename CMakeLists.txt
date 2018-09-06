@@ -69,7 +69,6 @@ target_link_libraries(odfsigcore
     ${XMLSEC1NSS_LIBRARIES}
     )
 target_compile_options(odfsigcore PRIVATE ${XMLSEC1NSS_CFLAGS_OTHER})
-add_dependencies(odfsigcore zip)
 
 # odfsig tests.
 add_executable(odfsigtest tests/testlib.cxx)
