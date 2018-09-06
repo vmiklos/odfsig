@@ -55,6 +55,10 @@ template <> struct default_delete<CERTCertificate>
 
 namespace
 {
+const xmlChar dateNodeName[] = "date";
+const xmlChar dateNsName[] = "http://purl.org/dc/elements/1.1/";
+const xmlChar xadesNsName[] = "http://uri.etsi.org/01903/v1.3.2#";
+
 /// Checks if `big` begins with `small`.
 bool starts_with(const std::string& big, const std::string& small)
 {
@@ -279,6 +283,8 @@ class XmlSignature : public Signature
 
     std::string getMethod() const override;
 
+    std::string getType() const override;
+
   private:
     std::string getObjectDate(xmlNode* objectNode) const;
 
@@ -288,6 +294,8 @@ class XmlSignature : public Signature
     std::string getSignaturePropertyDate(xmlNode* signaturePropertyNode) const;
 
     std::string getDateContent(xmlNode* dateNode) const;
+
+    bool hasObjectCertDigest(xmlNode* objectNode) const;
 
     std::string _errorString;
 
@@ -388,6 +396,66 @@ std::string XmlSignature::getMethod() const
     return std::string(fromXmlChar(xmlSecTransformKlassGetName(id)));
 }
 
+std::string XmlSignature::getType() const
+{
+    for (xmlNode* signatureChild = _signatureNode->children; signatureChild;
+         signatureChild = signatureChild->next)
+    {
+        if (!xmlSecCheckNodeName(signatureChild, xmlSecNodeObject,
+                                 xmlSecDSigNs))
+            continue;
+
+        bool hasCertDigest = hasObjectCertDigest(signatureChild);
+        if (hasCertDigest)
+            return std::string("XAdES");
+    }
+
+    return std::string("XML-DSig");
+}
+
+bool XmlSignature::hasObjectCertDigest(xmlNode* objectNode) const
+{
+    const xmlChar qualifyingPropertiesNodeName[] = "QualifyingProperties";
+    const xmlChar signedPropertiesNodeName[] = "SignedProperties";
+    const xmlChar signedSignaturePropertiesNodeName[] =
+        "SignedSignatureProperties";
+    const xmlChar signingCertificateNodeName[] = "SigningCertificate";
+    const xmlChar certNodeName[] = "Cert";
+    const xmlChar certDigestNodeName[] = "CertDigest";
+
+    xmlNode* qualifyingPropertiesNode =
+        xmlSecFindChild(objectNode, qualifyingPropertiesNodeName, xadesNsName);
+    if (!qualifyingPropertiesNode)
+        return false;
+
+    xmlNode* signedPropertiesNode = xmlSecFindChild(
+        qualifyingPropertiesNode, signedPropertiesNodeName, xadesNsName);
+    if (!signedPropertiesNode)
+        return false;
+
+    xmlNode* signedSignaturePropertiesNode = xmlSecFindChild(
+        signedPropertiesNode, signedSignaturePropertiesNodeName, xadesNsName);
+    if (!signedSignaturePropertiesNode)
+        return false;
+
+    xmlNode* signingCertificateNode = xmlSecFindChild(
+        signedSignaturePropertiesNode, signingCertificateNodeName, xadesNsName);
+    if (!signingCertificateNode)
+        return false;
+
+    xmlNode* certNode =
+        xmlSecFindChild(signingCertificateNode, certNodeName, xadesNsName);
+    if (!certNode)
+        return false;
+
+    xmlNode* certDigestNode =
+        xmlSecFindChild(certNode, certDigestNodeName, xadesNsName);
+    if (!certDigestNode)
+        return false;
+
+    return true;
+}
+
 std::string XmlSignature::getDate() const
 {
     for (xmlNode* signatureChild = _signatureNode->children; signatureChild;
@@ -455,9 +523,6 @@ XmlSignature::getSignaturePropertiesDate(xmlNode* signaturePropertiesNode) const
 std::string
 XmlSignature::getSignaturePropertyDate(xmlNode* signaturePropertyNode) const
 {
-    const xmlChar dateNodeName[] = "date";
-    const xmlChar dateNsName[] = "http://purl.org/dc/elements/1.1/";
-
     xmlNode* dateNode =
         xmlSecFindChild(signaturePropertyNode, dateNodeName, dateNsName);
     if (!dateNode)

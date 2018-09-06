@@ -48,6 +48,7 @@ TEST(OdfsigTest, testGood)
               signature->getSubjectName());
     ASSERT_EQ("2018-08-31T22:38:51.034635578", signature->getDate());
     ASSERT_EQ("rsa-sha256", signature->getMethod());
+    ASSERT_EQ("XAdES", signature->getType());
 }
 
 TEST(OdfsigTest, testBad)

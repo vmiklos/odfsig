@@ -42,6 +42,10 @@ bool printSignatures(
             std::cerr << "  - Signature Method Algorithm: " << method
                       << std::endl;
 
+        std::string type = signature->getType();
+        if (!type.empty())
+            std::cerr << "  - Signature Type: " << type << std::endl;
+
         if (!signature->verify())
         {
             if (!signature->getErrorString().empty())
