@@ -7,7 +7,7 @@ git pull -r
 rm -rf workdir
 mkdir workdir
 cd workdir
-cmake -DCMAKE_BUILD_TYPE=Debug -DODFSIG_ENABLE_WERROR=ON ..
+cmake -DCMAKE_BUILD_TYPE=Debug -DODFSIG_ENABLE_WERROR=ON "$@" ..
 make -j$(getconf _NPROCESSORS_ONLN)
 make check
 # Exclude workdir automatically

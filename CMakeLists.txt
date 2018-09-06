@@ -48,10 +48,8 @@ endif ()
 enable_testing()
 
 # Externals.
+add_subdirectory(extern)
 find_package(PkgConfig REQUIRED)
-
-# libzip external.
-include(FindZip)
 
 # xmlsec external.
 pkg_check_modules(XMLSEC1NSS REQUIRED xmlsec1-nss)
@@ -71,6 +69,7 @@ target_link_libraries(odfsigcore
     ${XMLSEC1NSS_LIBRARIES}
     )
 target_compile_options(odfsigcore PRIVATE ${XMLSEC1NSS_CFLAGS_OTHER})
+add_dependencies(odfsigcore zip)
 
 # odfsig tests.
 add_executable(odfsigtest tests/testlib.cxx)

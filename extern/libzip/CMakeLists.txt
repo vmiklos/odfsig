@@ -2,6 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+find_package(PkgConfig REQUIRED)
 include(ExternalProject)
 include(GNUInstallDirs)
 
@@ -22,12 +23,12 @@ else ()
         BUILD_COMMAND make
         INSTALL_COMMAND make install
         )
-    add_library(zip STATIC IMPORTED)
+    add_library(zip STATIC IMPORTED GLOBAL)
     set_property(TARGET zip PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/external/libzip-install/${CMAKE_INSTALL_LIBDIR}/libzip.a)
     add_dependencies(zip externalzip)
-    set(LIBZIP_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/external/libzip-install/include ${ZLIB_INCLUDE_DIRS})
+    set(LIBZIP_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/external/libzip-install/include ${ZLIB_INCLUDE_DIRS} CACHE INTERNAL "")
     # bz2 may not provide a pkg-config file, so just hardcode its name.
-    set(LIBZIP_LIBRARIES zip ${ZLIB_LIBRARIES} bz2)
+    set(LIBZIP_LIBRARIES zip ${ZLIB_LIBRARIES} bz2 CACHE INTERNAL "")
 endif ()
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
