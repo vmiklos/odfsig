@@ -49,13 +49,10 @@ enable_testing()
 
 # Externals.
 add_subdirectory(extern)
-find_package(PkgConfig REQUIRED)
 
 # xmlsec external.
+find_package(PkgConfig REQUIRED)
 pkg_check_modules(XMLSEC1NSS REQUIRED xmlsec1-nss)
-
-# googletest external.
-include(FindGtest)
 
 # odfsig library.
 add_library(odfsigcore src/lib.cxx)
@@ -73,10 +70,7 @@ target_compile_options(odfsigcore PRIVATE ${XMLSEC1NSS_CFLAGS_OTHER})
 add_executable(odfsigtest tests/testlib.cxx)
 target_link_libraries(odfsigtest
     odfsigcore
-    ${LIBGTEST_LIBRARIES}
-    )
-target_include_directories(odfsigtest PRIVATE
-    ${LIBGTEST_INCLUDE_DIRS}
+    googletest
     )
 add_test(NAME odfsig
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}

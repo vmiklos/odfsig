@@ -28,4 +28,8 @@ else ()
     set(LIBGTEST_LIBRARIES GTest::GTest GTest::Main pthread)
 endif ()
 
+add_library(googletest INTERFACE)
+target_include_directories(googletest INTERFACE ${LIBGTEST_INCLUDE_DIRS})
+target_link_libraries(googletest INTERFACE ${LIBGTEST_LIBRARIES})
+
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
