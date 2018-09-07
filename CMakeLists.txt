@@ -44,12 +44,6 @@ if (ODFSIG_ENABLE_GCOV)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
 endif ()
 
-# Testing.
-enable_testing()
-
-# Externals.
-add_subdirectory(extern)
-
 # xmlsec external.
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(XMLSEC1NSS REQUIRED xmlsec1-nss)
@@ -59,22 +53,8 @@ target_link_libraries(libxmlsec INTERFACE ${XMLSEC1NSS_LIBRARIES})
 target_compile_options(libxmlsec INTERFACE ${XMLSEC1NSS_CFLAGS_OTHER})
 
 add_subdirectory(src)
-
-# odfsig tests.
-add_executable(odfsigtest tests/testlib.cxx)
-target_link_libraries(odfsigtest
-    odfsigcore
-    googletest
-    )
-add_test(NAME odfsig
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    COMMAND odfsigtest
-    )
-
-set(CMAKE_CTEST_COMMAND ctest -V)
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
-add_dependencies(check odfsigtest)
-
 add_subdirectory(apps)
+add_subdirectory(tests)
+add_subdirectory(extern)
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
