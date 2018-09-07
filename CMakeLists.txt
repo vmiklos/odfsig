@@ -53,18 +53,18 @@ add_subdirectory(extern)
 # xmlsec external.
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(XMLSEC1NSS REQUIRED xmlsec1-nss)
+add_library(libxmlsec INTERFACE)
+target_include_directories(libxmlsec INTERFACE ${XMLSEC1NSS_INCLUDE_DIRS})
+target_link_libraries(libxmlsec INTERFACE ${XMLSEC1NSS_LIBRARIES})
+target_compile_options(libxmlsec INTERFACE ${XMLSEC1NSS_CFLAGS_OTHER})
 
 # odfsig library.
 add_library(odfsigcore src/lib.cxx)
-target_include_directories(odfsigcore PRIVATE
-    ${XMLSEC1NSS_INCLUDE_DIRS}
-    )
 target_include_directories(odfsigcore PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(odfsigcore
     libzip
-    ${XMLSEC1NSS_LIBRARIES}
+    libxmlsec
     )
-target_compile_options(odfsigcore PRIVATE ${XMLSEC1NSS_CFLAGS_OTHER})
 
 # odfsig tests.
 add_executable(odfsigtest tests/testlib.cxx)
