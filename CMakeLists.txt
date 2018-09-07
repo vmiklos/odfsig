@@ -58,13 +58,7 @@ target_include_directories(libxmlsec INTERFACE ${XMLSEC1NSS_INCLUDE_DIRS})
 target_link_libraries(libxmlsec INTERFACE ${XMLSEC1NSS_LIBRARIES})
 target_compile_options(libxmlsec INTERFACE ${XMLSEC1NSS_CFLAGS_OTHER})
 
-# odfsig library.
-add_library(odfsigcore src/lib.cxx)
-target_include_directories(odfsigcore PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(odfsigcore
-    libzip
-    libxmlsec
-    )
+add_subdirectory(src)
 
 # odfsig tests.
 add_executable(odfsigtest tests/testlib.cxx)
