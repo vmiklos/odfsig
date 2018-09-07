@@ -75,8 +75,6 @@ set(CMAKE_CTEST_COMMAND ctest -V)
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
 add_dependencies(check odfsigtest)
 
-# odfsig cmdline app.
-add_executable(odfsig apps/app.cxx)
-target_link_libraries(odfsig odfsigcore)
+add_subdirectory(apps)
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
