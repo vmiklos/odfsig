@@ -11,6 +11,7 @@ cmake -DCMAKE_BUILD_TYPE=Debug -DODFSIG_ENABLE_WERROR=ON "$@" ..
 make -j$(getconf _NPROCESSORS_ONLN)
 make check
 # Exclude workdir automatically
+cd ..
 ctags --c++-kinds=+p --fields=+iaS --extra=+q -R --totals=yes $(git ls-files|grep /|sed 's|/.*||'|sort -u)
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
