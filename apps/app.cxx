@@ -46,6 +46,19 @@ bool printSignatures(
         if (!type.empty())
             std::cerr << "  - Signature Type: " << type << std::endl;
 
+        std::vector<std::string> signedStreams = signature->getSignedStreams();
+        if (!signedStreams.empty())
+        {
+            std::cerr << "  - Signed Streams: ";
+            for (size_t i = 0; i < signedStreams.size(); ++i)
+            {
+                if (i)
+                    std::cerr << ", ";
+                std::cerr << signedStreams[i];
+            }
+            std::cerr << std::endl;
+        }
+
         if (!signature->verify())
         {
             if (!signature->getErrorString().empty())

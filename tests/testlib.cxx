@@ -49,6 +49,13 @@ TEST(OdfsigTest, testGood)
     ASSERT_EQ("2018-08-31T22:38:51.034635578", signature->getDate());
     ASSERT_EQ("rsa-sha256", signature->getMethod());
     ASSERT_EQ("XAdES", signature->getType());
+
+    std::vector<std::string> signedStreams{
+        "styles.xml",   "settings.xml",
+        "manifest.rdf", "META-INF/manifest.xml",
+        "mimetype",     "Thumbnails/thumbnail.png",
+        "content.xml",  "meta.xml"};
+    ASSERT_EQ(signedStreams, signature->getSignedStreams());
 }
 
 TEST(OdfsigTest, testBad)

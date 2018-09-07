@@ -29,6 +29,8 @@ class Signature
     virtual std::string getMethod() const = 0;
 
     virtual std::string getType() const = 0;
+
+    virtual std::vector<std::string> getSignedStreams() const = 0;
 };
 
 /// Verifies signatures of an ODF document.

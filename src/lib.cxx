@@ -285,6 +285,8 @@ class XmlSignature : public Signature
 
     std::string getType() const override;
 
+    virtual std::vector<std::string> getSignedStreams() const override;
+
   private:
     std::string getObjectDate(xmlNode* objectNode) const;
 
@@ -394,6 +396,35 @@ std::string XmlSignature::getMethod() const
         return fromXmlChar(href);
 
     return std::string(fromXmlChar(xmlSecTransformKlassGetName(id)));
+}
+
+std::vector<std::string> XmlSignature::getSignedStreams() const
+{
+    xmlNode* signedInfoNode =
+        xmlSecFindChild(_signatureNode, xmlSecNodeSignedInfo, xmlSecDSigNs);
+    if (!signedInfoNode)
+        return {};
+
+    std::vector<std::string> signedStreams;
+    for (xmlNode* signedInfoChild = signedInfoNode->children; signedInfoChild;
+         signedInfoChild = signedInfoChild->next)
+    {
+        if (!xmlSecCheckNodeName(signedInfoChild, xmlSecNodeReference,
+                                 xmlSecDSigNs))
+            continue;
+
+        xmlChar* uriProp = xmlGetProp(signedInfoChild, xmlSecAttrURI);
+        if (!uriProp)
+            continue;
+
+        std::string uri(fromXmlChar(uriProp));
+        if (starts_with(uri, "#"))
+            continue;
+
+        signedStreams.push_back(uri);
+    }
+
+    return signedStreams;
 }
 
 std::string XmlSignature::getType() const
