@@ -60,12 +60,11 @@ include(FindGtest)
 # odfsig library.
 add_library(odfsigcore src/lib.cxx)
 target_include_directories(odfsigcore PRIVATE
-    ${LIBZIP_INCLUDE_DIRS}
     ${XMLSEC1NSS_INCLUDE_DIRS}
     )
 target_include_directories(odfsigcore PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(odfsigcore
-    ${LIBZIP_LIBRARIES}
+    libzip
     ${XMLSEC1NSS_LIBRARIES}
     )
 target_compile_options(odfsigcore PRIVATE ${XMLSEC1NSS_CFLAGS_OTHER})

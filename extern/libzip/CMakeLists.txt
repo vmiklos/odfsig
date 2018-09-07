@@ -23,12 +23,16 @@ else ()
         BUILD_COMMAND make
         INSTALL_COMMAND make install
         )
-    add_library(zip STATIC IMPORTED GLOBAL)
+    add_library(zip STATIC IMPORTED)
     set_property(TARGET zip PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/external/libzip-install/${CMAKE_INSTALL_LIBDIR}/libzip.a)
     add_dependencies(zip externalzip)
-    set(LIBZIP_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/external/libzip-install/include ${ZLIB_INCLUDE_DIRS} CACHE INTERNAL "")
+    set(LIBZIP_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/external/libzip-install/include ${ZLIB_INCLUDE_DIRS})
     # bz2 may not provide a pkg-config file, so just hardcode its name.
-    set(LIBZIP_LIBRARIES zip ${ZLIB_LIBRARIES} bz2 CACHE INTERNAL "")
+    set(LIBZIP_LIBRARIES zip ${ZLIB_LIBRARIES} bz2)
 endif ()
+
+add_library(libzip INTERFACE)
+target_include_directories(libzip INTERFACE ${LIBZIP_INCLUDE_DIRS})
+target_link_libraries(libzip INTERFACE ${LIBZIP_LIBRARIES})
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
