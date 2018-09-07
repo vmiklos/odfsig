@@ -50,12 +50,16 @@ TEST(OdfsigTest, testGood)
     ASSERT_EQ("rsa-sha256", signature->getMethod());
     ASSERT_EQ("XAdES", signature->getType());
 
-    std::vector<std::string> signedStreams{
+    std::set<std::string> signedStreams{
         "styles.xml",   "settings.xml",
         "manifest.rdf", "META-INF/manifest.xml",
         "mimetype",     "Thumbnails/thumbnail.png",
         "content.xml",  "meta.xml"};
     ASSERT_EQ(signedStreams, signature->getSignedStreams());
+
+    // All streams are signed.
+    std::set<std::string> streams = verifier->getStreams();
+    ASSERT_EQ(signedStreams, verifier->getStreams());
 }
 
 TEST(OdfsigTest, testBad)

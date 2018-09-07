@@ -7,6 +7,7 @@
  */
 
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -30,7 +31,7 @@ class Signature
 
     virtual std::string getType() const = 0;
 
-    virtual std::vector<std::string> getSignedStreams() const = 0;
+    virtual std::set<std::string> getSignedStreams() const = 0;
 };
 
 /// Verifies signatures of an ODF document.
@@ -46,6 +47,12 @@ class Verifier
     virtual bool parseSignatures() = 0;
 
     virtual std::vector<std::unique_ptr<Signature>>& getSignatures() = 0;
+
+    /**
+     * Returns all streams in an ODF document (except the signature stream
+     * itself).
+     */
+    virtual std::set<std::string> getStreams() const = 0;
 
     static std::unique_ptr<Verifier> create();
 };

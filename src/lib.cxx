@@ -58,11 +58,19 @@ namespace
 const xmlChar dateNodeName[] = "date";
 const xmlChar dateNsName[] = "http://purl.org/dc/elements/1.1/";
 const xmlChar xadesNsName[] = "http://uri.etsi.org/01903/v1.3.2#";
+const char signaturesStreamName[] = "META-INF/documentsignatures.xml";
 
 /// Checks if `big` begins with `small`.
 bool starts_with(const std::string& big, const std::string& small)
 {
     return big.compare(0, small.length(), small) == 0;
+}
+
+/// Checks if `big` ends with `small`.
+bool ends_with(const std::string& big, const std::string& small)
+{
+    return big.compare(big.length() - small.length(), small.length(), small) ==
+           0;
 }
 
 /// Converts from libxml char to normal char.
@@ -285,7 +293,7 @@ class XmlSignature : public Signature
 
     std::string getType() const override;
 
-    virtual std::vector<std::string> getSignedStreams() const override;
+    virtual std::set<std::string> getSignedStreams() const override;
 
   private:
     std::string getObjectDate(xmlNode* objectNode) const;
@@ -398,14 +406,14 @@ std::string XmlSignature::getMethod() const
     return std::string(fromXmlChar(xmlSecTransformKlassGetName(id)));
 }
 
-std::vector<std::string> XmlSignature::getSignedStreams() const
+std::set<std::string> XmlSignature::getSignedStreams() const
 {
     xmlNode* signedInfoNode =
         xmlSecFindChild(_signatureNode, xmlSecNodeSignedInfo, xmlSecDSigNs);
     if (!signedInfoNode)
         return {};
 
-    std::vector<std::string> signedStreams;
+    std::set<std::string> signedStreams;
     for (xmlNode* signedInfoChild = signedInfoNode->children; signedInfoChild;
          signedInfoChild = signedInfoChild->next)
     {
@@ -421,7 +429,7 @@ std::vector<std::string> XmlSignature::getSignedStreams() const
         if (starts_with(uri, "#"))
             continue;
 
-        signedStreams.push_back(uri);
+        signedStreams.insert(uri);
     }
 
     return signedStreams;
@@ -574,6 +582,8 @@ class ZipVerifier : public Verifier
 
     std::vector<std::unique_ptr<Signature>>& getSignatures() override;
 
+    virtual std::set<std::string> getStreams() const override;
+
   private:
     bool locateSignatures();
 
@@ -683,11 +693,36 @@ std::vector<std::unique_ptr<Signature>>& ZipVerifier::getSignatures()
     return _signatures;
 }
 
+std::set<std::string> ZipVerifier::getStreams() const
+{
+    std::set<std::string> streams;
+    zip_int64_t numEntries = zip_get_num_entries(_zipArchive.get(), 0);
+    if (numEntries < 0)
+        return streams;
+
+    for (zip_int64_t entry = 0; entry < numEntries; ++entry)
+    {
+        const char* name = zip_get_name(_zipArchive.get(), entry, 0);
+        if (!name)
+            continue;
+
+        std::string stream(name);
+        if (ends_with(stream, "/"))
+            continue;
+
+        if (stream == signaturesStreamName)
+            continue;
+
+        streams.insert(zip_get_name(_zipArchive.get(), entry, 0));
+    }
+    return streams;
+}
+
 bool ZipVerifier::locateSignatures()
 {
     zip_flags_t locateFlags = 0;
-    _signaturesZipIndex = zip_name_locate(
-        _zipArchive.get(), "META-INF/documentsignatures.xml", locateFlags);
+    _signaturesZipIndex =
+        zip_name_locate(_zipArchive.get(), signaturesStreamName, locateFlags);
 
     return _signaturesZipIndex >= 0;
 }

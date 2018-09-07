@@ -11,7 +11,7 @@
 namespace
 {
 bool printSignatures(
-    const std::string& odfPath,
+    const std::string& odfPath, const std::set<std::string>& streams,
     std::vector<std::unique_ptr<odfsig::Signature>>& signatures)
 {
     if (signatures.empty())
@@ -46,17 +46,29 @@ bool printSignatures(
         if (!type.empty())
             std::cerr << "  - Signature Type: " << type << std::endl;
 
-        std::vector<std::string> signedStreams = signature->getSignedStreams();
+        std::set<std::string> signedStreams = signature->getSignedStreams();
         if (!signedStreams.empty())
         {
             std::cerr << "  - Signed Streams: ";
-            for (size_t i = 0; i < signedStreams.size(); ++i)
+            bool first = true;
+            for (const auto& signedStream : signedStreams)
             {
-                if (i)
+                if (first)
+                    first = false;
+                else
                     std::cerr << ", ";
-                std::cerr << signedStreams[i];
+                std::cerr << signedStream;
             }
             std::cerr << std::endl;
+        }
+
+        if (signedStreams == streams)
+            std::cerr << "  - Total document signed." << std::endl;
+        else
+        {
+            std::cerr << "  - Only part of the document is signed."
+                      << std::endl;
+            return false;
         }
 
         if (!signature->verify())
@@ -104,7 +116,8 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    if (!printSignatures(odfPath, verifier->getSignatures()))
+    std::set<std::string> streams = verifier->getStreams();
+    if (!printSignatures(odfPath, streams, verifier->getSignatures()))
         return 1;
 
     return 0;

@@ -23,6 +23,11 @@ the cmdline equivalent of the LibreOffice signature verifier GUI.
   https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS[nss])
 - https://libzip.org/[libzip]
 
+== Resources
+
+- http://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-part3.html#$$__RefHeading__752871_826425813$$[ODF
+  v1.2 digital signatures file spec]
+
 == License
 
 Use of this source code is governed by a BSD-style license that can be found in
