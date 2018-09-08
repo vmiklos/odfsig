@@ -4,5 +4,6 @@
 
 add_subdirectory(googletest)
 add_subdirectory(libzip)
+add_subdirectory(xmlsec)
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:

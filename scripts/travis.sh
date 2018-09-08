@@ -6,16 +6,6 @@
 # Baseline: Ubuntu Trusty 14.04.
 CWD=$PWD
 
-# xmlsec1 is too old to disable cert verification properly.
-xmlsec_ver=1.2.26
-wget http://www.aleksey.com/xmlsec/download/xmlsec1-$xmlsec_ver.tar.gz
-tar xvf xmlsec1-$xmlsec_ver.tar.gz
-cd xmlsec1-$xmlsec_ver
-./configure --prefix=/usr --without-gnutls --without-gcrypt --without-openssl --disable-apps --disable-docs --disable-crypto-dl
-make -j$(getconf _NPROCESSORS_ONLN)
-sudo make install
-cd -
-
 # Setup a dummy Firefox profile.
 mkdir -p ~/.mozilla/firefox
 cd ~/.mozilla/firefox
@@ -34,6 +24,7 @@ CC=gcc-7 CXX=g++-7 cmake \
     -DODFSIG_ENABLE_WERROR=ON \
     -DODFSIG_INTERNAL_LIBZIP=ON \
     -DODFSIG_INTERNAL_LIBGTEST=ON \
+    -DODFSIG_INTERNAL_XMLSEC=ON \
         ..
 make -j$(getconf _NPROCESSORS_ONLN)
 make check

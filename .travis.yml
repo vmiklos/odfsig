@@ -1,5 +1,4 @@
 language: cpp
-sudo: required
 script:
     - scripts/travis.sh
 addons:
@@ -11,9 +10,10 @@ addons:
             - g++-7
             # Actual dependencies.
             - cmake
-            # internal libgtest-dev has no dependencies
-            - libxmlsec1-dev
-            # internal libzip dependency
+            # Internal xmlsec dependencies.
+            - libnss3-dev
+            - libxml2-dev
+            # Internal libzip dependency.
             - libbz2-dev
             # Needed by scripts/travis.sh only.
             - libnss3-tools
