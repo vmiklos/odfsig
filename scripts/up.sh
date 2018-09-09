@@ -4,8 +4,9 @@
 # found in the LICENSE file.
 
 #git pull -r
-scripts/build.sh -DCMAKE_BUILD_TYPE=Debug -DODFSIG_ENABLE_WERROR=ON "$@"
-# Exclude workdir automatically
+scripts/build.sh --debug --werror "$@"
+
+# Exclude workdir automatically.
 ctags --c++-kinds=+p --fields=+iaS --extra=+q -R --totals=yes $(git ls-files|grep /|sed 's|/.*||'|sort -u)
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:

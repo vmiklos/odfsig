@@ -1,6 +1,6 @@
 language: cpp
 script:
-    - scripts/travis.sh
+    - scripts/travis.sh --debug --werror --internal-libs
 addons:
     apt:
         sources:

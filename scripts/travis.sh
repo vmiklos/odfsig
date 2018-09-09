@@ -17,11 +17,6 @@ certutil -N -f pwdfile.txt -d .
 certutil -A -n "odfsig ca" -t "C,C,C" -i $CWD/tests/keys/ca-chain.cert.pem -d .
 cd $CWD
 
-CC=gcc-7 CXX=g++-7 scripts/build.sh \
-    -DCMAKE_BUILD_TYPE=Debug \
-    -DODFSIG_ENABLE_WERROR=ON \
-    -DODFSIG_INTERNAL_LIBZIP=ON \
-    -DODFSIG_INTERNAL_LIBGTEST=ON \
-    -DODFSIG_INTERNAL_XMLSEC=ON
+CC=gcc-7 CXX=g++-7 scripts/build.sh "$@"
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
