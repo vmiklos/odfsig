@@ -394,14 +394,16 @@ std::string XmlSignature::getMethod() const
     if (!signatureMethodNode)
         return std::string();
 
-    xmlChar* href = xmlGetProp(signatureMethodNode, xmlSecAttrAlgorithm);
+    std::unique_ptr<xmlChar> href(
+        xmlGetProp(signatureMethodNode, xmlSecAttrAlgorithm));
     if (!href)
         return std::string();
 
-    xmlSecTransformId id = xmlSecTransformIdListFindByHref(
-        xmlSecTransformIdsGet(), href, xmlSecTransformUsageSignatureMethod);
+    xmlSecTransformId id =
+        xmlSecTransformIdListFindByHref(xmlSecTransformIdsGet(), href.get(),
+                                        xmlSecTransformUsageSignatureMethod);
     if (id == xmlSecTransformIdUnknown)
-        return fromXmlChar(href);
+        return fromXmlChar(href.get());
 
     return std::string(fromXmlChar(xmlSecTransformKlassGetName(id)));
 }
@@ -421,11 +423,12 @@ std::set<std::string> XmlSignature::getSignedStreams() const
                                  xmlSecDSigNs))
             continue;
 
-        xmlChar* uriProp = xmlGetProp(signedInfoChild, xmlSecAttrURI);
+        std::unique_ptr<xmlChar> uriProp(
+            xmlGetProp(signedInfoChild, xmlSecAttrURI));
         if (!uriProp)
             continue;
 
-        std::string uri(fromXmlChar(uriProp));
+        std::string uri(fromXmlChar(uriProp.get()));
         if (starts_with(uri, "#"))
             continue;
 

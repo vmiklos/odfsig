@@ -16,6 +16,7 @@ else ()
     ExternalProject_Add(extern-xmlsec-project
         URL http://www.aleksey.com/xmlsec/download/xmlsec1-1.2.26.tar.gz
         URL_HASH SHA256=8d8276c9c720ca42a3b0023df8b7ae41a2d6c5f9aa8d20ed1672d84cc8982d50
+        PATCH_COMMAND patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/nss-fix-memory-leak-in-GetCertName-220.patch
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON
         CONFIGURE_COMMAND ./configure
