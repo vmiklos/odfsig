@@ -1,12 +1,12 @@
 language: cpp
 script:
-    - scripts/travis.sh $DEBUG $WERROR --internal-libs
+    - scripts/travis.sh $TRAVIS_ARGS --internal-libs
 matrix:
   include:
   - name: "linux gcc release"
-    env: DEBUG= WERROR=--werror
-  - name: "linux gcc debug"
-    env: DEBUG=--debug WERROR=--werror
+    env: TRAVIS_ARGS="--werror"
+  - name: "linux clang debug"
+    env: TRAVIS_ARGS="--debug --werror --clang"
 addons:
     apt:
         sources:

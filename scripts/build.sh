@@ -19,6 +19,11 @@ do
             cmake_args+=" -DODFSIG_INTERNAL_LIBGTEST=ON"
             cmake_args+=" -DODFSIG_INTERNAL_XMLSEC=ON"
             ;;
+        --clang)
+            export CC=clang
+            export CXX=clang++
+            export CCACHE_CPP2=1
+            ;;
         *)
             cmake_args+=" $arg"
     esac
