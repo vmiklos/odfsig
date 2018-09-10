@@ -7,6 +7,10 @@ matrix:
     env: TRAVIS_ARGS="--werror"
   - name: "linux clang debug"
     env: TRAVIS_ARGS="--debug --werror --clang"
+  - name: "linux clang sanitizers"
+    env: TRAVIS_ARGS="--debug --werror --sanitizers"
+    # See <https://github.com/travis-ci/travis-ci/issues/9033>.
+    sudo: true
 addons:
     apt:
         sources:
