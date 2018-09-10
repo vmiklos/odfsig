@@ -7,6 +7,7 @@
  */
 
 #include <memory>
+#include <ostream>
 #include <set>
 #include <string>
 #include <vector>
@@ -56,6 +57,9 @@ class Verifier
 
     static std::unique_ptr<Verifier> create();
 };
+
+/// CLI wrapper around the C++ API.
+int main(int argc, char* argv[], std::ostream& ostream);
 }
 #endif /* _HAD_ODFSIG_LIB_H */
 
