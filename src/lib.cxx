@@ -88,12 +88,10 @@ const char* fromXmlChar(const xmlChar* s)
  * Path=...
  * Default=...
  */
-std::string getFirefoxProfile()
+std::string getFirefoxProfile(const std::string& cryptoConfig)
 {
     std::stringstream ss;
-    const char* home = getenv("HOME");
-    if (home)
-        ss << home;
+    ss << cryptoConfig;
     ss << "/.mozilla/firefox/";
     const std::string firefoxPath = ss.str();
 
@@ -195,10 +193,10 @@ int close(void* context)
 class XmlSecGuard
 {
   public:
-    explicit XmlSecGuard(zip_t* zipArchive)
+    explicit XmlSecGuard(zip_t* zipArchive, const std::string& cryptoConfig)
     {
         // Initialize nss.
-        std::string firefoxProfile = getFirefoxProfile();
+        std::string firefoxProfile = getFirefoxProfile(cryptoConfig);
         const char* nssDb = nullptr;
         if (!firefoxProfile.empty())
             nssDb = firefoxProfile.c_str();
@@ -577,6 +575,8 @@ XmlSignature::getSignaturePropertyDate(xmlNode* signaturePropertyNode) const
 class ZipVerifier : public Verifier
 {
   public:
+    explicit ZipVerifier(const std::string& cryptoConfig);
+
     bool openZip(const std::string& path) override;
 
     const std::string& getErrorString() const override;
@@ -599,11 +599,17 @@ class ZipVerifier : public Verifier
     std::vector<char> _signaturesBytes;
     std::unique_ptr<xmlDoc> _signaturesDoc;
     std::vector<std::unique_ptr<Signature>> _signatures;
+    std::string _cryptoConfig;
 };
 
-std::unique_ptr<Verifier> Verifier::create()
+std::unique_ptr<Verifier> Verifier::create(const std::string& cryptoConfig)
 {
-    return std::unique_ptr<Verifier>(new ZipVerifier());
+    return std::unique_ptr<Verifier>(new ZipVerifier(cryptoConfig));
+}
+
+ZipVerifier::ZipVerifier(const std::string& cryptoConfig)
+{
+    _cryptoConfig = cryptoConfig;
 }
 
 bool ZipVerifier::openZip(const std::string& path)
@@ -633,7 +639,7 @@ bool ZipVerifier::parseSignatures()
 
     _xmlGuard.reset(new XmlGuard());
 
-    _xmlSecGuard.reset(new XmlSecGuard(_zipArchive.get()));
+    _xmlSecGuard.reset(new XmlSecGuard(_zipArchive.get(), _cryptoConfig));
     if (!_xmlSecGuard->isGood())
     {
         _errorString = "Failed to initialize libxmlsec";

@@ -101,7 +101,12 @@ int main(int argc, char* argv[], std::ostream& ostream)
         return 1;
     }
 
-    std::unique_ptr<odfsig::Verifier> verifier(odfsig::Verifier::create());
+    std::string cryptoConfig;
+    const char* home = getenv("HOME");
+    if (home)
+        cryptoConfig = home;
+    std::unique_ptr<odfsig::Verifier> verifier(
+        odfsig::Verifier::create(cryptoConfig));
 
     std::string odfPath(argv[1]);
     if (!verifier->openZip(odfPath))

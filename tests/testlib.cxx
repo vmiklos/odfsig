@@ -11,14 +11,16 @@
 TEST(OdfsigTest, testOpenZip)
 {
     // ZipVerifier::openZip() negative testing.
-    std::unique_ptr<odfsig::Verifier> verifier(odfsig::Verifier::create());
+    std::unique_ptr<odfsig::Verifier> verifier(
+        odfsig::Verifier::create(getenv("HOME")));
     ASSERT_EQ(false, verifier->openZip("non-existent.odt"));
 }
 
 TEST(OdfsigTest, testParseSignaturesEmptyStream)
 {
     // ZipVerifier::parseSignatures(), empty signatures stream.
-    std::unique_ptr<odfsig::Verifier> verifier(odfsig::Verifier::create());
+    std::unique_ptr<odfsig::Verifier> verifier(
+        odfsig::Verifier::create(getenv("HOME")));
     ASSERT_TRUE(verifier->openZip("tests/data/empty-stream.odt"));
     ASSERT_TRUE(verifier->parseSignatures());
     ASSERT_TRUE(verifier->getSignatures().empty());
@@ -27,7 +29,8 @@ TEST(OdfsigTest, testParseSignaturesEmptyStream)
 TEST(OdfsigTest, testParseSignaturesNoStream)
 {
     // ZipVerifier::parseSignatures(), no signatures stream.
-    std::unique_ptr<odfsig::Verifier> verifier(odfsig::Verifier::create());
+    std::unique_ptr<odfsig::Verifier> verifier(
+        odfsig::Verifier::create(getenv("HOME")));
     ASSERT_TRUE(verifier->openZip("tests/data/no-stream.odt"));
     ASSERT_TRUE(verifier->parseSignatures());
     ASSERT_TRUE(verifier->getSignatures().empty());
@@ -36,7 +39,8 @@ TEST(OdfsigTest, testParseSignaturesNoStream)
 TEST(OdfsigTest, testGood)
 {
     // XmlSignature::verify(), positive testing.
-    std::unique_ptr<odfsig::Verifier> verifier(odfsig::Verifier::create());
+    std::unique_ptr<odfsig::Verifier> verifier(
+        odfsig::Verifier::create(getenv("HOME")));
     ASSERT_TRUE(verifier->openZip("tests/data/good.odt"));
     ASSERT_TRUE(verifier->parseSignatures());
     std::vector<std::unique_ptr<odfsig::Signature>>& signatures =
@@ -65,7 +69,8 @@ TEST(OdfsigTest, testGood)
 TEST(OdfsigTest, testBad)
 {
     // XmlSignature::verify(), negative testing.
-    std::unique_ptr<odfsig::Verifier> verifier(odfsig::Verifier::create());
+    std::unique_ptr<odfsig::Verifier> verifier(
+        odfsig::Verifier::create(getenv("HOME")));
     ASSERT_TRUE(verifier->openZip("tests/data/bad.odt"));
     ASSERT_TRUE(verifier->parseSignatures());
     std::vector<std::unique_ptr<odfsig::Signature>>& signatures =

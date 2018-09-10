@@ -55,7 +55,7 @@ class Verifier
      */
     virtual std::set<std::string> getStreams() const = 0;
 
-    static std::unique_ptr<Verifier> create();
+    static std::unique_ptr<Verifier> create(const std::string& cryptoConfig);
 };
 
 /// CLI wrapper around the C++ API.
