@@ -70,7 +70,7 @@ class Verifier
 };
 
 /// CLI wrapper around the C++ API.
-int main(int argc, char* argv[], std::ostream& ostream);
+int main(int argc, const char* argv[], std::ostream& ostream);
 }
 #endif /* _HAD_ODFSIG_LIB_H */
 

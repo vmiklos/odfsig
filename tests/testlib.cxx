@@ -4,6 +4,7 @@
  * found in the LICENSE file.
  */
 
+#include <iosfwd>
 #include <memory>
 #include <set>
 #include <stddef.h>
@@ -109,6 +110,16 @@ TEST(OdfsigTest, testBadCertificate)
         verifier->getSignatures();
     ASSERT_EQ(static_cast<size_t>(1), signatures.size());
     ASSERT_FALSE(signatures[0]->verify());
+}
+
+TEST(OdfsigTest, testTrustedDerCmdline)
+{
+    // --trusted-der results in working validation.
+    std::vector<const char*> args{"odfsig", "--trusted-der",
+                                  "tests/keys/ca-chain.cert.der",
+                                  "tests/data/good.odt"};
+    std::stringstream ss;
+    ASSERT_EQ(0, odfsig::main(args.size(), args.data(), ss));
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

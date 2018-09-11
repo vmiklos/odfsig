@@ -98,13 +98,45 @@ bool printSignatures(
 
 namespace odfsig
 {
-int main(int argc, char* argv[], std::ostream& ostream)
+
+struct Options
+{
+    std::string _odfPath;
+    std::vector<std::string> _trustedDers;
+};
+
+void parseOptions(std::vector<const char*>& args, Options& options)
+{
+    bool inTrustedDer = false;
+    for (const auto& arg : args)
+    {
+        std::string argString(arg);
+        if (argString == "--trusted-der")
+            inTrustedDer = true;
+        else if (inTrustedDer)
+        {
+            inTrustedDer = false;
+            options._trustedDers.push_back(argString);
+        }
+        else
+            options._odfPath = argString;
+    }
+}
+
+int main(int argc, const char* argv[], std::ostream& ostream)
 {
     if (argc < 2)
     {
-        ostream << "Usage: " << argv[0] << " <ODF-file>" << std::endl;
+        ostream << "Usage: " << argv[0] << " [options] <ODF-file>" << std::endl;
+        ostream << "--trusted-der <file>: load trusted (root) certificate from "
+                   "DER file <file>"
+                << std::endl;
         return 1;
     }
+
+    std::vector<const char*> args(argv, argv + argc);
+    Options options;
+    parseOptions(args, options);
 
     std::string cryptoConfig;
     const char* home = getenv("HOME");
@@ -112,11 +144,11 @@ int main(int argc, char* argv[], std::ostream& ostream)
         cryptoConfig = home;
     std::unique_ptr<odfsig::Verifier> verifier(
         odfsig::Verifier::create(cryptoConfig));
+    verifier->setTrustedDers(options._trustedDers);
 
-    std::string odfPath(argv[1]);
-    if (!verifier->openZip(odfPath))
+    if (!verifier->openZip(options._odfPath))
     {
-        ostream << "Can't open zip archive '" << odfPath
+        ostream << "Can't open zip archive '" << options._odfPath
                 << "': " << verifier->getErrorString() << "." << std::endl;
         return 1;
     }
@@ -129,7 +161,8 @@ int main(int argc, char* argv[], std::ostream& ostream)
     }
 
     std::set<std::string> streams = verifier->getStreams();
-    if (!printSignatures(odfPath, streams, verifier->getSignatures(), ostream))
+    if (!printSignatures(options._odfPath, streams, verifier->getSignatures(),
+                         ostream))
         return 1;
 
     return 0;
