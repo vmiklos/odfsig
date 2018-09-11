@@ -276,7 +276,8 @@ class XmlSecGuard
 class XmlSignature : public Signature
 {
   public:
-    explicit XmlSignature(xmlNode* signatureNode);
+    explicit XmlSignature(xmlNode* signatureNode,
+                          const std::vector<std::string>& trustedDers);
     virtual ~XmlSignature();
 
     const std::string& getErrorString() const override;
@@ -308,10 +309,13 @@ class XmlSignature : public Signature
     std::string _errorString;
 
     xmlNode* _signatureNode = nullptr;
+
+    std::vector<std::string> _trustedDers;
 };
 
-XmlSignature::XmlSignature(xmlNode* signatureNode)
-    : _signatureNode(signatureNode)
+XmlSignature::XmlSignature(xmlNode* signatureNode,
+                           const std::vector<std::string>& trustedDers)
+    : _signatureNode(signatureNode), _trustedDers(trustedDers)
 {
 }
 
@@ -332,6 +336,17 @@ bool XmlSignature::verify()
     {
         _errorString = "Keys manager init failed";
         return false;
+    }
+
+    for (const auto& trustedDer : _trustedDers)
+    {
+        if (xmlSecNssAppKeysMngrCertLoad(pKeysMngr.get(), trustedDer.c_str(),
+                                         xmlSecKeyDataFormatDer,
+                                         xmlSecKeyDataTypeTrusted) < 0)
+        {
+            _errorString = "Keys manager cert load failed";
+            return false;
+        }
     }
 
     std::unique_ptr<xmlSecDSigCtx> dsigCtx(
@@ -581,6 +596,8 @@ class ZipVerifier : public Verifier
 
     const std::string& getErrorString() const override;
 
+    void setTrustedDers(const std::vector<std::string>& trustedDers) override;
+
     bool parseSignatures() override;
 
     std::vector<std::unique_ptr<Signature>>& getSignatures() override;
@@ -591,15 +608,26 @@ class ZipVerifier : public Verifier
     bool locateSignatures();
 
     std::unique_ptr<zip_t> _zipArchive;
+
     std::string _errorString;
+
     zip_int64_t _signaturesZipIndex = 0;
+
     std::unique_ptr<XmlGuard> _xmlGuard;
+
     std::unique_ptr<XmlSecGuard> _xmlSecGuard;
+
     std::unique_ptr<zip_file_t> _zipFile;
+
     std::vector<char> _signaturesBytes;
+
     std::unique_ptr<xmlDoc> _signaturesDoc;
+
     std::vector<std::unique_ptr<Signature>> _signatures;
+
     std::string _cryptoConfig;
+
+    std::vector<std::string> _trustedDers;
 };
 
 std::unique_ptr<Verifier> Verifier::create(const std::string& cryptoConfig)
@@ -630,6 +658,11 @@ bool ZipVerifier::openZip(const std::string& path)
 }
 
 const std::string& ZipVerifier::getErrorString() const { return _errorString; }
+
+void ZipVerifier::setTrustedDers(const std::vector<std::string>& trustedDers)
+{
+    _trustedDers = trustedDers;
+}
 
 bool ZipVerifier::parseSignatures()
 {
@@ -691,8 +724,8 @@ bool ZipVerifier::parseSignatures()
 
     for (xmlNode* signatureNode = signaturesRoot->children; signatureNode;
          signatureNode = signatureNode->next)
-        _signatures.push_back(
-            std::unique_ptr<Signature>(new XmlSignature(signatureNode)));
+        _signatures.push_back(std::unique_ptr<Signature>(
+            new XmlSignature(signatureNode, _trustedDers)));
 
     return true;
 }

@@ -45,6 +45,13 @@ class Verifier
 
     virtual const std::string& getErrorString() const = 0;
 
+    /**
+     * List of file paths representing DER CA chains to trust, useful when the
+     * crypto config is empty.
+     */
+    virtual void
+    setTrustedDers(const std::vector<std::string>& trustedDers) = 0;
+
     virtual bool parseSignatures() = 0;
 
     virtual std::vector<std::unique_ptr<Signature>>& getSignatures() = 0;
@@ -55,6 +62,10 @@ class Verifier
      */
     virtual std::set<std::string> getStreams() const = 0;
 
+    /**
+     * cryptoConfig can be a path to a crypto DB, in which case no need to
+     * trust DER CA chains manually.
+     */
     static std::unique_ptr<Verifier> create(const std::string& cryptoConfig);
 };
 

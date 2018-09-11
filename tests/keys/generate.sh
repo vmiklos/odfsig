@@ -47,6 +47,7 @@ chmod 444 intermediate/certs/intermediate.cert.pem
 
 cat intermediate/certs/intermediate.cert.pem certs/ca.cert.pem > intermediate/certs/ca-chain.cert.pem
 chmod 444 intermediate/certs/ca-chain.cert.pem
+openssl x509 -outform DER -in intermediate/certs/ca-chain.cert.pem -out intermediate/certs/ca-chain.cert.der
 
 # Signing keys.
 for i in alice bob
