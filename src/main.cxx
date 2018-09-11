@@ -5,6 +5,11 @@
  */
 
 #include <iostream>
+#include <memory>
+#include <set>
+#include <stdlib.h>
+#include <string>
+#include <vector>
 
 #include <odfsig/lib.hxx>
 

@@ -7,19 +7,33 @@
 #include <odfsig/lib.hxx>
 
 #include <assert.h>
+#include <stddef.h>
 
-#include <fstream>
+#include <fstream> // IWYU pragma: keep
 #include <iostream>
-#include <sstream>
+#include <sstream> // IWYU pragma: keep
 
 #include <cert.h>
+#include <certt.h>
+#include <libxml/globals.h>
+#include <libxml/parser.h>
+#include <libxml/xmlstring.h>
+#include <libxml/xmlversion.h>
+#include <prtypes.h>
+#include <seccomon.h>
 #include <xmlsec/base64.h>
 #include <xmlsec/io.h>
+#include <xmlsec/keysdata.h>
+#include <xmlsec/keysmngr.h>
 #include <xmlsec/nss/app.h>
 #include <xmlsec/nss/crypto.h>
+#include <xmlsec/strings.h>
+#include <xmlsec/transforms.h>
 #include <xmlsec/xmldsig.h>
+#include <xmlsec/xmlsec.h>
 #include <xmlsec/xmltree.h>
 #include <zip.h>
+#include <zipconf.h>
 
 namespace std
 {

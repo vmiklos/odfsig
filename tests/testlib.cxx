@@ -4,6 +4,14 @@
  * found in the LICENSE file.
  */
 
+#include <memory>
+#include <set>
+#include <stddef.h>
+#include <string>
+#include <vector>
+
+#include <gtest/gtest-message.h>
+#include <gtest/gtest-test-part.h>
 #include <gtest/gtest.h>
 
 #include <odfsig/lib.hxx>
