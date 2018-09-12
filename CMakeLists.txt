@@ -25,11 +25,13 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type (default Release)" FORCE)
 endif()
 
+include(HandleAsciidoc)
 include(HandleOdfsigOptions)
 
-add_subdirectory(src)
 add_subdirectory(apps)
-add_subdirectory(tests)
+add_subdirectory(docs)
 add_subdirectory(extern)
+add_subdirectory(src)
+add_subdirectory(tests)
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
