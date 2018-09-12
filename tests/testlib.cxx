@@ -131,4 +131,12 @@ TEST(OdfsigTest, testInsecureCmdline)
     ASSERT_EQ(0, odfsig::main(args.size(), args.data(), ss));
 }
 
+TEST(OdfsigTest, testCmdlineHelp)
+{
+    // --help resulted in an error.
+    std::vector<const char*> args{"odfsig", "--help"};
+    std::stringstream ss;
+    ASSERT_EQ(0, odfsig::main(args.size(), args.data(), ss));
+}
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

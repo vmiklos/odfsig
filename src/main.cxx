@@ -94,18 +94,16 @@ bool printSignatures(
 
     return true;
 }
-}
-
-namespace odfsig
-{
 
 struct Options
 {
     std::string _odfPath;
     std::vector<std::string> _trustedDers;
     bool _insecure = false;
+    bool _help = false;
 };
 
+/// Minimal option parser to avoid Boost.Program_options dependency.
 void parseOptions(std::vector<const char*>& args, Options& options)
 {
     bool inTrustedDer = false;
@@ -121,26 +119,41 @@ void parseOptions(std::vector<const char*>& args, Options& options)
         }
         else if (argString == "--insecure")
             options._insecure = true;
+        else if (argString == "--help")
+            options._help = true;
         else
             options._odfPath = argString;
     }
 }
 
+void usage(const std::string& self, std::ostream& ostream)
+{
+    ostream << "Usage: " << self << " [options] <ODF-file>" << std::endl;
+    ostream << "--trusted-der <file>: load trusted (root) certificate from "
+               "DER file <file>"
+            << std::endl;
+    ostream << "--insecure: do not validate certificates" << std::endl;
+}
+}
+
+namespace odfsig
+{
 int main(int argc, const char* argv[], std::ostream& ostream)
 {
     if (argc < 2)
     {
-        ostream << "Usage: " << argv[0] << " [options] <ODF-file>" << std::endl;
-        ostream << "--trusted-der <file>: load trusted (root) certificate from "
-                   "DER file <file>"
-                << std::endl;
-        ostream << "--insecure: do not validate certificates" << std::endl;
+        usage(argv[0], ostream);
         return 1;
     }
 
     std::vector<const char*> args(argv, argv + argc);
     Options options;
     parseOptions(args, options);
+    if (options._help)
+    {
+        usage(argv[0], ostream);
+        return 0;
+    }
 
     std::string cryptoConfig;
     const char* home = getenv("HOME");
