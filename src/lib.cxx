@@ -291,7 +291,8 @@ class XmlSignature : public Signature
 {
   public:
     explicit XmlSignature(xmlNode* signatureNode,
-                          const std::vector<std::string>& trustedDers);
+                          const std::vector<std::string>& trustedDers,
+                          bool insecure);
     virtual ~XmlSignature();
 
     const std::string& getErrorString() const override;
@@ -325,11 +326,15 @@ class XmlSignature : public Signature
     xmlNode* _signatureNode = nullptr;
 
     std::vector<std::string> _trustedDers;
+
+    bool _insecure = false;
 };
 
 XmlSignature::XmlSignature(xmlNode* signatureNode,
-                           const std::vector<std::string>& trustedDers)
-    : _signatureNode(signatureNode), _trustedDers(trustedDers)
+                           const std::vector<std::string>& trustedDers,
+                           bool insecure)
+    : _signatureNode(signatureNode), _trustedDers(trustedDers),
+      _insecure(insecure)
 {
 }
 
@@ -370,6 +375,10 @@ bool XmlSignature::verify()
         _errorString = "DSig context initialize failed";
         return false;
     }
+
+    if (_insecure)
+        dsigCtx->keyInfoReadCtx.flags |=
+            XMLSEC_KEYINFO_FLAGS_X509DATA_DONT_VERIFY_CERTS;
 
     if (xmlSecDSigCtxVerify(dsigCtx.get(), _signatureNode) < 0)
     {
@@ -612,6 +621,8 @@ class ZipVerifier : public Verifier
 
     void setTrustedDers(const std::vector<std::string>& trustedDers) override;
 
+    void setInsecure(bool insecure) override;
+
     bool parseSignatures() override;
 
     std::vector<std::unique_ptr<Signature>>& getSignatures() override;
@@ -642,6 +653,8 @@ class ZipVerifier : public Verifier
     std::string _cryptoConfig;
 
     std::vector<std::string> _trustedDers;
+
+    bool _insecure = false;
 };
 
 std::unique_ptr<Verifier> Verifier::create(const std::string& cryptoConfig)
@@ -677,6 +690,8 @@ void ZipVerifier::setTrustedDers(const std::vector<std::string>& trustedDers)
 {
     _trustedDers = trustedDers;
 }
+
+void ZipVerifier::setInsecure(bool insecure) { _insecure = insecure; }
 
 bool ZipVerifier::parseSignatures()
 {
@@ -739,7 +754,7 @@ bool ZipVerifier::parseSignatures()
     for (xmlNode* signatureNode = signaturesRoot->children; signatureNode;
          signatureNode = signatureNode->next)
         _signatures.push_back(std::unique_ptr<Signature>(
-            new XmlSignature(signatureNode, _trustedDers)));
+            new XmlSignature(signatureNode, _trustedDers, _insecure)));
 
     return true;
 }

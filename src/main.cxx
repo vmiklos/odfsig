@@ -103,6 +103,7 @@ struct Options
 {
     std::string _odfPath;
     std::vector<std::string> _trustedDers;
+    bool _insecure = false;
 };
 
 void parseOptions(std::vector<const char*>& args, Options& options)
@@ -118,6 +119,8 @@ void parseOptions(std::vector<const char*>& args, Options& options)
             inTrustedDer = false;
             options._trustedDers.push_back(argString);
         }
+        else if (argString == "--insecure")
+            options._insecure = true;
         else
             options._odfPath = argString;
     }
@@ -131,6 +134,7 @@ int main(int argc, const char* argv[], std::ostream& ostream)
         ostream << "--trusted-der <file>: load trusted (root) certificate from "
                    "DER file <file>"
                 << std::endl;
+        ostream << "--insecure: do not validate certificates" << std::endl;
         return 1;
     }
 
@@ -145,6 +149,7 @@ int main(int argc, const char* argv[], std::ostream& ostream)
     std::unique_ptr<odfsig::Verifier> verifier(
         odfsig::Verifier::create(cryptoConfig));
     verifier->setTrustedDers(options._trustedDers);
+    verifier->setInsecure(options._insecure);
 
     if (!verifier->openZip(options._odfPath))
     {

@@ -52,6 +52,9 @@ class Verifier
     virtual void
     setTrustedDers(const std::vector<std::string>& trustedDers) = 0;
 
+    /// Sets if the certificate should be validated.
+    virtual void setInsecure(bool insecure) = 0;
+
     virtual bool parseSignatures() = 0;
 
     virtual std::vector<std::unique_ptr<Signature>>& getSignatures() = 0;

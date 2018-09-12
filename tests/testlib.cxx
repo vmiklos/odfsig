@@ -122,4 +122,13 @@ TEST(OdfsigTest, testTrustedDerCmdline)
     ASSERT_EQ(0, odfsig::main(args.size(), args.data(), ss));
 }
 
+TEST(OdfsigTest, testInsecureCmdline)
+{
+    // --insecure results in working validation.
+    std::vector<const char*> args{"odfsig", "--insecure",
+                                  "tests/data/good.odt"};
+    std::stringstream ss;
+    ASSERT_EQ(0, odfsig::main(args.size(), args.data(), ss));
+}
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
