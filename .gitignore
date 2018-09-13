@@ -37,3 +37,13 @@ compile_commands.json
 
 # CMake
 workdir
+
+# lcov
+coverage
+odfsig.info
+
+# ctags
+tags
+
+# scripts
+up.sh
