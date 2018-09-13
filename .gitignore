@@ -37,6 +37,7 @@ compile_commands.json
 
 # CMake
 workdir
+instdir
 
 # lcov
 coverage

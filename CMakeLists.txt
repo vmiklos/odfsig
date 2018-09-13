@@ -31,6 +31,7 @@ include(HandleOdfsigOptions)
 add_subdirectory(apps)
 add_subdirectory(docs)
 add_subdirectory(extern)
+add_subdirectory(include)
 add_subdirectory(src)
 add_subdirectory(tests)
 

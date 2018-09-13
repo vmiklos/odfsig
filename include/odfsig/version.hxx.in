@@ -1,0 +1,10 @@
+#ifndef _HAD_ODFSIG_VERSION_H
+#define _HAD_ODFSIG_VERSION_H
+
+#define ODFSIG_VERSION_MAJOR @ODFSIG_VERSION_MAJOR@
+#define ODFSIG_VERSION_MINOR @ODFSIG_VERSION_MINOR@
+#define ODFSIG_VERSION_GIT "@ODFSIG_VERSION_GIT@"
+
+#endif /* _HAD_ODFSIG_VERSION_H */
+
+/* vim:set shiftwidth=4 softtabstop=4 expandtab: */

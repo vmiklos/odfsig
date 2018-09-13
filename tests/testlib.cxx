@@ -139,4 +139,12 @@ TEST(OdfsigTest, testCmdlineHelp)
     ASSERT_EQ(0, odfsig::main(args.size(), args.data(), ss));
 }
 
+TEST(OdfsigTest, testCmdlineVersion)
+{
+    // --version resulted in an error.
+    std::vector<const char*> args{"odfsig", "--version"};
+    std::stringstream ss;
+    ASSERT_EQ(0, odfsig::main(args.size(), args.data(), ss));
+}
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

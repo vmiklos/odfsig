@@ -12,6 +12,7 @@
 #include <vector>
 
 #include <odfsig/lib.hxx>
+#include <odfsig/version.hxx>
 
 namespace
 {
@@ -101,6 +102,7 @@ struct Options
     std::vector<std::string> _trustedDers;
     bool _insecure = false;
     bool _help = false;
+    bool _version = false;
 };
 
 /// Minimal option parser to avoid Boost.Program_options dependency.
@@ -121,6 +123,8 @@ void parseOptions(std::vector<const char*>& args, Options& options)
             options._insecure = true;
         else if (argString == "--help")
             options._help = true;
+        else if (argString == "--version")
+            options._version = true;
         else
             options._odfPath = argString;
     }
@@ -152,6 +156,13 @@ int main(int argc, const char* argv[], std::ostream& ostream)
     if (options._help)
     {
         usage(argv[0], ostream);
+        return 0;
+    }
+
+    if (options._version)
+    {
+        ostream << "odfsig version " << ODFSIG_VERSION_MAJOR << "."
+                << ODFSIG_VERSION_MINOR << "-g" ODFSIG_VERSION_GIT << std::endl;
         return 0;
     }
 
