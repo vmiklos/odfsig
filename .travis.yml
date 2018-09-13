@@ -25,5 +25,3 @@ addons:
             - libxml2-dev
             # Internal libzip dependency.
             - libbz2-dev
-            # Needed by scripts/travis.sh only.
-            - libnss3-tools
