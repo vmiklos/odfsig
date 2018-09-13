@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 if (A2X)
+    include(GNUInstallDirs)
     add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/odfsig.1
         COMMAND ${A2X} -f manpage -D ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/odfsig.adoc
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/odfsig.adoc
@@ -10,6 +11,10 @@ if (A2X)
         VERBATIM)
 
     add_custom_target(man ALL DEPENDS odfsig.1)
+
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/odfsig.1
+        DESTINATION ${CMAKE_INSTALL_MANDIR}/man1
+        )
 endif ()
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:

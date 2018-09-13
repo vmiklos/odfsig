@@ -3,7 +3,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-cmake_args=""
+cmake_args="-DCMAKE_INSTALL_PREFIX:PATH=$PWD/instdir"
 
 for arg in "$@"
 do
@@ -47,5 +47,6 @@ cd workdir
 cmake $cmake_args ..
 make -j$(getconf _NPROCESSORS_ONLN)
 make check
+make install
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:

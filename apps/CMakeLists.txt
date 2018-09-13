@@ -10,4 +10,8 @@ target_link_libraries(odfsig
     odfsigcore
     )
 
+install(TARGETS odfsig
+    DESTINATION bin
+    )
+
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
