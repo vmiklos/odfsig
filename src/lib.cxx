@@ -167,20 +167,11 @@ void* open(const char* uri)
 
     zip_int64_t signatureZipIndex = zip_name_locate(zipArchive, uri, 0);
     if (signatureZipIndex < 0)
-    {
-        std::cerr << "error, XmlSecIO::open: can't find file: " << uri
-                  << std::endl;
         return nullptr;
-    }
 
     zip_file_t* zipFile(zip_fopen_index(zipArchive, signatureZipIndex, 0));
     if (!zipFile)
-    {
-        std::cerr << "error, main: can't open file at index "
-                  << signatureZipIndex << ": " << zip_strerror(zipArchive)
-                  << std::endl;
         return nullptr;
-    }
 
     return zipFile;
 }
@@ -216,29 +207,17 @@ class XmlSecGuard
             nssDb = firefoxProfile.c_str();
         _good = xmlSecNssAppInit(nssDb) >= 0;
         if (!_good)
-        {
-            std::cerr << "error, XmlSecGuard ctor: nss init failed"
-                      << std::endl;
             return;
-        }
 
         // Initialize xmlsec.
         _good = xmlSecInit() >= 0;
         if (!_good)
-        {
-            std::cerr << "error, XmlSecGuard ctor: xmlsec init failed"
-                      << std::endl;
             return;
-        }
 
         // Initialize the nss backend of xmlsec.
         _good = xmlSecNssInit() >= 0;
         if (!_good)
-        {
-            std::cerr << "error, XmlSecGuard ctor: xmlsec nss init failed"
-                      << std::endl;
             return;
-        }
 
         XmlSecIO::zipArchive = zipArchive;
         xmlSecIOCleanupCallbacks();
@@ -257,27 +236,15 @@ class XmlSecGuard
 
         _good = xmlSecNssShutdown() >= 0;
         if (!_good)
-        {
-            std::cerr << "error, XmlSecGuard dtor: xmlsec nss shutdown failed"
-                      << std::endl;
             return;
-        }
 
         _good = xmlSecShutdown() >= 0;
         if (!_good)
-        {
-            std::cerr << "error, XmlSecGuard dtor: xmlsec shutdown failed"
-                      << std::endl;
             return;
-        }
 
         _good = xmlSecNssAppShutdown() >= 0;
         if (!_good)
-        {
-            std::cerr << "error, XmlSecGuard dtor: nss shutdown failed"
-                      << std::endl;
             return;
-        }
     }
 
     bool isGood() const { return _good; }
@@ -731,6 +698,7 @@ bool ZipVerifier::parseSignatures()
         std::stringstream ss;
         ss << "Can't read file at index " << _signaturesZipIndex << ": "
            << zip_file_strerror(_zipFile.get());
+        _errorString = ss.str();
         return false;
     }
 

@@ -83,21 +83,6 @@ TEST(OdfsigTest, testGood)
     ASSERT_EQ(signedStreams, verifier->getStreams());
 }
 
-TEST(OdfsigTest, testBadSignature)
-{
-    // XmlSignature::verify(), negative testing.
-    std::unique_ptr<odfsig::Verifier> verifier(
-        odfsig::Verifier::create(std::string()));
-    verifier->setTrustedDers({"tests/keys/ca-chain.cert.der"});
-
-    ASSERT_TRUE(verifier->openZip("tests/data/bad.odt"));
-    ASSERT_TRUE(verifier->parseSignatures());
-    std::vector<std::unique_ptr<odfsig::Signature>>& signatures =
-        verifier->getSignatures();
-    ASSERT_EQ(static_cast<size_t>(1), signatures.size());
-    ASSERT_FALSE(signatures[0]->verify());
-}
-
 TEST(OdfsigTest, testBadCertificate)
 {
     // Missing setTrustedDers() should result in failure.
@@ -145,6 +130,40 @@ TEST(OdfsigTest, testCmdlineVersion)
     std::vector<const char*> args{"odfsig", "--version"};
     std::stringstream ss;
     ASSERT_EQ(0, odfsig::main(args.size(), args.data(), ss));
+}
+
+TEST(OdfsigTest, testCmdlineNoStream)
+{
+    // No signatures stream.
+    std::vector<const char*> args{"odfsig", "tests/data/no-stream.odt"};
+    std::stringstream ss;
+    ASSERT_EQ(1, odfsig::main(args.size(), args.data(), ss));
+}
+
+TEST(OdfsigTest, testCmdlineBad)
+{
+    // Bad signatures stream.
+    std::vector<const char*> args{"odfsig", "--trusted-der",
+                                  "tests/keys/ca-chain.cert.der",
+                                  "tests/data/bad.odt"};
+    std::stringstream ss;
+    ASSERT_EQ(1, odfsig::main(args.size(), args.data(), ss));
+}
+
+TEST(OdfsigTest, testCmdlineBadPath)
+{
+    // No signatures stream.
+    std::vector<const char*> args{"odfsig", "tests/data/asdf.odt"};
+    std::stringstream ss;
+    ASSERT_EQ(1, odfsig::main(args.size(), args.data(), ss));
+}
+
+TEST(OdfsigTest, testCmdlineNoArgs)
+{
+    // No arguments.
+    std::vector<const char*> args{"odfsig"};
+    std::stringstream ss;
+    ASSERT_EQ(1, odfsig::main(args.size(), args.data(), ss));
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
