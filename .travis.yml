@@ -23,5 +23,3 @@ addons:
             # Internal xmlsec dependencies.
             - libnss3-dev
             - libxml2-dev
-            # Internal libzip dependency.
-            - libbz2-dev
