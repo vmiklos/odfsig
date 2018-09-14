@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 add_subdirectory(googletest)
+add_subdirectory(libxml2)
 add_subdirectory(libzip)
 add_subdirectory(xmlsec)
 

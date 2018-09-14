@@ -11,7 +11,12 @@ else ()
     include(GNUInstallDirs)
 
     pkg_check_modules(NSS REQUIRED nss)
-    pkg_check_modules(LIBXML REQUIRED libxml-2.0)
+    if (NOT ODFSIG_INTERNAL_LIBXML2)
+        pkg_check_modules(LIBXML REQUIRED libxml-2.0)
+    else ()
+        set(LIBXML_INCLUDE_DIRS "")
+        set(LIBXML_LIBRARIES libxml2)
+    endif ()
 
     ExternalProject_Add(extern-xmlsec-project
         URL http://www.aleksey.com/xmlsec/download/xmlsec1-1.2.26.tar.gz

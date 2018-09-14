@@ -17,6 +17,7 @@ do
         --internal-libs)
             cmake_args+=" -DODFSIG_INTERNAL_LIBZIP=ON"
             cmake_args+=" -DODFSIG_INTERNAL_LIBGTEST=ON"
+            cmake_args+=" -DODFSIG_INTERNAL_LIBXML2=ON"
             cmake_args+=" -DODFSIG_INTERNAL_XMLSEC=ON"
             ;;
         --clang)

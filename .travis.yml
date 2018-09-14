@@ -16,10 +16,8 @@ addons:
         sources:
             - ubuntu-toolchain-r-test
         packages:
-            # Toolchain.
+            # Build-time dependencies.
             - g++-7
-            # Actual dependencies.
             - cmake
-            # Internal xmlsec dependencies.
+            # xmlsec dependency.
             - libnss3-dev
-            - libxml2-dev
