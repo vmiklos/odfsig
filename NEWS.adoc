@@ -1,0 +1,8 @@
+= Version descriptions
+
+== 1.0
+
+- Initial release
+- Runs on Linux
+- Can detect digest mismatches in signatures
+- Can detect certificate validation problems
