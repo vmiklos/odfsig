@@ -7,7 +7,7 @@ if (ODFSIG_INTERNAL_LIBXML2)
     include(GNUInstallDirs)
 
     ExternalProject_Add(extern-libxml2-project
-        URL ftp://xmlsoft.org/libxml2/libxml2-2.9.8.tar.gz
+        URL http://xmlsoft.org/sources/libxml2-2.9.8.tar.gz
         URL_HASH SHA256=0b74e51595654f958148759cfef0993114ddccccbb6f31aee018f3558e8e2732
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON
