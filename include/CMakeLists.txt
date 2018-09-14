@@ -18,4 +18,10 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/odfsig/version.hxx"
   )
 
+set(ODFSIG_ARCHIVE_NAME "odfsig-${ODFSIG_VERSION_MAJOR}.${ODFSIG_VERSION_MINOR}")
+add_custom_target(dist
+    COMMAND git archive --prefix=${ODFSIG_ARCHIVE_NAME}/ -o ${CMAKE_BINARY_DIR}/${ODFSIG_ARCHIVE_NAME}.tar.gz HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
+
 # vim:set shiftwidth=4 softtabstop=4 expandtab:

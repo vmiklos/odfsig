@@ -138,6 +138,12 @@ void usage(const std::string& self, std::ostream& ostream)
             << std::endl;
     ostream << "--insecure: do not validate certificates" << std::endl;
 }
+
+/// Build-time equivalent of strlen().
+template <class T, size_t N> constexpr size_t strsize(T (&)[N])
+{
+    return N - 1;
+}
 }
 
 namespace odfsig
@@ -162,7 +168,10 @@ int main(int argc, const char* argv[], std::ostream& ostream)
     if (options._version)
     {
         ostream << "odfsig version " << ODFSIG_VERSION_MAJOR << "."
-                << ODFSIG_VERSION_MINOR << "-g" ODFSIG_VERSION_GIT << std::endl;
+                << ODFSIG_VERSION_MINOR;
+        if (strsize(ODFSIG_VERSION_GIT))
+            ostream << "-g" ODFSIG_VERSION_GIT;
+        ostream << std::endl;
         return 0;
     }
 
