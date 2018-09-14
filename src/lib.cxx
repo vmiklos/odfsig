@@ -7,26 +7,17 @@
 #include <odfsig/lib.hxx>
 
 #include <assert.h>
-#include <stddef.h>
 
-#include <fstream> // IWYU pragma: keep
-#include <iostream>
 #include <sstream> // IWYU pragma: keep
 
-#include <cert.h>
-#include <certt.h>
 #include <libxml/globals.h>
 #include <libxml/parser.h>
 #include <libxml/xmlstring.h>
 #include <libxml/xmlversion.h>
-#include <prtypes.h>
-#include <seccomon.h>
 #include <xmlsec/base64.h>
 #include <xmlsec/io.h>
-#include <xmlsec/keysdata.h>
+#include <xmlsec/keyinfo.h>
 #include <xmlsec/keysmngr.h>
-#include <xmlsec/nss/app.h>
-#include <xmlsec/nss/crypto.h>
 #include <xmlsec/strings.h>
 #include <xmlsec/transforms.h>
 #include <xmlsec/xmldsig.h>
@@ -34,6 +25,9 @@
 #include <xmlsec/xmltree.h>
 #include <zip.h>
 #include <zipconf.h>
+
+#include <odfsig/crypto.hxx>
+#include <odfsig/string.hxx>
 
 namespace std
 {
@@ -61,10 +55,6 @@ template <> struct default_delete<xmlChar>
 {
     void operator()(xmlChar* ptr) { xmlFree(ptr); }
 };
-template <> struct default_delete<CERTCertificate>
-{
-    void operator()(CERTCertificate* ptr) { CERT_DestroyCertificate(ptr); }
-};
 }
 
 namespace
@@ -73,12 +63,6 @@ const xmlChar dateNodeName[] = "date";
 const xmlChar dateNsName[] = "http://purl.org/dc/elements/1.1/";
 const xmlChar xadesNsName[] = "http://uri.etsi.org/01903/v1.3.2#";
 const char signaturesStreamName[] = "META-INF/documentsignatures.xml";
-
-/// Checks if `big` begins with `small`.
-bool starts_with(const std::string& big, const std::string& small)
-{
-    return big.compare(0, small.length(), small) == 0;
-}
 
 /// Checks if `big` ends with `small`.
 bool ends_with(const std::string& big, const std::string& small)
@@ -91,41 +75,6 @@ bool ends_with(const std::string& big, const std::string& small)
 const char* fromXmlChar(const xmlChar* s)
 {
     return reinterpret_cast<const char*>(s);
-}
-
-/**
- * Finds the default Firefox profile.
- *
- * Expected profiles.ini format is something like:
- *
- * [Profile0]
- * Path=...
- * Default=...
- */
-std::string getFirefoxProfile(const std::string& cryptoConfig)
-{
-    std::stringstream ss;
-    ss << cryptoConfig;
-    ss << "/.mozilla/firefox/";
-    const std::string firefoxPath = ss.str();
-
-    std::ifstream profilesIni(firefoxPath + "profiles.ini");
-    if (!profilesIni.good())
-        return std::string();
-
-    std::string profilePath;
-    const std::string pathPrefix("Path=");
-    std::string line;
-    while (std::getline(profilesIni, line))
-    {
-        if (starts_with(line, pathPrefix))
-            // Path= is expected to be before Default=.
-            profilePath = line.substr(pathPrefix.size());
-        else if (line == "Default=1")
-            return firefoxPath + profilePath;
-    }
-
-    return std::string();
 }
 }
 
@@ -198,25 +147,14 @@ int close(void* context)
 class XmlSecGuard
 {
   public:
-    explicit XmlSecGuard(zip_t* zipArchive, const std::string& cryptoConfig)
+    explicit XmlSecGuard(zip_t* zipArchive, Crypto& crypto) : _crypto(crypto)
     {
-        // Initialize nss.
-        std::string firefoxProfile = getFirefoxProfile(cryptoConfig);
-        const char* nssDb = nullptr;
-        if (!firefoxProfile.empty())
-            nssDb = firefoxProfile.c_str();
-        _good = xmlSecNssAppInit(nssDb) >= 0;
-        if (!_good)
-            return;
-
         // Initialize xmlsec.
         _good = xmlSecInit() >= 0;
         if (!_good)
             return;
 
-        // Initialize the nss backend of xmlsec.
-        _good = xmlSecNssInit() >= 0;
-        if (!_good)
+        if (!_crypto.xmlSecInitialize())
             return;
 
         XmlSecIO::zipArchive = zipArchive;
@@ -234,16 +172,14 @@ class XmlSecGuard
         xmlSecIORegisterDefaultCallbacks();
         XmlSecIO::zipArchive = nullptr;
 
-        _good = xmlSecNssShutdown() >= 0;
-        if (!_good)
+        if (!_crypto.xmlSecShutdown())
             return;
 
         _good = xmlSecShutdown() >= 0;
         if (!_good)
             return;
 
-        _good = xmlSecNssAppShutdown() >= 0;
-        if (!_good)
+        if (!_crypto.shutdown())
             return;
     }
 
@@ -251,13 +187,14 @@ class XmlSecGuard
 
   private:
     bool _good = false;
+    Crypto& _crypto;
 };
 
 /// Implementation of Signature using libxml.
 class XmlSignature : public Signature
 {
   public:
-    explicit XmlSignature(xmlNode* signatureNode,
+    explicit XmlSignature(xmlNode* signatureNode, Crypto& crypto,
                           const std::vector<std::string>& trustedDers,
                           bool insecure);
     virtual ~XmlSignature();
@@ -295,13 +232,15 @@ class XmlSignature : public Signature
     std::vector<std::string> _trustedDers;
 
     bool _insecure = false;
+
+    Crypto& _crypto;
 };
 
-XmlSignature::XmlSignature(xmlNode* signatureNode,
+XmlSignature::XmlSignature(xmlNode* signatureNode, Crypto& crypto,
                            const std::vector<std::string>& trustedDers,
                            bool insecure)
     : _signatureNode(signatureNode), _trustedDers(trustedDers),
-      _insecure(insecure)
+      _insecure(insecure), _crypto(crypto)
 {
 }
 
@@ -318,21 +257,10 @@ bool XmlSignature::verify()
         return false;
     }
 
-    if (xmlSecNssAppDefaultKeysMngrInit(pKeysMngr.get()) < 0)
+    if (!_crypto.initializeKeysManager(pKeysMngr.get(), _trustedDers))
     {
-        _errorString = "Keys manager init failed";
+        _errorString = "Keys manager crypto init or cert load failed";
         return false;
-    }
-
-    for (const auto& trustedDer : _trustedDers)
-    {
-        if (xmlSecNssAppKeysMngrCertLoad(pKeysMngr.get(), trustedDer.c_str(),
-                                         xmlSecKeyDataFormatDer,
-                                         xmlSecKeyDataTypeTrusted) < 0)
-        {
-            _errorString = "Keys manager cert load failed";
-            return false;
-        }
     }
 
     std::unique_ptr<xmlSecDSigCtx> dsigCtx(
@@ -377,15 +305,7 @@ std::string XmlSignature::getSubjectName() const
     if (size < 0)
         return std::string();
 
-    SECItem certItem;
-    certItem.data = content.get();
-    certItem.len = size;
-    std::unique_ptr<CERTCertificate> cert(CERT_NewTempCertificate(
-        CERT_GetDefaultCertDB(), &certItem, NULL, PR_FALSE, PR_TRUE));
-    if (!cert || !cert->subjectName)
-        return std::string();
-
-    return std::string(cert->subjectName);
+    return _crypto.getCertificateSubjectName(content.get(), size);
 }
 
 std::string XmlSignature::getMethod() const
@@ -607,6 +527,8 @@ class ZipVerifier : public Verifier
 
     std::unique_ptr<XmlGuard> _xmlGuard;
 
+    std::unique_ptr<Crypto> _crypto;
+
     std::unique_ptr<XmlSecGuard> _xmlSecGuard;
 
     std::unique_ptr<zip_file_t> _zipFile;
@@ -668,7 +590,14 @@ bool ZipVerifier::parseSignatures()
 
     _xmlGuard.reset(new XmlGuard());
 
-    _xmlSecGuard.reset(new XmlSecGuard(_zipArchive.get(), _cryptoConfig));
+    _crypto = Crypto::create();
+    if (!_crypto->initialize(_cryptoConfig))
+    {
+        _errorString = "Failed to initialize crypto";
+        return false;
+    }
+
+    _xmlSecGuard.reset(new XmlSecGuard(_zipArchive.get(), *_crypto));
     if (!_xmlSecGuard->isGood())
     {
         _errorString = "Failed to initialize libxmlsec";
@@ -721,8 +650,8 @@ bool ZipVerifier::parseSignatures()
 
     for (xmlNode* signatureNode = signaturesRoot->children; signatureNode;
          signatureNode = signatureNode->next)
-        _signatures.push_back(std::unique_ptr<Signature>(
-            new XmlSignature(signatureNode, _trustedDers, _insecure)));
+        _signatures.push_back(std::unique_ptr<Signature>(new XmlSignature(
+            signatureNode, *_crypto, _trustedDers, _insecure)));
 
     return true;
 }

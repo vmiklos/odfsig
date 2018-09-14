@@ -3,8 +3,10 @@
 # found in the LICENSE file.
 
 add_library(odfsigcore
+    crypto.cxx
     lib.cxx
     main.cxx
+    string.cxx
     )
 target_include_directories(odfsigcore
     PUBLIC
