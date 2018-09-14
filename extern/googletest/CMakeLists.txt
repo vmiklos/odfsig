@@ -15,8 +15,6 @@ else ()
         BUILD_IN_SOURCE ON
         CONFIGURE_COMMAND ${CMAKE_COMMAND}
             -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/install
-        BUILD_COMMAND ${CMAKE_COMMAND} --build .
-        INSTALL_COMMAND ${CMAKE_COMMAND} --build . --target install
         )
     add_library(gtest STATIC IMPORTED)
     set_property(TARGET gtest PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libgtest.a)

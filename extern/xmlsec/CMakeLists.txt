@@ -35,8 +35,8 @@ else ()
             --disable-apps
             --disable-docs
             --without-openssl
-        BUILD_COMMAND make
-        INSTALL_COMMAND make install
+        BUILD_COMMAND $(MAKE)
+        INSTALL_COMMAND $(MAKE) install
         )
     add_library(xmlsec1 STATIC IMPORTED)
     set_property(TARGET xmlsec1 PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxmlsec1.a)

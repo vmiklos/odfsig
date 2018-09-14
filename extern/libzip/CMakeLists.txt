@@ -23,8 +23,6 @@ else ()
             -DENABLE_COMMONCRYPTO=OFF
             -DENABLE_BZIP2=OFF
             -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/install
-        BUILD_COMMAND ${CMAKE_COMMAND} --build .
-        INSTALL_COMMAND ${CMAKE_COMMAND} --build . --target install
         )
     add_library(zip STATIC IMPORTED)
     set_property(TARGET zip PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libzip.a)

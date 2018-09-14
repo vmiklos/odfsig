@@ -20,7 +20,7 @@ if (ODFSIG_INTERNAL_LIBXML2)
             --without-lzma
             --disable-shared
         BUILD_COMMAND $(MAKE)
-        INSTALL_COMMAND make install
+        INSTALL_COMMAND $(MAKE) install
         )
     add_library(xml2 STATIC IMPORTED)
     set_property(TARGET xml2 PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxml2.a)
