@@ -19,6 +19,8 @@ option(ODFSIG_ENABLE_GCOV "Measure code coverage of tests." OFF)
 option(ODFSIG_INTERNAL_LIBZIP "Use internal libzip." OFF)
 option(ODFSIG_INTERNAL_LIBGTEST "Use internal libgtest." OFF)
 option(ODFSIG_INTERNAL_XMLSEC "Use internal xmlsec." OFF)
+option(ODFSIG_INTERNAL_LIBXML2 "Use internal libxml2." OFF)
+option(ODFSIG_INTERNAL_ZLIB "Use internal zlib." OFF)
 
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "No build type selected, default to Release")

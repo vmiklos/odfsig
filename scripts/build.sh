@@ -19,6 +19,7 @@ do
             cmake_args+=" -DODFSIG_INTERNAL_LIBGTEST=ON"
             cmake_args+=" -DODFSIG_INTERNAL_LIBXML2=ON"
             cmake_args+=" -DODFSIG_INTERNAL_XMLSEC=ON"
+            cmake_args+=" -DODFSIG_INTERNAL_ZLIB=ON"
             ;;
         --clang)
             export CC=clang
