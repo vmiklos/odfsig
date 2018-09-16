@@ -10,11 +10,8 @@ if (ODFSIG_INTERNAL_ZLIB)
         URL_HASH SHA256=c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON
-        CONFIGURE_COMMAND ./configure
-            --prefix=${CMAKE_CURRENT_BINARY_DIR}/install
-            --static
-        BUILD_COMMAND $(MAKE)
-        INSTALL_COMMAND $(MAKE) install
+        CONFIGURE_COMMAND ${CMAKE_COMMAND}
+            -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/install
         )
     add_library(z STATIC IMPORTED)
     set_property(TARGET z PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/install/lib/libz.a)
