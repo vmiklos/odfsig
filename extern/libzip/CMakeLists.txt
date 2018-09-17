@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 if (WIN32)
+    set(ZLIB_ROOT_OPTION -DZLIB_ROOT=${CMAKE_CURRENT_BINARY_DIR}/../zlib/install)
 else ()
     set(PATCH_COMMAND patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/add-an-option-to-disable-bzip2-support.patch)
 endif()
@@ -32,6 +33,7 @@ else ()
             -DENABLE_OPENSSL=OFF
             -DENABLE_COMMONCRYPTO=OFF
             -DENABLE_BZIP2=OFF
+            ${ZLIB_ROOT_OPTION}
             -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/install
         )
     add_library(zip STATIC IMPORTED)
