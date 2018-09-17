@@ -1,0 +1,20 @@
+= Coding style
+
+- Memory management: no manual delete. Use an `std::default_delete<>` template
+  specialization when it comes to releasing resources with C library calls.
+
+- No conditional compilation at a C preprocessor level (`#ifdef`). If something
+  like that is needed, create interfaces, create multiple implementations of
+  that interface and implement a factory function multiple times. Use the build
+  system to ensure that only one of the factory implementations are compiled.
+
+- Error handling: no exceptions. Return errors when dealing with user input, or
+  use `assert()` to find bugs in the code.
+
+- Naming: type names (classes, etc.) should start with an upper-case letter
+  (e.g. ZipVerifier). Other names should be camel case, and start with a lower
+  case letter (e.g. openZip()). Class members are prefixed with an underscore
+  (`_`).
+
+- Whitespace formatting: install the git hook in `git-hooks/` to let
+  `clang-format` handle formatting for you.
