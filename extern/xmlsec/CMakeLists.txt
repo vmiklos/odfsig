@@ -21,6 +21,8 @@ else ()
         set(BUILD_COMMAND cd win32 &&
             nmake)
         set(INSTALL_COMMAND echo NOP)
+        set(XMLSEC_INCLUDE_DIR
+            ${CMAKE_CURRENT_BINARY_DIR}/extern-xmlsec-project-prefix/src/extern-xmlsec-project/include)
     else ()
         find_package(PkgConfig REQUIRED)
         pkg_check_modules(NSS REQUIRED nss)
@@ -38,6 +40,8 @@ else ()
             --without-openssl)
         set(BUILD_COMMAND $(MAKE))
         set(INSTALL_COMMAND $(MAKE) install)
+        set(XMLSEC_INCLUDE_DIR
+            ${CMAKE_CURRENT_BINARY_DIR}/install/include/xmlsec1)
     endif()
     if (NOT ODFSIG_INTERNAL_LIBXML2)
         pkg_check_modules(LIBXML REQUIRED libxml-2.0)
@@ -66,7 +70,7 @@ else ()
     set(XMLSEC_INCLUDE_DIRS
         ${NSS_INCLUDE_DIRS}
         ${LIBXML_INCLUDE_DIRS}
-        ${CMAKE_CURRENT_BINARY_DIR}/install/include/xmlsec1
+        ${XMLSEC_INCLUDE_DIR}
         )
     # nss after static libs to please --as-needed linkers.
     set(XMLSEC_LIBRARIES
@@ -77,6 +81,7 @@ else ()
         )
     set(XMLSEC_CFLAGS_OTHER
         -DXMLSEC_NO_SIZE_T
+        -DXMLSEC_NO_XSLT
         )
 endif ()
 
