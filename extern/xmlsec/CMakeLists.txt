@@ -42,7 +42,7 @@ else ()
     if (NOT ODFSIG_INTERNAL_LIBXML2)
         pkg_check_modules(LIBXML REQUIRED libxml-2.0)
     else ()
-        set(LIBXML_INCLUDE_DIRS "")
+        set(LIBXML_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/../libxml2/extern-libxml2-project-prefix/src/extern-libxml2-project/include/)
         set(LIBXML_LIBRARIES libxml2)
     endif ()
 
