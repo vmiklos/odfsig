@@ -4,8 +4,10 @@
 
 if (WIN32)
     set(ZLIB_ROOT_OPTION -DZLIB_ROOT=${CMAKE_CURRENT_BINARY_DIR}/../zlib/install)
+    set(LIBZIP_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/lib/zip.lib)
 else ()
     set(PATCH_COMMAND patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/add-an-option-to-disable-bzip2-support.patch)
+    set(LIBZIP_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libzip.a)
 endif()
 
 if (NOT ODFSIG_INTERNAL_LIBZIP)
@@ -37,7 +39,7 @@ else ()
             -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/install
         )
     add_library(zip STATIC IMPORTED)
-    set_property(TARGET zip PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libzip.a)
+    set_property(TARGET zip PROPERTY IMPORTED_LOCATION ${LIBZIP_LIBRARY})
     add_dependencies(zip extern-libzip-project)
     set(LIBZIP_INCLUDE_DIRS
         ${CMAKE_CURRENT_BINARY_DIR}/install/include

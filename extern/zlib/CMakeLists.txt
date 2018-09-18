@@ -14,7 +14,11 @@ if (ODFSIG_INTERNAL_ZLIB)
             -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/install
         )
     add_library(z STATIC IMPORTED)
-    set_property(TARGET z PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/install/lib/libz.a)
+    if (WIN32)
+        set_property(TARGET z PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/install/lib/zlibstaticd.lib)
+    else ()
+        set_property(TARGET z PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/install/lib/libz.a)
+    endif ()
     add_dependencies(z extern-zlib-project)
 
     set(ZLIB_INCLUDE_DIRS
