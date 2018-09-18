@@ -2,7 +2,12 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-set(CRYPTO nss)
+if (WIN32)
+    set(CRYPTO cng)
+else ()
+    set(CRYPTO nss)
+endif()
+
 add_library(odfsigcore
     crypto-${CRYPTO}.cxx
     lib.cxx

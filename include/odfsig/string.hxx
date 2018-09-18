@@ -10,8 +10,8 @@
 
 namespace odfsig
 {
-/// Checks if `big` begins with `small`.
-bool starts_with(const std::string& big, const std::string& small);
+/// Checks if `big` begins with `prefix`.
+bool starts_with(const std::string& big, const std::string& prefix);
 }
 #endif /* _HAD_ODFSIG_STRING_H */
 

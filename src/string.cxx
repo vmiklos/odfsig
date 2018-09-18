@@ -8,9 +8,9 @@
 
 namespace odfsig
 {
-bool starts_with(const std::string& big, const std::string& small)
+bool starts_with(const std::string& big, const std::string& prefix)
 {
-    return big.compare(0, small.length(), small) == 0;
+    return big.compare(0, prefix.length(), prefix) == 0;
 }
 }
 
