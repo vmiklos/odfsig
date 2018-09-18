@@ -10,10 +10,34 @@ else ()
     include(GNUInstallDirs)
 
     if (WIN32)
+        set(CONFIGURE_COMMAND cd win32 &&
+            cscript /e:javascript configure.js
+            crypto=mscng
+            xslt=no
+            iconv=no
+            static=no
+            include=${CMAKE_CURRENT_BINARY_DIR}/../libxml2/extern-libxml2-project-prefix/src/extern-libxml2-project/include/
+            lib=${CMAKE_CURRENT_BINARY_DIR}/../libxml2/extern-libxml2-project-prefix/src/extern-libxml2-project/win32/bin.msvc/)
+        set(BUILD_COMMAND cd win32 &&
+            nmake)
+        set(INSTALL_COMMAND echo NOP)
     else ()
         find_package(PkgConfig REQUIRED)
         pkg_check_modules(NSS REQUIRED nss)
         set (PATCH_COMMAND patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/nss-fix-memory-leak-in-GetCertName-220.patch)
+        set(CONFIGURE_COMMAND ./configure
+            --prefix=${CMAKE_CURRENT_BINARY_DIR}/install
+            --with-pic
+            --disable-shared
+            --disable-crypto-dl
+            --without-libxslt
+            --without-gnutls
+            --without-gcrypt
+            --disable-apps
+            --disable-docs
+            --without-openssl)
+        set(BUILD_COMMAND $(MAKE))
+        set(INSTALL_COMMAND $(MAKE) install)
     endif()
     if (NOT ODFSIG_INTERNAL_LIBXML2)
         pkg_check_modules(LIBXML REQUIRED libxml-2.0)
@@ -28,19 +52,9 @@ else ()
         PATCH_COMMAND ${PATCH_COMMAND}
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON
-        CONFIGURE_COMMAND ./configure
-            --prefix=${CMAKE_CURRENT_BINARY_DIR}/install
-            --with-pic
-            --disable-shared
-            --disable-crypto-dl
-            --without-libxslt
-            --without-gnutls
-            --without-gcrypt
-            --disable-apps
-            --disable-docs
-            --without-openssl
-        BUILD_COMMAND $(MAKE)
-        INSTALL_COMMAND $(MAKE) install
+        CONFIGURE_COMMAND ${CONFIGURE_COMMAND}
+        BUILD_COMMAND ${BUILD_COMMAND}
+        INSTALL_COMMAND ${INSTALL_COMMAND}
         )
     add_library(xmlsec1 STATIC IMPORTED)
     set_property(TARGET xmlsec1 PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxmlsec1.a)
