@@ -16,11 +16,20 @@ else ()
         CONFIGURE_COMMAND ${CMAKE_COMMAND}
             -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/install
         )
+
+    if (WIN32)
+        set(GTEST_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/lib/gtestd.lib)
+        set(GTEST_MAIN_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/lib/gtest_maind.lib)
+    else ()
+        set(GTEST_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libgtest.a)
+        set(GTEST_MAIN_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libgtest_main.a)
+    endif ()
+
     add_library(gtest STATIC IMPORTED)
-    set_property(TARGET gtest PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libgtest.a)
+    set_property(TARGET gtest PROPERTY IMPORTED_LOCATION ${GTEST_LIBRARY})
     add_dependencies(gtest extern-googletest-project)
     add_library(gtest_main STATIC IMPORTED)
-    set_property(TARGET gtest_main PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libgtest_main.a)
+    set_property(TARGET gtest_main PROPERTY IMPORTED_LOCATION ${GTEST_MAIN_LIBRARY})
     add_dependencies(gtest_main extern-googletest-project)
     set(GTEST_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/install/include)
     set(GTEST_BOTH_LIBRARIES gtest gtest_main ${CMAKE_THREAD_LIBS_INIT})
