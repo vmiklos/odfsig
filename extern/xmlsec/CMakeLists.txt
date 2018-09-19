@@ -67,6 +67,7 @@ else ()
         CONFIGURE_COMMAND ${CONFIGURE_COMMAND}
         BUILD_COMMAND ${BUILD_COMMAND}
         INSTALL_COMMAND ${INSTALL_COMMAND}
+        DEPENDS extern-libxml2-project
         )
     add_library(xmlsec1 STATIC IMPORTED)
     set_property(TARGET xmlsec1 PROPERTY IMPORTED_LOCATION ${XMLSEC_LIBRARY})

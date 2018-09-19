@@ -37,6 +37,7 @@ else ()
             -DENABLE_BZIP2=OFF
             ${ZLIB_ROOT_OPTION}
             -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/install
+        DEPENDS extern-zlib-project
         )
     add_library(zip STATIC IMPORTED)
     set_property(TARGET zip PROPERTY IMPORTED_LOCATION ${LIBZIP_LIBRARY})

@@ -12,6 +12,8 @@ if (ODFSIG_INTERNAL_LIBXML2)
         set(BUILD_COMMAND cd win32 &&
             nmake)
         set(INSTALL_COMMAND echo NOP)
+        set(LIBXML2_LIBRARY
+            ${CMAKE_CURRENT_BINARY_DIR}/extern-libxml2-project-prefix/src/extern-libxml2-project/win32/bin.msvc/libxml2.lib)
     else()
         set(CONFIGURE_COMMAND ./configure
             --prefix=${CMAKE_CURRENT_BINARY_DIR}/install
@@ -23,6 +25,8 @@ if (ODFSIG_INTERNAL_LIBXML2)
             --disable-shared)
         set(BUILD_COMMAND $(MAKE))
         set(INSTALL_COMMAND $(MAKE) install)
+        set(LIBXML2_LIBRARY
+            ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxml2.a)
     endif()
     ExternalProject_Add(extern-libxml2-project
         URL http://xmlsoft.org/sources/libxml2-2.9.8.tar.gz
@@ -34,7 +38,7 @@ if (ODFSIG_INTERNAL_LIBXML2)
         INSTALL_COMMAND ${INSTALL_COMMAND}
         )
     add_library(xml2 STATIC IMPORTED)
-    set_property(TARGET xml2 PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxml2.a)
+    set_property(TARGET xml2 PROPERTY IMPORTED_LOCATION ${LIBXML2_LIBRARY})
     add_dependencies(xml2 extern-libxml2-project)
 
     set(LIBXML2_INCLUDE_DIRS

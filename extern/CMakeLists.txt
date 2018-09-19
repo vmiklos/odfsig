@@ -3,9 +3,9 @@
 # found in the LICENSE file.
 
 add_subdirectory(googletest)
-add_subdirectory(libxml2)
-add_subdirectory(libzip)
-add_subdirectory(xmlsec)
 add_subdirectory(zlib)
+add_subdirectory(libzip)
+add_subdirectory(libxml2)
+add_subdirectory(xmlsec)
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
