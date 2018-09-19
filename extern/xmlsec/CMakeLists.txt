@@ -23,6 +23,10 @@ else ()
         set(INSTALL_COMMAND echo NOP)
         set(XMLSEC_INCLUDE_DIR
             ${CMAKE_CURRENT_BINARY_DIR}/extern-xmlsec-project-prefix/src/extern-xmlsec-project/include)
+        set(XMLSEC_LIBRARY
+            ${CMAKE_CURRENT_BINARY_DIR}/extern-xmlsec-project-prefix/src/extern-xmlsec-project/win32/binaries/libxmlsec.lib)
+        set(XMLSEC_CRYPTO_LIBRARY
+            ${CMAKE_CURRENT_BINARY_DIR}/extern-xmlsec-project-prefix/src/extern-xmlsec-project/win32/binaries/libxmlsec-mscng.lib)
     else ()
         find_package(PkgConfig REQUIRED)
         pkg_check_modules(NSS REQUIRED nss)
@@ -42,6 +46,10 @@ else ()
         set(INSTALL_COMMAND $(MAKE) install)
         set(XMLSEC_INCLUDE_DIR
             ${CMAKE_CURRENT_BINARY_DIR}/install/include/xmlsec1)
+        set(XMLSEC_LIBRARY
+            ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxmlsec1.a)
+        set(XMLSEC_CRYPTO_LIBRARY
+            ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxmlsec1-nss.a)
     endif()
     if (NOT ODFSIG_INTERNAL_LIBXML2)
         pkg_check_modules(LIBXML REQUIRED libxml-2.0)
@@ -61,10 +69,10 @@ else ()
         INSTALL_COMMAND ${INSTALL_COMMAND}
         )
     add_library(xmlsec1 STATIC IMPORTED)
-    set_property(TARGET xmlsec1 PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxmlsec1.a)
+    set_property(TARGET xmlsec1 PROPERTY IMPORTED_LOCATION ${XMLSEC_LIBRARY})
     add_dependencies(xmlsec1 extern-xmlsec-project)
     add_library(xmlsec1-nss STATIC IMPORTED)
-    set_property(TARGET xmlsec1-nss PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxmlsec1-nss.a)
+    set_property(TARGET xmlsec1-nss PROPERTY IMPORTED_LOCATION ${XMLSEC_CRYPTO_LIBRARY})
     add_dependencies(xmlsec1-nss extern-xmlsec-project)
 
     set(XMLSEC_INCLUDE_DIRS
