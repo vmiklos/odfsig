@@ -15,6 +15,7 @@ else ()
         BUILD_IN_SOURCE ON
         CONFIGURE_COMMAND ${CMAKE_COMMAND}
             -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/install
+            -Dgtest_force_shared_crt=ON
         )
 
     if (WIN32)
