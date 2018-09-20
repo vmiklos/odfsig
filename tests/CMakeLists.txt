@@ -18,7 +18,7 @@ add_test(NAME odfsig
 
 set(CMAKE_CTEST_COMMAND ctest -V)
 add_custom_target(check
-    COMMAND ${CMAKE_CTEST_COMMAND} -C ${CMAKE_BUILD_TYPE}
+    COMMAND ${CMAKE_CTEST_COMMAND} -C $<CONFIG>
     )
 add_dependencies(check
     odfsigtest
