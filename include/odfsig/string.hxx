@@ -12,6 +12,10 @@ namespace odfsig
 {
 /// Checks if `big` begins with `prefix`.
 bool starts_with(const std::string& big, const std::string& prefix);
+
+/// Replaces `from` with `to` in `str`.
+void replace_all(std::string& str, const std::string& from,
+                 const std::string& to);
 }
 #endif /* _HAD_ODFSIG_STRING_H */
 

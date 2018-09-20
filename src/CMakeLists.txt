@@ -4,6 +4,7 @@
 
 if (WIN32)
     set(CRYPTO cng)
+    set(CRYPTO_LIBRARIES crypt32)
 else ()
     set(CRYPTO nss)
 endif()
@@ -22,6 +23,7 @@ target_include_directories(odfsigcore
 target_link_libraries(odfsigcore
     libzip
     libxmlsec
+    ${CRYPTO_LIBRARIES}
     )
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:

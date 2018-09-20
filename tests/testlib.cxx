@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include <odfsig/lib.hxx>
+#include <odfsig/string.hxx>
 
 TEST(OdfsigTest, testOpenZip)
 {
@@ -65,8 +66,16 @@ TEST(OdfsigTest, testGood)
     ASSERT_EQ(static_cast<size_t>(1), signatures.size());
     std::unique_ptr<odfsig::Signature>& signature = signatures[0];
     ASSERT_TRUE(signature->verify());
+
+    std::string subjectName = signature->getSubjectName();
+
+    // Map CNG result to NSS reference.
+    odfsig::replace_all(subjectName, ", S=", ", ST=");
+    odfsig::replace_all(subjectName, ", ", ",");
+
     ASSERT_EQ("CN=odfsig test example alice,O=odfsig test,ST=Budapest,C=HU",
-              signature->getSubjectName());
+              subjectName);
+
     ASSERT_EQ("2018-08-31T22:38:51.034635578", signature->getDate());
     ASSERT_EQ("rsa-sha256", signature->getMethod());
     ASSERT_EQ("XAdES", signature->getType());

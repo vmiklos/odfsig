@@ -6,12 +6,25 @@
 
 #include <odfsig/crypto.hxx>
 
+#include <codecvt>
+
 #include <xmlsec/keysdata.h>
 #include <xmlsec/mscng/app.h>
 #include <xmlsec/mscng/crypto.h>
 #include <xmlsec/xmlsec.h>
 
 #include <odfsig/string.hxx>
+
+namespace std
+{
+template <> struct default_delete<const CERT_CONTEXT>
+{
+    void operator()(const CERT_CONTEXT* ptr)
+    {
+        CertFreeCertificateContext(ptr);
+    }
+};
+}
 
 namespace odfsig
 {
@@ -64,8 +77,27 @@ bool CngCrypto::initializeKeysManager(xmlSecKeysMngr* keysManager,
 std::string CngCrypto::getCertificateSubjectName(unsigned char* certificate,
                                                  int size)
 {
-    // TODO
-    return std::string();
+    std::unique_ptr<const CERT_CONTEXT> context(
+        CertCreateCertificateContext(X509_ASN_ENCODING, certificate, size));
+    if (!context->pCertInfo)
+        return std::string();
+
+    DWORD subjectSize = CertNameToStrW(
+        X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, &context->pCertInfo->Subject,
+        CERT_X500_NAME_STR | CERT_NAME_STR_REVERSE_FLAG, nullptr, 0);
+    if (subjectSize <= 0)
+        return std::string();
+
+    std::vector<wchar_t> subject(subjectSize);
+    subjectSize = CertNameToStrW(
+        X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, &context->pCertInfo->Subject,
+        CERT_X500_NAME_STR | CERT_NAME_STR_REVERSE_FLAG, subject.data(),
+        subject.size());
+    if (subjectSize <= 0)
+        return std::string();
+
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> convert;
+    return convert.to_bytes(subject.data());
 }
 
 std::unique_ptr<Crypto> Crypto::create()
