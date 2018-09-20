@@ -12,6 +12,7 @@ set(CMAKE_MODULE_PATH
     )
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 option(ODFSIG_ENABLE_WERROR "Fail and stop if a warning is triggered." OFF)
 option(ODFSIG_ENABLE_CCACHE "Try to use ccache automatically" ON)
