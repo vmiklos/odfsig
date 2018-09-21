@@ -1,0 +1,18 @@
+version: "{build}"
+
+os:
+    - Visual Studio 2017
+
+platform:
+    - Win32
+
+configuration:
+    - Release
+
+before_build:
+    - cmake -H. -Bworkdir -DODFSIG_INTERNAL_LIBZIP=ON -DODFSIG_INTERNAL_LIBGTEST=ON -DODFSIG_INTERNAL_LIBXML2=ON -DODFSIG_INTERNAL_XMLSEC=ON -DODFSIG_INTERNAL_ZLIB=ON
+
+build:
+  project: workdir\odfsig.sln
+  parallel: true
+  verbosity: normal
