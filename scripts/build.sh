@@ -15,11 +15,7 @@ do
             cmake_args+=" -DODFSIG_ENABLE_WERROR=ON"
             ;;
         --internal-libs)
-            cmake_args+=" -DODFSIG_INTERNAL_LIBZIP=ON"
-            cmake_args+=" -DODFSIG_INTERNAL_LIBGTEST=ON"
-            cmake_args+=" -DODFSIG_INTERNAL_LIBXML2=ON"
-            cmake_args+=" -DODFSIG_INTERNAL_XMLSEC=ON"
-            cmake_args+=" -DODFSIG_INTERNAL_ZLIB=ON"
+            cmake_args+=" -DODFSIG_INTERNAL_LIBS=ON"
             ;;
         --clang)
             export CC=clang
