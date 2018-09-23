@@ -10,7 +10,7 @@ configuration:
     - Release
 
 before_build:
-    - cmake -H. -Bworkdir -DODFSIG_INTERNAL_LIBS=ON
+    - cmake -H. -Bworkdir
 
 build:
   project: workdir\odfsig.sln
