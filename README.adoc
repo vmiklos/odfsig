@@ -18,9 +18,7 @@ odfsig verifies the digital signatures in an ODF document.
 
 === Runtime
 
-- https://www.aleksey.com/xmlsec/[xmlsec1-nss] (implies
-  http://xmlsoft.org/[libxml-2.0] and
-  https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS[nss])
+- https://www.aleksey.com/xmlsec/[xmlsec1-nss or xmlsec1-mscng]
 - https://libzip.org/[libzip]
 
 == Resources
