@@ -6,6 +6,8 @@
 
 #include <odfsig/string.hxx>
 
+#include <stddef.h>
+
 namespace odfsig
 {
 bool starts_with(const std::string& big, const std::string& prefix)

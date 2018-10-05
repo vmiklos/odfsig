@@ -7,7 +7,10 @@
 #include <odfsig/crypto.hxx>
 
 #include <fstream> // IWYU pragma: keep
+#include <memory>
 #include <sstream> // IWYU pragma: keep
+#include <string>
+#include <vector>
 
 #include <cert.h>
 #include <certt.h>
