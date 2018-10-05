@@ -1,5 +1,10 @@
 = Version descriptions
 
+== 2.0
+
+- First release with multiple backends (MS CNG next to NSS)
+- Runs on Windows
+
 == 1.0
 
 - Initial release
