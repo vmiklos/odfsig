@@ -6,7 +6,7 @@ if (WIN32)
     set(ZLIB_ROOT_OPTION -DZLIB_ROOT=${CMAKE_CURRENT_BINARY_DIR}/../zlib/install)
     set(LIBZIP_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/lib/zip.lib)
 else ()
-    set(PATCH_COMMAND patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/add-an-option-to-disable-bzip2-support.patch)
+    set(PATCH_COMMAND patch -p1 -i ${CMAKE_CURRENT_SOURCE_DIR}/add-an-option-to-disable-bzip2-support.patch)
     set(LIBZIP_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libzip.a)
 endif()
 

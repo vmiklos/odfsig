@@ -33,7 +33,7 @@ else ()
     else ()
         find_package(PkgConfig REQUIRED)
         pkg_check_modules(NSS REQUIRED nss)
-        set (PATCH_COMMAND patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/nss-fix-memory-leak-in-GetCertName-220.patch)
+        set (PATCH_COMMAND patch -p1 -i ${CMAKE_CURRENT_SOURCE_DIR}/nss-fix-memory-leak-in-GetCertName-220.patch)
         set(CONFIGURE_COMMAND ./configure
             --prefix=${CMAKE_CURRENT_BINARY_DIR}/install
             --with-pic
