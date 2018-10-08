@@ -6,7 +6,7 @@
 
 #include <odfsig/string.hxx>
 
-#include <stddef.h>
+#include <cstddef>
 
 namespace odfsig
 {

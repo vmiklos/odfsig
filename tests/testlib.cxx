@@ -4,10 +4,10 @@
  * found in the LICENSE file.
  */
 
+#include <cstddef>
 #include <iosfwd>
 #include <memory>
 #include <set>
-#include <stddef.h>
 #include <string>
 #include <vector>
 

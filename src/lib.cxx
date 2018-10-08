@@ -6,8 +6,7 @@
 
 #include <odfsig/lib.hxx>
 
-#include <assert.h>
-
+#include <cassert>
 #include <sstream> // IWYU pragma: keep
 
 #include <libxml/globals.h>
