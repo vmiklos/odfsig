@@ -140,7 +140,7 @@ void usage(const std::string& self, std::ostream& ostream)
 }
 
 /// Build-time equivalent of strlen().
-template <class T, size_t N> constexpr size_t strsize(T (&)[N])
+template <class T, size_t N> constexpr size_t strsize(T (&/*str*/)[N])
 {
     return N - 1;
 }
