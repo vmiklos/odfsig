@@ -410,12 +410,7 @@ bool XmlSignature::hasObjectCertDigest(xmlNode* objectNode) const
     if (!certNode)
         return false;
 
-    xmlNode* certDigestNode =
-        xmlSecFindChild(certNode, certDigestNodeName, xadesNsName);
-    if (!certDigestNode)
-        return false;
-
-    return true;
+    return xmlSecFindChild(certNode, certDigestNodeName, xadesNsName);
 }
 
 std::string XmlSignature::getDate() const
