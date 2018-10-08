@@ -196,7 +196,7 @@ class XmlSignature : public Signature
     explicit XmlSignature(xmlNode* signatureNode, Crypto& crypto,
                           const std::vector<std::string>& trustedDers,
                           bool insecure);
-    virtual ~XmlSignature();
+    ~XmlSignature() override;
 
     const std::string& getErrorString() const override;
 
@@ -210,7 +210,7 @@ class XmlSignature : public Signature
 
     std::string getType() const override;
 
-    virtual std::set<std::string> getSignedStreams() const override;
+    std::set<std::string> getSignedStreams() const override;
 
   private:
     std::string getObjectDate(xmlNode* objectNode) const;
@@ -513,7 +513,7 @@ class ZipVerifier : public Verifier
 
     std::vector<std::unique_ptr<Signature>>& getSignatures() override;
 
-    virtual std::set<std::string> getStreams() const override;
+    std::set<std::string> getStreams() const override;
 
   private:
     bool locateSignatures();
