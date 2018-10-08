@@ -7,5 +7,4 @@ md workdir
 cd workdir
 cmake ..
 cmake --build . --config Release
-REM disable due to the use-after-free bug in xmlsec 1.2.26's mscng backend
-REM cmake --build . --config Release --target check
+cmake --build . --config Release --target check

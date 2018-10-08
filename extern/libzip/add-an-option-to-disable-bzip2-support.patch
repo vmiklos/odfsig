@@ -23,8 +23,8 @@ index 73a3485..879e0f2 100644
  OPTION(ENABLE_COMMONCRYPTO "Enable use of CommonCrypto" ON)
 +OPTION(ENABLE_BZIP2 "Enable use of BZip2" ON)
  
- OPTION(BUILD_TOOLS "Build tools in the src directory (zipcmp, zipmerge, ziptool)" ON)
- OPTION(BUILD_REGRESS "Build regression tests" ON)
+ INCLUDE(CheckFunctionExists)
+ INCLUDE(CheckIncludeFiles)
 @@ -186,15 +187,17 @@ IF(ZLIB_VERSION_STRING VERSION_LESS "1.1.2")
    MESSAGE(FATAL_ERROR "-- ZLIB version too old, please install at least v1.1.2")
  ENDIF(ZLIB_VERSION_STRING VERSION_LESS "1.1.2")

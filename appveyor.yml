@@ -16,3 +16,7 @@ build:
   project: workdir\odfsig.sln
   parallel: true
   verbosity: normal
+
+test_script:
+  - cd workdir
+  - ctest -V -C %CONFIGURATION%
