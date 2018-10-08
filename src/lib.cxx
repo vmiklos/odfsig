@@ -606,7 +606,8 @@ bool ZipVerifier::parseSignatures()
         return false;
     }
 
-    char readBuffer[8192];
+    const int bufferSize = 8192;
+    char readBuffer[bufferSize];
     zip_int64_t readSize;
     while ((readSize =
                 zip_fread(_zipFile.get(), readBuffer, sizeof(readBuffer))) > 0)
