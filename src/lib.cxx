@@ -194,8 +194,7 @@ class XmlSignature : public Signature
 {
   public:
     explicit XmlSignature(xmlNode* signatureNode, Crypto& crypto,
-                          const std::vector<std::string>& trustedDers,
-                          bool insecure);
+                          std::vector<std::string> trustedDers, bool insecure);
     ~XmlSignature() override;
 
     const std::string& getErrorString() const override;
@@ -236,9 +235,8 @@ class XmlSignature : public Signature
 };
 
 XmlSignature::XmlSignature(xmlNode* signatureNode, Crypto& crypto,
-                           const std::vector<std::string>& trustedDers,
-                           bool insecure)
-    : _signatureNode(signatureNode), _trustedDers(trustedDers),
+                           std::vector<std::string> trustedDers, bool insecure)
+    : _signatureNode(signatureNode), _trustedDers(std::move(trustedDers)),
       _insecure(insecure), _crypto(crypto)
 {
 }
