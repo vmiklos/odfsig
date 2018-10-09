@@ -6,6 +6,7 @@
 
 #include <odfsig/lib.hxx>
 
+#include <algorithm>
 #include <cassert>
 #include <sstream> // IWYU pragma: keep
 
