@@ -4,6 +4,7 @@
 # found in the LICENSE file.
 
 cmake_args="-DCMAKE_INSTALL_PREFIX:PATH=$PWD/instdir"
+run_clang_tidy=""
 
 for arg in "$@"
 do
@@ -34,6 +35,18 @@ do
 	    export CCACHE_CPP2=YES
             cmake_args+=" -DODFSIG_INTERNAL_XMLSEC=ON"
             ;;
+        --tidy)
+            export CC=clang
+            export CXX=clang++
+            export CCACHE_CPP2=1
+            for i in run-clang-tidy run-clang-tidy-5.0
+            do
+                if [ -n "$(type -p $i)" ]; then
+                    run_clang_tidy=$i
+                    break
+                fi
+            done
+            ;;
         *)
             cmake_args+=" $arg"
     esac
@@ -46,5 +59,12 @@ cmake $cmake_args ..
 make -j$(getconf _NPROCESSORS_ONLN)
 make check
 make install
+if [ -n "$run_clang_tidy" ]; then
+    # filter for tracked directories, i.e. implicitly filter out workdir
+    directories="$(git ls-files|grep /|sed 's|/.*||'|sort -u|xargs echo|sed 's/ /|/g')"
+    $run_clang_tidy -header-filter="^$PWD/(${directories})/.*" 2>&1 |tee log
+    # run-clang-tidy-7.0 will exit with a proper error code, grep till then
+    ! grep error: log
+fi
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
