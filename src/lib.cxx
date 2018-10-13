@@ -581,7 +581,7 @@ bool ZipVerifier::parseSignatures()
         // No problem, later getSignatures() will return an empty list.
         return true;
 
-    _xmlGuard.reset(new XmlGuard());
+    _xmlGuard = std::make_unique<XmlGuard>();
 
     _crypto = Crypto::create();
     if (!_crypto->initialize(_cryptoConfig))
@@ -590,7 +590,7 @@ bool ZipVerifier::parseSignatures()
         return false;
     }
 
-    _xmlSecGuard.reset(new XmlSecGuard(_zipArchive.get(), *_crypto));
+    _xmlSecGuard = std::make_unique<XmlSecGuard>(_zipArchive.get(), *_crypto);
     if (!_xmlSecGuard->isGood())
     {
         _errorString = "Failed to initialize libxmlsec";
