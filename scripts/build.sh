@@ -36,16 +36,16 @@ do
             cmake_args+=" -DODFSIG_INTERNAL_XMLSEC=ON"
             ;;
         --tidy)
-            export CC=clang
-            export CXX=clang++
+            if [ "$CC" != "gcc-7" ]; then
+                export CC=clang
+                export CXX=clang++
+                run_clang_tidy=run-clang-tidy
+            else
+                export CC=clang-7
+                export CXX=clang++-7
+                run_clang_tidy=run-clang-tidy-7
+            fi
             export CCACHE_CPP2=1
-            for i in run-clang-tidy run-clang-tidy-5.0
-            do
-                if [ -n "$(type -p $i)" ]; then
-                    run_clang_tidy=$i
-                    break
-                fi
-            done
             ;;
         *)
             cmake_args+=" $arg"
@@ -59,12 +59,12 @@ cmake $cmake_args ..
 make -j$(getconf _NPROCESSORS_ONLN)
 make check
 make install
+cd ..
 if [ -n "$run_clang_tidy" ]; then
+    ln -s workdir/compile_commands.json .
     # filter for tracked directories, i.e. implicitly filter out workdir
     directories="$(git ls-files|grep /|sed 's|/.*||'|sort -u|xargs echo|sed 's/ /|/g')"
-    $run_clang_tidy -header-filter="^$PWD/(${directories})/.*" 2>&1 |tee log
-    # run-clang-tidy-7.0 will exit with a proper error code, grep till then
-    ! grep error: log
+    $run_clang_tidy -header-filter="^$PWD/(${directories})/.*"
 fi
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
