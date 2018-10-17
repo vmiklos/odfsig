@@ -53,6 +53,7 @@ do
 done
 
 rm -rf workdir
+rm -f compile_commands.json
 mkdir workdir
 cd workdir
 cmake $cmake_args ..

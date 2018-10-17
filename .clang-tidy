@@ -1,4 +1,5 @@
 ---
+# modernize-use-equals-delete will ignore macros only in LLVM 8
 Checks: "clang-diagnostic-*,\
 performance-*,\
 unused-*,\
