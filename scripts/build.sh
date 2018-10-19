@@ -61,8 +61,8 @@ make -j$(getconf _NPROCESSORS_ONLN)
 make check
 make install
 cd ..
+ln -s workdir/compile_commands.json .
 if [ -n "$run_clang_tidy" ]; then
-    ln -s workdir/compile_commands.json .
     # filter for tracked directories, i.e. implicitly filter out workdir
     directories="$(git ls-files|grep /|sed 's|/.*||'|sort -u|xargs echo|sed 's/ /|/g')"
     $run_clang_tidy -header-filter="^$PWD/(${directories})/.*"

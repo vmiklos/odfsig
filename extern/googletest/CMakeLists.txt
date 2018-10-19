@@ -11,6 +11,8 @@ else ()
     ExternalProject_Add(extern-googletest-project
         URL https://github.com/google/googletest/archive/release-1.8.1.tar.gz
         URL_HASH SHA256=9bf1fe5182a604b4135edc1a425ae356c9ad15e9b23f9f12a02e80184c3a249c
+        PATCH_COMMAND ${PATCH_EXECUTABLE}
+            ${CMAKE_CURRENT_SOURCE_DIR}/msvc-debug.patch
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON
         CONFIGURE_COMMAND ${CMAKE_COMMAND}

@@ -8,6 +8,7 @@ platform:
 
 configuration:
     - Release
+    - Debug
 
 before_build:
     - cmake -H. -Bworkdir

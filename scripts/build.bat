@@ -6,5 +6,5 @@ cmake -E remove_directory workdir
 md workdir
 cd workdir
 cmake ..
-cmake --build . --config Release
-cmake --build . --config Release --target check
+cmake --build . --config Debug
+cmake --build . --config Debug --target check
