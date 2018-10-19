@@ -8,9 +8,13 @@ if (ODFSIG_INTERNAL_ZLIB)
     ExternalProject_Add(extern-zlib-project
         URL http://zlib.net/zlib-1.2.11.tar.gz
         URL_HASH SHA256=c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1
+        # Proposed upstream at <https://github.com/madler/zlib/pull/385>.
+        PATCH_COMMAND ${PATCH_EXECUTABLE}
+            ${CMAKE_CURRENT_SOURCE_DIR}/msvc-debug.patch
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON
         CONFIGURE_COMMAND ${CMAKE_COMMAND}
+            -DCMAKE_DEBUG_POSTFIX=
             -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/install
         )
     add_library(z STATIC IMPORTED)
