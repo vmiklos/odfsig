@@ -11,7 +11,7 @@ configuration:
     - Debug
 
 before_build:
-    - cmake -H. -Bworkdir
+    - cmake -H. -Bworkdir -DODFSIG_ENABLE_WERROR=ON
 
 build:
   project: workdir\odfsig.sln

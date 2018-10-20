@@ -11,6 +11,13 @@ endif ()
 
 set(CMAKE_CXX_STANDARD 14)
 if (WIN32)
+    # would warn on e.g. getenv()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_CRT_SECURE_NO_DEPRECATE")
+    # possible loss of data, libzip vs libxml2 different int types
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -wd4244")
+    if (ODFSIG_ENABLE_WERROR)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
+    endif ()
 else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
