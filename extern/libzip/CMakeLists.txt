@@ -2,6 +2,9 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+set(LIBZIP_VERSION 1.5.1)
+set(LIBZIP_SHA256SUM 47eaa45faa448c72bd6906e5a096846c469a185f293cafd8456abb165841b3f2)
+
 if (WIN32)
     set(ZLIB_ROOT_OPTION -DZLIB_ROOT=${CMAKE_CURRENT_BINARY_DIR}/../zlib/install)
     set(LIBZIP_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/lib/zip.lib)
@@ -23,8 +26,8 @@ else ()
         set(ZLIB_LIBRARIES zlib)
     endif()
     ExternalProject_Add(extern-libzip-project
-        URL https://libzip.org/download/libzip-1.5.1.tar.gz
-        URL_HASH SHA256=47eaa45faa448c72bd6906e5a096846c469a185f293cafd8456abb165841b3f2
+        URL https://libzip.org/download/libzip-${LIBZIP_VERSION}.tar.gz
+        URL_HASH SHA256=${LIBZIP_SHA256SUM}
         PATCH_COMMAND ${PATCH_EXECUTABLE}
             ${CMAKE_CURRENT_SOURCE_DIR}/add-an-option-to-disable-bzip2-support.patch
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs

@@ -2,6 +2,9 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+set(LIBXML2_VERSION 2.9.8)
+set(LIBXML2_SHA256SUM 0b74e51595654f958148759cfef0993114ddccccbb6f31aee018f3558e8e2732)
+
 if (ODFSIG_INTERNAL_LIBXML2)
     include(ExternalProject)
     include(GNUInstallDirs)
@@ -32,8 +35,8 @@ if (ODFSIG_INTERNAL_LIBXML2)
             ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxml2.a)
     endif()
     ExternalProject_Add(extern-libxml2-project
-        URL http://xmlsoft.org/sources/libxml2-2.9.8.tar.gz
-        URL_HASH SHA256=0b74e51595654f958148759cfef0993114ddccccbb6f31aee018f3558e8e2732
+        URL http://xmlsoft.org/sources/libxml2-${LIBXML2_VERSION}.tar.gz
+        URL_HASH SHA256=${LIBXML2_SHA256SUM}
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON
         CONFIGURE_COMMAND ${CONFIGURE_COMMAND}

@@ -2,6 +2,9 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+set(XMLSEC_VERSION 1.2.26)
+set(XMLSEC_SHA256SUM 8d8276c9c720ca42a3b0023df8b7ae41a2d6c5f9aa8d20ed1672d84cc8982d50)
+
 if (NOT ODFSIG_INTERNAL_XMLSEC)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(XMLSEC REQUIRED xmlsec1-nss)
@@ -61,8 +64,8 @@ else ()
     endif ()
 
     ExternalProject_Add(extern-xmlsec-project
-        URL http://www.aleksey.com/xmlsec/download/xmlsec1-1.2.26.tar.gz
-        URL_HASH SHA256=8d8276c9c720ca42a3b0023df8b7ae41a2d6c5f9aa8d20ed1672d84cc8982d50
+        URL http://www.aleksey.com/xmlsec/download/xmlsec1-${XMLSEC_VERSION}.tar.gz
+        URL_HASH SHA256=${XMLSEC_SHA256SUM}
         PATCH_COMMAND ${PATCH_EXECUTABLE}
             ${CMAKE_CURRENT_SOURCE_DIR}/mscng-fixes.patch
             ${CMAKE_CURRENT_SOURCE_DIR}/nss-fix-memory-leak-in-GetCertName-220.patch
