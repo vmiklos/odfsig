@@ -64,11 +64,11 @@ const xmlChar dateNsName[] = "http://purl.org/dc/elements/1.1/";
 const xmlChar xadesNsName[] = "http://uri.etsi.org/01903/v1.3.2#";
 const char signaturesStreamName[] = "META-INF/documentsignatures.xml";
 
-/// Checks if `big` ends with `small`.
-bool ends_with(const std::string& big, const std::string& small)
+/// Checks if `big` ends with `suffix`.
+bool ends_with(const std::string& big, const std::string& suffix)
 {
-    return big.compare(big.length() - small.length(), small.length(), small) ==
-           0;
+    return big.compare(big.length() - suffix.length(), suffix.length(),
+                       suffix) == 0;
 }
 
 /// Converts from libxml char to normal char.
