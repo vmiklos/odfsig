@@ -30,6 +30,11 @@ following locations:
 --trusted-der <file>::
 	Load trusted (root) certificate (chain) from a DER file.
 
+== EXIT STATUS
+
+The exit status is 0 if all signatures are valid, 1 if at least one signature
+is invalid, and 2 if an error occurred.
+
 == LICENSE
 
 Use of this source code is governed by a BSD-style license that can be found in

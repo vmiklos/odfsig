@@ -12,6 +12,7 @@
 #include <vector>
 
 #include <odfsig/lib.hxx>
+#include <odfsig/string.hxx>
 #include <odfsig/version.hxx>
 
 namespace
@@ -125,7 +126,8 @@ class Options
 };
 
 /// Minimal option parser to avoid Boost.Program_options dependency.
-void parseOptions(std::vector<const char*>& args, Options& options)
+bool parseOptions(std::vector<const char*>& args, Options& options,
+                  std::ostream& ostream)
 {
     bool inTrustedDer = false;
     for (const auto& arg : args)
@@ -144,9 +146,17 @@ void parseOptions(std::vector<const char*>& args, Options& options)
             options.setHelp(true);
         else if (argString == "--version")
             options.setVersion(true);
+        else if (odfsig::starts_with(argString, "--"))
+        {
+            ostream << "Error: unrecognized argument: " << argString
+                    << std::endl;
+            return false;
+        }
         else
             options.setOdfPath(argString);
     }
+
+    return true;
 }
 
 void usage(const std::string& self, std::ostream& ostream)
@@ -177,7 +187,8 @@ int main(int argc, const char* argv[], std::ostream& ostream)
 
     std::vector<const char*> args(argv, argv + argc);
     Options options;
-    parseOptions(args, options);
+    if (!parseOptions(args, options, ostream))
+        return 2;
     if (options.isHelp())
     {
         usage(argv[0], ostream);

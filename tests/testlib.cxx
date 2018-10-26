@@ -175,4 +175,15 @@ TEST(OdfsigTest, testCmdlineNoArgs)
     ASSERT_EQ(1, odfsig::main(args.size(), args.data(), ss));
 }
 
+TEST(OdfsigTest, testCmdlineBadArg)
+{
+    // Bad argument.
+    std::vector<const char*> args{"odfsig", "--trusted-derr",
+                                  "tests/keys/ca-chain.cert.der",
+                                  "tests/data/good.odt"};
+    std::stringstream ss;
+    // This was 1, bad argument was just ignored silently.
+    ASSERT_EQ(2, odfsig::main(args.size(), args.data(), ss));
+}
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
