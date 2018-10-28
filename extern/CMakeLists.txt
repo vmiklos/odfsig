@@ -9,6 +9,9 @@ add_subdirectory(googletest)
 add_subdirectory(zlib)
 add_subdirectory(libzip)
 add_subdirectory(libxml2)
+if (NOT WIN32)
+    add_subdirectory(nss)
+endif ()
 add_subdirectory(xmlsec)
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:

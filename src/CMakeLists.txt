@@ -20,10 +20,16 @@ target_include_directories(odfsigcore
     "${CMAKE_SOURCE_DIR}/include"
     "${CMAKE_BINARY_DIR}/include"
     )
+# In practice rpath is only needed for nss, everything else is linked
+# statically.
+if (ODFSIG_INTERNAL_NSS)
+    set(ODFSIG_RPATH -Wl,-rpath,$ORIGIN)
+endif ()
 target_link_libraries(odfsigcore
     libzip
     libxmlsec
     ${CRYPTO_LIBRARIES}
+    ${ODFSIG_RPATH}
     )
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:

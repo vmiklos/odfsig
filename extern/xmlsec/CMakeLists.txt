@@ -34,9 +34,17 @@ else ()
         set(XMLSEC_CRYPTO_LIBRARY
             ${CMAKE_CURRENT_BINARY_DIR}/extern-xmlsec-project-prefix/src/extern-xmlsec-project/win32/binaries/libxmlsec-mscng.lib)
     else ()
+        if (ODFSIG_INTERNAL_NSS)
+            set(ODFSIG_INTERNAL_XMLSEC_NSS
+                NSPR_CFLAGS=-I${CMAKE_CURRENT_BINARY_DIR}/../nss/extern-nss-project-prefix/src/extern-nss-project/dist/out/include
+                NSPR_LIBS=-L${CMAKE_BINARY_DIR}/bin\ -lnspr4
+                NSS_CFLAGS=-I${CMAKE_CURRENT_BINARY_DIR}/../nss/extern-nss-project-prefix/src/extern-nss-project/dist/public/nss
+                NSS_LIBS=-L${CMAKE_BINARY_DIR}/bin\ -lsmime3\ -lnss3\ -lnssutil3
+            )
+        endif ()
         find_package(PkgConfig REQUIRED)
-        pkg_check_modules(NSS REQUIRED nss)
         set(CONFIGURE_COMMAND ./configure
+            ${ODFSIG_INTERNAL_XMLSEC_NSS}
             --prefix=${CMAKE_CURRENT_BINARY_DIR}/install
             --with-pic
             --disable-shared
@@ -62,7 +70,24 @@ else ()
         set(LIBXML_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/../libxml2/extern-libxml2-project-prefix/src/extern-libxml2-project/include/)
         set(LIBXML_LIBRARIES libxml2)
     endif ()
+    if (NOT ODFSIG_INTERNAL_NSS)
+        if (NOT WIN32)
+            pkg_check_modules(NSS REQUIRED nss)
+        endif ()
+    else ()
+        set(NSS_INCLUDE_DIRS
+            ${CMAKE_CURRENT_BINARY_DIR}/../nss/extern-nss-project-prefix/src/extern-nss-project/dist/out/include
+            ${CMAKE_CURRENT_BINARY_DIR}/../nss/extern-nss-project-prefix/src/extern-nss-project/dist/public/nss
+        )
+        set(NSS_LIBRARIES nss)
+    endif ()
 
+    if (ODFSIG_INTERNAL_LIBXML2)
+        set(ODFSIG_LIBXML2_PROJECT extern-libxml2-project)
+    endif ()
+    if (ODFSIG_INTERNAL_NSS)
+        set(ODFSIG_NSS_PROJECT extern-nss-project)
+    endif ()
     ExternalProject_Add(extern-xmlsec-project
         URL http://www.aleksey.com/xmlsec/download/xmlsec1-${XMLSEC_VERSION}.tar.gz
         URL_HASH SHA256=${XMLSEC_SHA256SUM}
@@ -71,7 +96,7 @@ else ()
         CONFIGURE_COMMAND ${CONFIGURE_COMMAND}
         BUILD_COMMAND ${BUILD_COMMAND}
         INSTALL_COMMAND ${INSTALL_COMMAND}
-        DEPENDS extern-libxml2-project
+        DEPENDS ${ODFSIG_LIBXML2_PROJECT} ${ODFSIG_NSS_PROJECT}
         )
     add_library(xmlsec1 STATIC IMPORTED)
     set_property(TARGET xmlsec1 PROPERTY IMPORTED_LOCATION ${XMLSEC_LIBRARY})
