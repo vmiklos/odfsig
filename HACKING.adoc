@@ -18,3 +18,30 @@
 
 - Whitespace formatting: install the git hook in `git-hooks/` to let
   `clang-format` handle formatting for you.
+
+== Checklist before release
+
+Ideally CI checks everything before a commit hits master, but here are a few
+things which are not part of CI:
+
+- IWYU:
+
+----
+./up.sh --iwyu 2>&1 |tee log
+egrep 'should add|should remove' log
+----
+
+- using system libraries: this works on latest stable openSUSE (Leap 15.0
+  currently):
+
+----
+scripts/build.sh
+----
+
+NOTE: the lack of `--internal-libs` is the point of this exercise
+
+- version check of libraries:
+
+----
+scripts/extern.py
+----
