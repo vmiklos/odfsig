@@ -18,7 +18,7 @@ if (ODFSIG_INTERNAL_NSS)
         CONFIGURE_COMMAND
             echo NOP
         BUILD_COMMAND
-            $(MAKE) -j1 -C nss nss_build_all BUILD_OPT=1 USE_64=1 OBJDIR_NAME=out NSS_DISABLE_GTESTS=1 CC=$(CC_ORIG) CXX=$(CXX_ORIG)
+            $(MAKE) -j1 -C nss nss_build_all BUILD_OPT=1 USE_64=1 OBJDIR_NAME=out NSS_DISABLE_GTESTS=1 CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER}
         INSTALL_COMMAND
             COMMAND mkdir -p ${CMAKE_BINARY_DIR}/bin/
             COMMAND install -v -m755 dist/out/lib/libfreebl3.so ${CMAKE_BINARY_DIR}/bin/

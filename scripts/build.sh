@@ -52,10 +52,6 @@ do
     esac
 done
 
-# Strip off sanitizer arguments.
-export CC_ORIG=${CC%% *}
-export CXX_ORIG=${CXX%% *}
-
 rm -rf workdir
 rm -f compile_commands.json
 mkdir workdir
