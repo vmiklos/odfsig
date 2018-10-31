@@ -17,6 +17,11 @@ if (ODFSIG_INTERNAL_NSS)
 	# would break with them.
         set(ODFSIG_LINUX_CC CC=${CMAKE_C_COMPILER})
         set(ODFSIG_LINUX_CXX CXX=${CMAKE_CXX_COMPILER})
+
+        set(ODFSIG_LINUX_INSTALL
+            COMMAND install -v -m755 dist/out/lib/libfreeblpriv3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/out/lib/libsqlite3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+        )
     endif ()
 
     # NSS_DISABLE_GTESTS=1 gives us a 2m13s speedup.
@@ -31,45 +36,44 @@ if (ODFSIG_INTERNAL_NSS)
             $(MAKE) -j1 -C nss nss_build_all BUILD_OPT=1 USE_64=1 OBJDIR_NAME=out NSS_DISABLE_GTESTS=1 ${ODFSIG_LINUX_CC} ${ODFSIG_LINUX_CXX} ${ODFSIG_MACOS_SDK}
         INSTALL_COMMAND
             COMMAND mkdir -p ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libfreebl3.so ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libfreeblpriv3.so ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libnspr4.so ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libnss3.so ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libnssckbi.so ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libnssdbm3.so ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libnssutil3.so ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libplc4.so ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libplds4.so ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libsmime3.so ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libsoftokn3.so ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libssl3.so ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libsqlite3.so ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/out/lib/libfreebl3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/out/lib/libnspr4${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/out/lib/libnss3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/out/lib/libnssckbi${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/out/lib/libnssdbm3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/out/lib/libnssutil3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/out/lib/libplc4${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/out/lib/libplds4${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/out/lib/libsmime3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/out/lib/libsoftokn3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/out/lib/libssl3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            ${ODFSIG_LINUX_INSTALL}
         )
 
     # We link to a subset of the above libs, that subset is represented with
     # imported libraries as well.
     add_library(smime3 STATIC IMPORTED)
-    set_property(TARGET smime3 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/libsmime3.so)
+    set_property(TARGET smime3 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/libsmime3${CMAKE_SHARED_LIBRARY_SUFFIX})
     add_dependencies(smime3 extern-nss-project)
 
     add_library(nss3 STATIC IMPORTED)
-    set_property(TARGET nss3 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/libnss3.so)
+    set_property(TARGET nss3 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/libnss3${CMAKE_SHARED_LIBRARY_SUFFIX})
     add_dependencies(nss3 extern-nss-project)
 
     add_library(nssutil3 STATIC IMPORTED)
-    set_property(TARGET nssutil3 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/libnssutil3.so)
+    set_property(TARGET nssutil3 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/libnssutil3${CMAKE_SHARED_LIBRARY_SUFFIX})
     add_dependencies(nssutil3 extern-nss-project)
 
     add_library(plc4 STATIC IMPORTED)
-    set_property(TARGET plc4 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/libplc4.so)
+    set_property(TARGET plc4 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/libplc4${CMAKE_SHARED_LIBRARY_SUFFIX})
     add_dependencies(plc4 extern-nss-project)
 
     add_library(plds4 STATIC IMPORTED)
-    set_property(TARGET plds4 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/libplds4.so)
+    set_property(TARGET plds4 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/libplds4${CMAKE_SHARED_LIBRARY_SUFFIX})
     add_dependencies(plds4 extern-nss-project)
 
     add_library(nspr4 STATIC IMPORTED)
-    set_property(TARGET nspr4 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/libnspr4.so)
+    set_property(TARGET nspr4 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/libnspr4${CMAKE_SHARED_LIBRARY_SUFFIX})
     add_dependencies(nspr4 extern-nss-project)
 
     set(NSS_INCLUDE_DIRS
