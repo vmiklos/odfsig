@@ -9,6 +9,16 @@ if (ODFSIG_INTERNAL_NSS)
     include(ExternalProject)
     include(GNUInstallDirs)
 
+    if (WIN32)
+    elseif (APPLE)
+        set(ODFSIG_MACOS_SDK MACOS_SDK_DIR=${CMAKE_OSX_SYSROOT})
+    else ()
+	# Drop compiler arguments (e.g. sanitizers) on Linux, as NSS build
+	# would break with them.
+        set(ODFSIG_LINUX_CC CC=${CMAKE_C_COMPILER})
+        set(ODFSIG_LINUX_CXX CXX=${CMAKE_CXX_COMPILER})
+    endif ()
+
     # NSS_DISABLE_GTESTS=1 gives us a 2m13s speedup.
     ExternalProject_Add(extern-nss-project
         URL https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_40_RTM/src/nss-${NSS_VERSION}-with-nspr-4.20.tar.gz
@@ -18,7 +28,7 @@ if (ODFSIG_INTERNAL_NSS)
         CONFIGURE_COMMAND
             echo NOP
         BUILD_COMMAND
-            $(MAKE) -j1 -C nss nss_build_all BUILD_OPT=1 USE_64=1 OBJDIR_NAME=out NSS_DISABLE_GTESTS=1 CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER}
+            $(MAKE) -j1 -C nss nss_build_all BUILD_OPT=1 USE_64=1 OBJDIR_NAME=out NSS_DISABLE_GTESTS=1 ${ODFSIG_LINUX_CC} ${ODFSIG_LINUX_CXX} ${ODFSIG_MACOS_SDK}
         INSTALL_COMMAND
             COMMAND mkdir -p ${CMAKE_BINARY_DIR}/bin/
             COMMAND install -v -m755 dist/out/lib/libfreebl3.so ${CMAKE_BINARY_DIR}/bin/
