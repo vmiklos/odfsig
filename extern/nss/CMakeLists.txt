@@ -12,6 +12,7 @@ if (ODFSIG_INTERNAL_NSS)
     if (WIN32)
     elseif (APPLE)
         set(ODFSIG_MACOS_SDK MACOS_SDK_DIR=${CMAKE_OSX_SYSROOT})
+        set(ODFSIG_MACOS_NSPR_SUBDIR out/)
     else ()
 	# Drop compiler arguments (e.g. sanitizers) on Linux, as NSS build
 	# would break with them.
@@ -35,15 +36,15 @@ if (ODFSIG_INTERNAL_NSS)
         BUILD_COMMAND
             $(MAKE) -j1 -C nss nss_build_all BUILD_OPT=1 USE_64=1 OBJDIR_NAME=out NSS_DISABLE_GTESTS=1 ${ODFSIG_LINUX_CC} ${ODFSIG_LINUX_CXX} ${ODFSIG_MACOS_SDK}
         INSTALL_COMMAND
-            COMMAND mkdir -p ${CMAKE_BINARY_DIR}/bin/
+            COMMAND mkdir -p ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}
             COMMAND install -v -m755 dist/out/lib/libfreebl3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libnspr4${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/out/lib/libnspr4${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}
             COMMAND install -v -m755 dist/out/lib/libnss3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
             COMMAND install -v -m755 dist/out/lib/libnssckbi${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
             COMMAND install -v -m755 dist/out/lib/libnssdbm3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
             COMMAND install -v -m755 dist/out/lib/libnssutil3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libplc4${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libplds4${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/out/lib/libplc4${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}
+            COMMAND install -v -m755 dist/out/lib/libplds4${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}
             COMMAND install -v -m755 dist/out/lib/libsmime3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
             COMMAND install -v -m755 dist/out/lib/libsoftokn3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
             COMMAND install -v -m755 dist/out/lib/libssl3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
@@ -65,15 +66,15 @@ if (ODFSIG_INTERNAL_NSS)
     add_dependencies(nssutil3 extern-nss-project)
 
     add_library(plc4 STATIC IMPORTED)
-    set_property(TARGET plc4 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/libplc4${CMAKE_SHARED_LIBRARY_SUFFIX})
+    set_property(TARGET plc4 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}libplc4${CMAKE_SHARED_LIBRARY_SUFFIX})
     add_dependencies(plc4 extern-nss-project)
 
     add_library(plds4 STATIC IMPORTED)
-    set_property(TARGET plds4 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/libplds4${CMAKE_SHARED_LIBRARY_SUFFIX})
+    set_property(TARGET plds4 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}libplds4${CMAKE_SHARED_LIBRARY_SUFFIX})
     add_dependencies(plds4 extern-nss-project)
 
     add_library(nspr4 STATIC IMPORTED)
-    set_property(TARGET nspr4 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/libnspr4${CMAKE_SHARED_LIBRARY_SUFFIX})
+    set_property(TARGET nspr4 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}libnspr4${CMAKE_SHARED_LIBRARY_SUFFIX})
     add_dependencies(nspr4 extern-nss-project)
 
     set(NSS_INCLUDE_DIRS
