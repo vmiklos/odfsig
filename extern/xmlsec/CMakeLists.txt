@@ -42,7 +42,6 @@ else ()
                 NSS_LIBS=-L${CMAKE_BINARY_DIR}/bin\ -lsmime3\ -lnss3\ -lnssutil3
             )
         endif ()
-        find_package(PkgConfig REQUIRED)
         set(CONFIGURE_COMMAND ./configure
             ${ODFSIG_INTERNAL_XMLSEC_NSS}
             --prefix=${CMAKE_CURRENT_BINARY_DIR}/install
@@ -65,6 +64,7 @@ else ()
             ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxmlsec1-nss.a)
     endif()
     if (NOT ODFSIG_INTERNAL_LIBXML2)
+        find_package(PkgConfig REQUIRED)
         pkg_check_modules(LIBXML REQUIRED libxml-2.0)
     else ()
         set(LIBXML_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/../libxml2/extern-libxml2-project-prefix/src/extern-libxml2-project/include/)
