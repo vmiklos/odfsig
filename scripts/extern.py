@@ -18,6 +18,7 @@ releaseMonitoring = {
     "libzip": ["libzip", "http://www.nih.at/libzip/"],
     "xmlsec": ["xmlsec1", "http://www.aleksey.com/xmlsec/download.html"],
     "zlib": ["zlib", "http://www.zlib.net/"],
+    "nss": ["nss", "http://ftp.mozilla.org/pub/mozilla.org/security/nss/releases/"],
 }
 
 
