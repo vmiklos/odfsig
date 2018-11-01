@@ -4,15 +4,23 @@ script:
 matrix:
   include:
   - name: "linux gcc release"
+    os: linux
     env: TRAVIS_ARGS="--werror"
   - name: "linux clang debug"
+    os: linux
     env: TRAVIS_ARGS="--debug --werror --clang"
   - name: "linux clang sanitizers"
+    os: linux
     env: TRAVIS_ARGS="--debug --werror --sanitizers"
     # See <https://github.com/travis-ci/travis-ci/issues/9033>.
     sudo: true
   - name: "linux clang tidy"
+    os: linux
     env: TRAVIS_ARGS="--debug --werror --tidy"
+  - name: "macos release"
+    os: osx
+    osx_image: xcode8.3
+    env: TRAVIS_ARGS="--werror"
 addons:
     apt:
         sources:
