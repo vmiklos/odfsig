@@ -21,6 +21,14 @@ odfsig verifies the digital signatures in an ODF document.
 - https://www.aleksey.com/xmlsec/[xmlsec1-nss or xmlsec1-mscng]
 - https://libzip.org/[libzip]
 
+== Platforms
+
+odfsig has been used on a variety of platforms:
+
+- Linux
+- Windows
+- macOS
+
 == Resources
 
 - http://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-part3.html#$$__RefHeading__752871_826425813$$[ODF
