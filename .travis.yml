@@ -21,6 +21,10 @@ matrix:
     os: osx
     osx_image: xcode8.3
     env: TRAVIS_ARGS="--werror"
+  - name: "macos debug"
+    os: osx
+    osx_image: xcode8.3
+    env: TRAVIS_ARGS="--debug --werror"
 addons:
     apt:
         sources:
