@@ -9,6 +9,7 @@
 #
 
 import os
+import platform
 import shutil
 import zipfile
 
@@ -58,7 +59,42 @@ def main():
                 if not name == "odfsig":
                     zip.write(os.path.join(root, name))
 
+def mainDarwin():
+    instdir = "odfsig"
+    if os.path.exists(instdir):
+        shutil.rmtree(instdir)
+    os.mkdir(instdir)
+    os.mkdir(instdir + "/out")
+    bins = [
+        "libfreebl3.dylib",
+        "libnss3.dylib",
+        "libnssckbi.dylib",
+        "libnssdbm3.dylib",
+        "libnssutil3.dylib",
+        "libsmime3.dylib",
+        "libsoftokn3.dylib",
+        "libssl3.dylib",
+        "odfsig",
+    ]
+    for bin in bins:
+        shutil.copyfile("workdir/bin/" + bin, instdir + "/" + bin)
+    nsprdylibs = [
+        "libnspr4.dylib",
+        "libplc4.dylib",
+        "libplds4.dylib",
+    ]
+    for dylib in nsprdylibs:
+        shutil.copyfile("workdir/bin/out/" + dylib, instdir + "/out/" + dylib)
+
+    with zipfile.ZipFile(instdir + ".zip", "w") as zip:
+        for root, dirs, files in os.walk("odfsig"):
+            for name in files:
+                zip.write(os.path.join(root, name))
+
 if __name__ == '__main__':
-    main()
+    if platform.system() == "Darwin":
+        mainDarwin()
+    else:
+        main()
 
 # vim:set filetype=python shiftwidth=4 softtabstop=4 expandtab:
