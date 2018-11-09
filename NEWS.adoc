@@ -2,6 +2,11 @@
 
 == 2.0
 
+- Runs on macOS
+- Don't silently ignore unrecognized arguments
+
+== 2.0
+
 - First release with multiple backends (MS CNG next to NSS)
 - Runs on Windows
 
