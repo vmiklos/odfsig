@@ -4,7 +4,7 @@
 
 include(FindGit)
 
-set(ODFSIG_VERSION_MAJOR 3)
+set(ODFSIG_VERSION_MAJOR 4)
 set(ODFSIG_VERSION_MINOR 0)
 if (GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
     execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
