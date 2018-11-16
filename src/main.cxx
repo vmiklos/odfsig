@@ -126,7 +126,7 @@ class Options
 };
 
 /// Minimal option parser to avoid Boost.Program_options dependency.
-bool parseOptions(std::vector<const char*>& args, Options& options,
+bool parseOptions(const std::vector<const char*>& args, Options& options,
                   std::ostream& ostream)
 {
     bool inTrustedDer = false;
@@ -169,6 +169,7 @@ void usage(const std::string& self, std::ostream& ostream)
 }
 
 /// Build-time equivalent of strlen().
+/// NOLINTNEXTLINE(modernize-avoid-c-arrays)
 template <class T, size_t N> constexpr size_t strsize(T (&/*str*/)[N])
 {
     return N - 1;
@@ -177,21 +178,20 @@ template <class T, size_t N> constexpr size_t strsize(T (&/*str*/)[N])
 
 namespace odfsig
 {
-int main(int argc, const char* argv[], std::ostream& ostream)
+int main(const std::vector<const char*>& args, std::ostream& ostream)
 {
-    if (argc < 2)
+    if (args.size() < 2)
     {
-        usage(argv[0], ostream);
+        usage(args[0], ostream);
         return 1;
     }
 
-    std::vector<const char*> args(argv, argv + argc);
     Options options;
     if (!parseOptions(args, options, ostream))
         return 2;
     if (options.isHelp())
     {
-        usage(argv[0], ostream);
+        usage(args[0], ostream);
         return 0;
     }
 

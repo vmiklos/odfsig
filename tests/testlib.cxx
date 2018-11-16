@@ -113,7 +113,7 @@ TEST(OdfsigTest, testTrustedDerCmdline)
                                   "tests/keys/ca-chain.cert.der",
                                   "tests/data/good.odt"};
     std::stringstream ss;
-    ASSERT_EQ(0, odfsig::main(args.size(), args.data(), ss));
+    ASSERT_EQ(0, odfsig::main(args, ss));
 }
 
 TEST(OdfsigTest, testInsecureCmdline)
@@ -122,7 +122,7 @@ TEST(OdfsigTest, testInsecureCmdline)
     std::vector<const char*> args{"odfsig", "--insecure",
                                   "tests/data/good.odt"};
     std::stringstream ss;
-    ASSERT_EQ(0, odfsig::main(args.size(), args.data(), ss));
+    ASSERT_EQ(0, odfsig::main(args, ss));
 }
 
 TEST(OdfsigTest, testCmdlineHelp)
@@ -130,7 +130,7 @@ TEST(OdfsigTest, testCmdlineHelp)
     // --help resulted in an error.
     std::vector<const char*> args{"odfsig", "--help"};
     std::stringstream ss;
-    ASSERT_EQ(0, odfsig::main(args.size(), args.data(), ss));
+    ASSERT_EQ(0, odfsig::main(args, ss));
 }
 
 TEST(OdfsigTest, testCmdlineVersion)
@@ -138,7 +138,7 @@ TEST(OdfsigTest, testCmdlineVersion)
     // --version resulted in an error.
     std::vector<const char*> args{"odfsig", "--version"};
     std::stringstream ss;
-    ASSERT_EQ(0, odfsig::main(args.size(), args.data(), ss));
+    ASSERT_EQ(0, odfsig::main(args, ss));
 }
 
 TEST(OdfsigTest, testCmdlineNoStream)
@@ -146,7 +146,7 @@ TEST(OdfsigTest, testCmdlineNoStream)
     // No signatures stream.
     std::vector<const char*> args{"odfsig", "tests/data/no-stream.odt"};
     std::stringstream ss;
-    ASSERT_EQ(1, odfsig::main(args.size(), args.data(), ss));
+    ASSERT_EQ(1, odfsig::main(args, ss));
 }
 
 TEST(OdfsigTest, testCmdlineBad)
@@ -156,7 +156,7 @@ TEST(OdfsigTest, testCmdlineBad)
                                   "tests/keys/ca-chain.cert.der",
                                   "tests/data/bad.odt"};
     std::stringstream ss;
-    ASSERT_EQ(1, odfsig::main(args.size(), args.data(), ss));
+    ASSERT_EQ(1, odfsig::main(args, ss));
 }
 
 TEST(OdfsigTest, testCmdlineBadPath)
@@ -164,7 +164,7 @@ TEST(OdfsigTest, testCmdlineBadPath)
     // No signatures stream.
     std::vector<const char*> args{"odfsig", "tests/data/asdf.odt"};
     std::stringstream ss;
-    ASSERT_EQ(1, odfsig::main(args.size(), args.data(), ss));
+    ASSERT_EQ(1, odfsig::main(args, ss));
 }
 
 TEST(OdfsigTest, testCmdlineNoArgs)
@@ -172,7 +172,7 @@ TEST(OdfsigTest, testCmdlineNoArgs)
     // No arguments.
     std::vector<const char*> args{"odfsig"};
     std::stringstream ss;
-    ASSERT_EQ(1, odfsig::main(args.size(), args.data(), ss));
+    ASSERT_EQ(1, odfsig::main(args, ss));
 }
 
 TEST(OdfsigTest, testCmdlineBadArg)
@@ -183,7 +183,7 @@ TEST(OdfsigTest, testCmdlineBadArg)
                                   "tests/data/good.odt"};
     std::stringstream ss;
     // This was 1, bad argument was just ignored silently.
-    ASSERT_EQ(2, odfsig::main(args.size(), args.data(), ss));
+    ASSERT_EQ(2, odfsig::main(args, ss));
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

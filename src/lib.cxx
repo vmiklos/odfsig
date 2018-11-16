@@ -59,10 +59,10 @@ template <> struct default_delete<xmlChar>
 
 namespace
 {
-const xmlChar dateNodeName[] = "date";
-const xmlChar dateNsName[] = "http://purl.org/dc/elements/1.1/";
-const xmlChar xadesNsName[] = "http://uri.etsi.org/01903/v1.3.2#";
-const char signaturesStreamName[] = "META-INF/documentsignatures.xml";
+const xmlChar* dateNodeName = BAD_CAST("date");
+const xmlChar* dateNsName = BAD_CAST("http://purl.org/dc/elements/1.1/");
+const xmlChar* xadesNsName = BAD_CAST("http://uri.etsi.org/01903/v1.3.2#");
+const char* signaturesStreamName = "META-INF/documentsignatures.xml";
 
 /// Checks if `big` ends with `suffix`.
 bool ends_with(const std::string& big, const std::string& suffix)
@@ -378,13 +378,14 @@ std::string XmlSignature::getType() const
 
 bool XmlSignature::hasObjectCertDigest(xmlNode* objectNode) const
 {
-    const xmlChar qualifyingPropertiesNodeName[] = "QualifyingProperties";
-    const xmlChar signedPropertiesNodeName[] = "SignedProperties";
-    const xmlChar signedSignaturePropertiesNodeName[] =
-        "SignedSignatureProperties";
-    const xmlChar signingCertificateNodeName[] = "SigningCertificate";
-    const xmlChar certNodeName[] = "Cert";
-    const xmlChar certDigestNodeName[] = "CertDigest";
+    const xmlChar* qualifyingPropertiesNodeName =
+        BAD_CAST("QualifyingProperties");
+    const xmlChar* signedPropertiesNodeName = BAD_CAST("SignedProperties");
+    const xmlChar* signedSignaturePropertiesNodeName =
+        BAD_CAST("SignedSignatureProperties");
+    const xmlChar* signingCertificateNodeName = BAD_CAST("SigningCertificate");
+    const xmlChar* certNodeName = BAD_CAST("Cert");
+    const xmlChar* certDigestNodeName = BAD_CAST("CertDigest");
 
     xmlNode* qualifyingPropertiesNode =
         xmlSecFindChild(objectNode, qualifyingPropertiesNodeName, xadesNsName);
@@ -460,7 +461,7 @@ std::string XmlSignature::getDateContent(xmlNode* dateNode) const
 std::string
 XmlSignature::getSignaturePropertiesDate(xmlNode* signaturePropertiesNode) const
 {
-    const xmlChar signaturePropertyNodeName[] = "SignatureProperty";
+    const xmlChar* signaturePropertyNodeName = BAD_CAST("SignatureProperty");
 
     for (xmlNode* signaturePropertiesChild = signaturePropertiesNode->children;
          signaturePropertiesChild;
@@ -608,13 +609,13 @@ bool ZipVerifier::parseSignatures()
     }
 
     const int bufferSize = 8192;
-    char readBuffer[bufferSize];
+    std::vector<char> readBuffer(bufferSize);
     zip_int64_t readSize;
-    while ((readSize =
-                zip_fread(_zipFile.get(), readBuffer, sizeof(readBuffer))) > 0)
+    while ((readSize = zip_fread(_zipFile.get(), readBuffer.data(),
+                                 readBuffer.size())) > 0)
     {
-        _signaturesBytes.insert(_signaturesBytes.end(), readBuffer,
-                                readBuffer + readSize);
+        _signaturesBytes.insert(_signaturesBytes.end(), readBuffer.data(),
+                                readBuffer.data() + readSize);
     }
     if (readSize == -1)
     {
