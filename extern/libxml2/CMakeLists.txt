@@ -22,7 +22,7 @@ if (ODFSIG_INTERNAL_LIBXML2)
             ${CMAKE_CURRENT_BINARY_DIR}/extern-libxml2-project-prefix/src/extern-libxml2-project/win32/bin.msvc/libxml2.lib)
     else()
         if (APPLE)
-           set(ODFSIG_LIBXML2_MACOS_ICONV iconv)
+            set(ICONV iconv)
         endif ()
         set(CONFIGURE_COMMAND ./configure
             --prefix=${CMAKE_CURRENT_BINARY_DIR}/install
@@ -55,7 +55,7 @@ if (ODFSIG_INTERNAL_LIBXML2)
         )
     set(LIBXML2_LIBRARIES
         xml2
-        ${ODFSIG_LIBXML2_MACOS_ICONV}
+        ${ICONV}
         )
 endif ()
 
