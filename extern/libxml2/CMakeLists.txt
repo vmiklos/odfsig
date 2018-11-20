@@ -5,7 +5,10 @@
 set(LIBXML2_VERSION 2.9.8)
 set(LIBXML2_SHA256SUM 0b74e51595654f958148759cfef0993114ddccccbb6f31aee018f3558e8e2732)
 
-if (ODFSIG_INTERNAL_LIBXML2)
+if (NOT ODFSIG_INTERNAL_LIBXML2)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(LIBXML REQUIRED libxml-2.0)
+else ()
     include(ExternalProject)
     include(GNUInstallDirs)
 
@@ -37,6 +40,7 @@ if (ODFSIG_INTERNAL_LIBXML2)
         set(LIBXML2_LIBRARY
             ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxml2.a)
     endif()
+
     ExternalProject_Add(extern-libxml2-project
         URL http://xmlsoft.org/sources/libxml2-${LIBXML2_VERSION}.tar.gz
         URL_HASH SHA256=${LIBXML2_SHA256SUM}
