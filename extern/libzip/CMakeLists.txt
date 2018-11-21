@@ -12,12 +12,14 @@ else ()
     include(ExternalProject)
     include(GNUInstallDirs)
 
-    if (WIN32)
+    if (ODFSIG_INTERNAL_ZLIB)
         set(ZLIB_ROOT_OPTION -DZLIB_ROOT=${CMAKE_CURRENT_BINARY_DIR}/../zlib/install)
+    endif ()
+    if (WIN32)
         set(LIBZIP_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/lib/zip.lib)
     else ()
         set(LIBZIP_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libzip.a)
-    endif()
+    endif ()
 
     ExternalProject_Add(extern-libzip-project
         URL https://libzip.org/download/libzip-${LIBZIP_VERSION}.tar.gz
