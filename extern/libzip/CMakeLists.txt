@@ -5,26 +5,27 @@
 set(LIBZIP_VERSION 1.5.1)
 set(LIBZIP_SHA256SUM 47eaa45faa448c72bd6906e5a096846c469a185f293cafd8456abb165841b3f2)
 
-if (WIN32)
-    set(ZLIB_ROOT_OPTION -DZLIB_ROOT=${CMAKE_CURRENT_BINARY_DIR}/../zlib/install)
-    set(LIBZIP_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/lib/zip.lib)
-else ()
-    set(LIBZIP_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libzip.a)
-endif()
-
 if (NOT ODFSIG_INTERNAL_LIBZIP)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(LIBZIP REQUIRED libzip)
 else ()
     include(ExternalProject)
     include(GNUInstallDirs)
-    if (NOT ODFSIG_INTERNAL_LIBXML2)
+    if (NOT ODFSIG_INTERNAL_ZLIB)
         find_package(PkgConfig REQUIRED)
         pkg_check_modules(ZLIB REQUIRED zlib)
     else()
         set(ZLIB_INCLUDE_DIRS "")
         set(ZLIB_LIBRARIES zlib)
     endif()
+
+    if (WIN32)
+        set(ZLIB_ROOT_OPTION -DZLIB_ROOT=${CMAKE_CURRENT_BINARY_DIR}/../zlib/install)
+        set(LIBZIP_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/lib/zip.lib)
+    else ()
+        set(LIBZIP_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libzip.a)
+    endif()
+
     ExternalProject_Add(extern-libzip-project
         URL https://libzip.org/download/libzip-${LIBZIP_VERSION}.tar.gz
         URL_HASH SHA256=${LIBZIP_SHA256SUM}
