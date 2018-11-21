@@ -11,13 +11,6 @@ if (NOT ODFSIG_INTERNAL_LIBZIP)
 else ()
     include(ExternalProject)
     include(GNUInstallDirs)
-    if (NOT ODFSIG_INTERNAL_ZLIB)
-        find_package(PkgConfig REQUIRED)
-        pkg_check_modules(ZLIB REQUIRED zlib)
-    else()
-        set(ZLIB_INCLUDE_DIRS "")
-        set(ZLIB_LIBRARIES zlib)
-    endif()
 
     if (WIN32)
         set(ZLIB_ROOT_OPTION -DZLIB_ROOT=${CMAKE_CURRENT_BINARY_DIR}/../zlib/install)
@@ -46,17 +39,12 @@ else ()
     add_library(zip STATIC IMPORTED)
     set_property(TARGET zip PROPERTY IMPORTED_LOCATION ${LIBZIP_LIBRARY})
     add_dependencies(zip extern-libzip-project)
-    set(LIBZIP_INCLUDE_DIRS
-        ${CMAKE_CURRENT_BINARY_DIR}/install/include
-        ${ZLIB_INCLUDE_DIRS}
-        )
-    set(LIBZIP_LIBRARIES
-        zip
-        ${ZLIB_LIBRARIES})
+    set(LIBZIP_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/install/include)
+    set(LIBZIP_LIBRARIES zip)
 endif ()
 
 add_library(libzip INTERFACE)
 target_include_directories(libzip INTERFACE ${LIBZIP_INCLUDE_DIRS})
-target_link_libraries(libzip INTERFACE ${LIBZIP_LIBRARIES})
+target_link_libraries(libzip INTERFACE ${LIBZIP_LIBRARIES} zlib)
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
