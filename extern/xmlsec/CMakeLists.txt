@@ -27,8 +27,7 @@ else ()
             ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin/$<CONFIG> &&
             ${CMAKE_COMMAND} -E copy win32/binaries/libxmlsec.dll win32/binaries/libxmlsec-mscng.dll ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/
             )
-        set(XMLSEC_INCLUDE_DIR
-            ${CMAKE_CURRENT_BINARY_DIR}/extern-xmlsec-project-prefix/src/extern-xmlsec-project/include)
+        set(XMLSEC_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/extern-xmlsec-project-prefix/src/extern-xmlsec-project/include)
         set(XMLSEC_LIBRARY
             ${CMAKE_CURRENT_BINARY_DIR}/extern-xmlsec-project-prefix/src/extern-xmlsec-project/win32/binaries/libxmlsec.lib)
         set(XMLSEC_CRYPTO_LIBRARY
@@ -56,8 +55,7 @@ else ()
             --without-openssl)
         set(BUILD_COMMAND $(MAKE))
         set(INSTALL_COMMAND $(MAKE) install)
-        set(XMLSEC_INCLUDE_DIR
-            ${CMAKE_CURRENT_BINARY_DIR}/install/include/xmlsec1)
+        set(XMLSEC_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/install/include/xmlsec1)
         set(XMLSEC_LIBRARY
             ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxmlsec1.a)
         set(XMLSEC_CRYPTO_LIBRARY
@@ -88,9 +86,6 @@ else ()
     set_property(TARGET xmlsec1-nss PROPERTY IMPORTED_LOCATION ${XMLSEC_CRYPTO_LIBRARY})
     add_dependencies(xmlsec1-nss extern-xmlsec-project)
 
-    set(XMLSEC_INCLUDE_DIRS
-        ${XMLSEC_INCLUDE_DIR}
-        )
     # nss after static libs to please --as-needed linkers.
     set(XMLSEC_LIBRARIES
         xmlsec1-nss
