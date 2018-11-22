@@ -13,7 +13,7 @@ else ()
     include(GNUInstallDirs)
 
     if (WIN32)
-        set(CONFIGURE_COMMAND cd win32 &&
+        set(CONFIGURE_COMMAND ${CMAKE_COMMAND} -E chdir win32
             cscript /e:javascript configure.js
             crypto=mscng
             xslt=no
@@ -21,11 +21,11 @@ else ()
             static=no
             include=${CMAKE_CURRENT_BINARY_DIR}/../libxml2/extern-libxml2-project-prefix/src/extern-libxml2-project/include/
             lib=${CMAKE_CURRENT_BINARY_DIR}/../libxml2/extern-libxml2-project-prefix/src/extern-libxml2-project/win32/bin.msvc/)
-        set(BUILD_COMMAND cd win32 &&
+        set(BUILD_COMMAND ${CMAKE_COMMAND} -E chdir win32
             nmake)
         set(INSTALL_COMMAND
-            ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin/$<CONFIG> &&
-            ${CMAKE_COMMAND} -E copy win32/binaries/libxmlsec.dll win32/binaries/libxmlsec-mscng.dll ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin/$<CONFIG>
+            COMMAND ${CMAKE_COMMAND} -E copy win32/binaries/libxmlsec.dll win32/binaries/libxmlsec-mscng.dll ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/
             )
         set(XMLSEC_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/extern-xmlsec-project-prefix/src/extern-xmlsec-project/include)
         set(XMLSEC_LIBRARY
@@ -54,7 +54,7 @@ else ()
             --disable-docs
             --without-openssl)
         set(BUILD_COMMAND $(MAKE))
-        set(INSTALL_COMMAND $(MAKE) install)
+        set(INSTALL_COMMAND COMMAND $(MAKE) install)
         set(XMLSEC_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/install/include/xmlsec1)
         set(XMLSEC_LIBRARY
             ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxmlsec1.a)
