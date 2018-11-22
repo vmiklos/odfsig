@@ -5,7 +5,9 @@
 set(ZLIB_VERSION 1.2.11)
 set(ZLIB_SHA256SUM c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1)
 
-if (ODFSIG_INTERNAL_ZLIB)
+if (NOT ODFSIG_INTERNAL_ZLIB)
+    find_package(ZLIB REQUIRED)
+else ()
     include(ExternalProject)
 
     ExternalProject_Add(extern-zlib-project
@@ -28,16 +30,13 @@ if (ODFSIG_INTERNAL_ZLIB)
     endif ()
     add_dependencies(z extern-zlib-project)
 
-    set(ZLIB_INCLUDE_DIRS
+    set(ZLIB_INCLUDE_DIR
         ${CMAKE_CURRENT_BINARY_DIR}/install/include
-        )
-    set(ZLIB_LIBRARIES
-        z
         )
 endif ()
 
 add_library(zlib INTERFACE)
-target_include_directories(zlib INTERFACE ${ZLIB_INCLUDE_DIRS})
-target_link_libraries(zlib INTERFACE ${ZLIB_LIBRARIES})
+target_include_directories(zlib INTERFACE ${ZLIB_INCLUDE_DIR})
+target_link_libraries(zlib INTERFACE z)
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
