@@ -63,13 +63,6 @@ else ()
         set(XMLSEC_CRYPTO_LIBRARY
             ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxmlsec1-nss.a)
     endif()
-    if (NOT ODFSIG_INTERNAL_LIBXML2)
-        find_package(PkgConfig REQUIRED)
-        pkg_check_modules(LIBXML REQUIRED libxml-2.0)
-    else ()
-        set(LIBXML_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/../libxml2/extern-libxml2-project-prefix/src/extern-libxml2-project/include/)
-        set(LIBXML_LIBRARIES libxml2)
-    endif ()
     if (NOT ODFSIG_INTERNAL_NSS)
         if (NOT WIN32)
             pkg_check_modules(NSS REQUIRED nss)
@@ -107,15 +100,14 @@ else ()
 
     set(XMLSEC_INCLUDE_DIRS
         ${NSS_INCLUDE_DIRS}
-        ${LIBXML_INCLUDE_DIRS}
         ${XMLSEC_INCLUDE_DIR}
         )
     # nss after static libs to please --as-needed linkers.
     set(XMLSEC_LIBRARIES
         xmlsec1-nss
         xmlsec1
+        libxml2
         ${NSS_LIBRARIES}
-        ${LIBXML_LIBRARIES}
         )
     set(XMLSEC_CFLAGS_OTHER
         -DXMLSEC_NO_SIZE_T
