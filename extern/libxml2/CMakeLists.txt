@@ -21,9 +21,6 @@ else ()
             COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin/$<CONFIG>
             COMMAND ${CMAKE_COMMAND} -E copy win32/bin.msvc/libxml2.dll ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/
             )
-        set(LIBXML2_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/extern-libxml2-project-prefix/src/extern-libxml2-project/include/)
-        set(LIBXML2_LIBRARY
-            ${CMAKE_CURRENT_BINARY_DIR}/extern-libxml2-project-prefix/src/extern-libxml2-project/win32/bin.msvc/libxml2.lib)
     else()
         if (APPLE)
             set(ICONV iconv)
@@ -38,9 +35,6 @@ else ()
             --disable-shared)
         set(BUILD_COMMAND $(MAKE))
         set(INSTALL_COMMAND COMMAND $(MAKE) install)
-        set(LIBXML2_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/install/include/libxml2)
-        set(LIBXML2_LIBRARY
-            ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxml2.a)
     endif()
 
     ExternalProject_Add(extern-libxml2-project
@@ -52,6 +46,16 @@ else ()
         BUILD_COMMAND ${BUILD_COMMAND}
         INSTALL_COMMAND ${INSTALL_COMMAND}
         )
+
+    if (WIN32)
+        ExternalProject_Get_Property(extern-libxml2-project SOURCE_DIR)
+        set(LIBXML2_INCLUDE_DIRS ${SOURCE_DIR}/include/)
+        set(LIBXML2_LIBRARY ${SOURCE_DIR}/win32/bin.msvc/libxml2.lib)
+    else ()
+        set(LIBXML2_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/install/include/libxml2)
+        set(LIBXML2_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxml2.a)
+    endif ()
+
     add_library(xml2 STATIC IMPORTED)
     set_property(TARGET xml2 PROPERTY IMPORTED_LOCATION ${LIBXML2_LIBRARY})
     add_dependencies(xml2 extern-libxml2-project)
