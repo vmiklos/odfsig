@@ -21,7 +21,7 @@ else ()
             ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin/$<CONFIG> &&
             ${CMAKE_COMMAND} -E copy win32/bin.msvc/libxml2.dll ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/
             )
-        set(LIBXML2_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/../libxml2/extern-libxml2-project-prefix/src/extern-libxml2-project/include/)
+        set(LIBXML2_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/extern-libxml2-project-prefix/src/extern-libxml2-project/include/)
         set(LIBXML2_LIBRARY
             ${CMAKE_CURRENT_BINARY_DIR}/extern-libxml2-project-prefix/src/extern-libxml2-project/win32/bin.msvc/libxml2.lib)
     else()
