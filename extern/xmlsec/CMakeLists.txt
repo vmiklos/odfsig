@@ -63,23 +63,13 @@ else ()
         set(XMLSEC_CRYPTO_LIBRARY
             ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxmlsec1-nss.a)
     endif()
-    if (NOT ODFSIG_INTERNAL_NSS)
-        if (NOT WIN32)
-            pkg_check_modules(NSS REQUIRED nss)
-        endif ()
-    else ()
-        set(NSS_INCLUDE_DIRS
-            ${CMAKE_CURRENT_BINARY_DIR}/../nss/extern-nss-project-prefix/src/extern-nss-project/dist/out/include
-            ${CMAKE_CURRENT_BINARY_DIR}/../nss/extern-nss-project-prefix/src/extern-nss-project/dist/public/nss
-        )
-        set(NSS_LIBRARIES nss)
-    endif ()
 
     if (ODFSIG_INTERNAL_LIBXML2)
         set(ODFSIG_LIBXML2_PROJECT extern-libxml2-project)
     endif ()
     if (ODFSIG_INTERNAL_NSS)
         set(ODFSIG_NSS_PROJECT extern-nss-project)
+        set(NSS_LIBRARIES nss)
     endif ()
     ExternalProject_Add(extern-xmlsec-project
         URL http://www.aleksey.com/xmlsec/download/xmlsec1-${XMLSEC_VERSION}.tar.gz
@@ -99,7 +89,6 @@ else ()
     add_dependencies(xmlsec1-nss extern-xmlsec-project)
 
     set(XMLSEC_INCLUDE_DIRS
-        ${NSS_INCLUDE_DIRS}
         ${XMLSEC_INCLUDE_DIR}
         )
     # nss after static libs to please --as-needed linkers.
