@@ -28,17 +28,13 @@ else ()
             COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin/$<CONFIG>
             COMMAND ${CMAKE_COMMAND} -E copy win32/binaries/libxmlsec.dll win32/binaries/libxmlsec-mscng.dll ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/
             )
-        set(XMLSEC_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/extern-xmlsec-project-prefix/src/extern-xmlsec-project/include)
-        set(XMLSEC_LIBRARY
-            ${CMAKE_CURRENT_BINARY_DIR}/extern-xmlsec-project-prefix/src/extern-xmlsec-project/win32/binaries/libxmlsec.lib)
-        set(XMLSEC_CRYPTO_LIBRARY
-            ${CMAKE_CURRENT_BINARY_DIR}/extern-xmlsec-project-prefix/src/extern-xmlsec-project/win32/binaries/libxmlsec-mscng.lib)
     else ()
         if (ODFSIG_INTERNAL_NSS)
+            ExternalProject_Get_Property(extern-nss-project SOURCE_DIR)
             set(ODFSIG_INTERNAL_XMLSEC_NSS
-                NSPR_CFLAGS=-I${CMAKE_CURRENT_BINARY_DIR}/../nss/extern-nss-project-prefix/src/extern-nss-project/dist/out/include
+                NSPR_CFLAGS=-I${SOURCE_DIR}/dist/out/include
                 NSPR_LIBS=-L${CMAKE_BINARY_DIR}/bin\ -lnspr4
-                NSS_CFLAGS=-I${CMAKE_CURRENT_BINARY_DIR}/../nss/extern-nss-project-prefix/src/extern-nss-project/dist/public/nss
+                NSS_CFLAGS=-I${SOURCE_DIR}/dist/public/nss
                 NSS_LIBS=-L${CMAKE_BINARY_DIR}/bin\ -lsmime3\ -lnss3\ -lnssutil3
             )
         endif ()
@@ -56,11 +52,6 @@ else ()
             --without-openssl)
         set(BUILD_COMMAND $(MAKE))
         set(INSTALL_COMMAND COMMAND $(MAKE) install)
-        set(XMLSEC_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/install/include/xmlsec1)
-        set(XMLSEC_LIBRARY
-            ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxmlsec1.a)
-        set(XMLSEC_CRYPTO_LIBRARY
-            ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxmlsec1-nss.a)
     endif()
 
     if (ODFSIG_INTERNAL_LIBXML2)
@@ -80,6 +71,20 @@ else ()
         INSTALL_COMMAND ${INSTALL_COMMAND}
         DEPENDS ${ODFSIG_LIBXML2_PROJECT} ${ODFSIG_NSS_PROJECT}
         )
+
+    if (WIN32)
+        ExternalProject_Get_Property(extern-xmlsec-project SOURCE_DIR)
+        set(XMLSEC_INCLUDE_DIRS ${SOURCE_DIR}/include)
+        set(XMLSEC_LIBRARY ${SOURCE_DIR}/win32/binaries/libxmlsec.lib)
+        set(XMLSEC_CRYPTO_LIBRARY ${SOURCE_DIR}/win32/binaries/libxmlsec-mscng.lib)
+    else ()
+        set(XMLSEC_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/install/include/xmlsec1)
+        set(XMLSEC_LIBRARY
+            ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxmlsec1.a)
+        set(XMLSEC_CRYPTO_LIBRARY
+            ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxmlsec1-nss.a)
+    endif ()
+
     add_library(xmlsec1 STATIC IMPORTED)
     set_property(TARGET xmlsec1 PROPERTY IMPORTED_LOCATION ${XMLSEC_LIBRARY})
     add_dependencies(xmlsec1 extern-xmlsec-project)
