@@ -80,9 +80,10 @@ else ()
     set_property(TARGET nspr4 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}libnspr4${CMAKE_SHARED_LIBRARY_SUFFIX})
     add_dependencies(nspr4 extern-nss-project)
 
+    ExternalProject_Get_Property(extern-nss-project SOURCE_DIR)
     set(NSS_INCLUDE_DIRS
-        ${CMAKE_CURRENT_BINARY_DIR}/extern-nss-project-prefix/src/extern-nss-project/dist/out/include
-        ${CMAKE_CURRENT_BINARY_DIR}/extern-nss-project-prefix/src/extern-nss-project/dist/public/nss
+        ${SOURCE_DIR}/dist/out/include
+        ${SOURCE_DIR}/dist/public/nss
         )
     set(NSS_LIBRARIES
         smime3
