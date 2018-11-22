@@ -5,7 +5,10 @@
 set(NSS_VERSION 3.40)
 set(NSS_SHA256SUM 8381b57add736985a3846cc34d3cae9b98c46ca504ba65b86ea8178f78c8cb11)
 
-if (ODFSIG_INTERNAL_NSS)
+if (NOT ODFSIG_INTERNAL_NSS)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(NSS REQUIRED nss)
+else ()
     include(ExternalProject)
     include(GNUInstallDirs)
 
