@@ -13,13 +13,13 @@ else ()
     include(GNUInstallDirs)
 
     if (WIN32)
-        set(CONFIGURE_COMMAND cd win32 &&
+        set(CONFIGURE_COMMAND ${CMAKE_COMMAND} -E chdir win32
             cscript /e:javascript configure.js iconv=no sax1=yes)
-        set(BUILD_COMMAND cd win32 &&
+        set(BUILD_COMMAND ${CMAKE_COMMAND} -E chdir win32
             nmake)
         set(INSTALL_COMMAND
-            ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin/$<CONFIG> &&
-            ${CMAKE_COMMAND} -E copy win32/bin.msvc/libxml2.dll ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin/$<CONFIG>
+            COMMAND ${CMAKE_COMMAND} -E copy win32/bin.msvc/libxml2.dll ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/
             )
         set(LIBXML2_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/extern-libxml2-project-prefix/src/extern-libxml2-project/include/)
         set(LIBXML2_LIBRARY
@@ -37,7 +37,7 @@ else ()
             --without-lzma
             --disable-shared)
         set(BUILD_COMMAND $(MAKE))
-        set(INSTALL_COMMAND $(MAKE) install)
+        set(INSTALL_COMMAND COMMAND $(MAKE) install)
         set(LIBXML2_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/install/include/libxml2)
         set(LIBXML2_LIBRARY
             ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxml2.a)
