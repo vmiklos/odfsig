@@ -81,8 +81,8 @@ else ()
     add_dependencies(nspr4 extern-nss-project)
 
     set(NSS_INCLUDE_DIRS
-        ${CMAKE_CURRENT_BINARY_DIR}/../nss/extern-nss-project-prefix/src/extern-nss-project/dist/out/include
-        ${CMAKE_CURRENT_BINARY_DIR}/../nss/extern-nss-project-prefix/src/extern-nss-project/dist/public/nss
+        ${CMAKE_CURRENT_BINARY_DIR}/extern-nss-project-prefix/src/extern-nss-project/dist/out/include
+        ${CMAKE_CURRENT_BINARY_DIR}/extern-nss-project-prefix/src/extern-nss-project/dist/public/nss
         )
     set(NSS_LIBRARIES
         smime3
