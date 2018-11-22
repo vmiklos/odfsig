@@ -13,14 +13,15 @@ else ()
     include(GNUInstallDirs)
 
     if (WIN32)
+        ExternalProject_Get_Property(extern-libxml2-project SOURCE_DIR)
         set(CONFIGURE_COMMAND ${CMAKE_COMMAND} -E chdir win32
             cscript /e:javascript configure.js
             crypto=mscng
             xslt=no
             iconv=no
             static=no
-            include=${CMAKE_CURRENT_BINARY_DIR}/../libxml2/extern-libxml2-project-prefix/src/extern-libxml2-project/include/
-            lib=${CMAKE_CURRENT_BINARY_DIR}/../libxml2/extern-libxml2-project-prefix/src/extern-libxml2-project/win32/bin.msvc/)
+            include=${SOURCE_DIR}/include/
+            lib=${SOURCE_DIR}/win32/bin.msvc/)
         set(BUILD_COMMAND ${CMAKE_COMMAND} -E chdir win32
             nmake)
         set(INSTALL_COMMAND
