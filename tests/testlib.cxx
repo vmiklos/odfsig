@@ -66,6 +66,7 @@ TEST(OdfsigTest, testGood)
     ASSERT_EQ(static_cast<size_t>(1), signatures.size());
     std::unique_ptr<odfsig::Signature>& signature = signatures[0];
     ASSERT_TRUE(signature->verify());
+    ASSERT_TRUE(signature->verifyXAdES());
 
     std::string subjectName = signature->getSubjectName();
 
