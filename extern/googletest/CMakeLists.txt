@@ -19,16 +19,17 @@ else ()
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON
         CONFIGURE_COMMAND ${CMAKE_COMMAND}
-            -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/install
+            -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/extern-googletest-project-prefix
             -Dgtest_force_shared_crt=ON
         )
 
+    ExternalProject_Get_Property(extern-googletest-project INSTALL_DIR)
     if (WIN32)
-        set(GTEST_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/lib/gtest.lib)
-        set(GTEST_MAIN_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/lib/gtest_main.lib)
+        set(GTEST_LIBRARY ${INSTALL_DIR}/lib/gtest.lib)
+        set(GTEST_MAIN_LIBRARY ${INSTALL_DIR}/lib/gtest_main.lib)
     else ()
-        set(GTEST_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libgtest.a)
-        set(GTEST_MAIN_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libgtest_main.a)
+        set(GTEST_LIBRARY ${INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}/libgtest.a)
+        set(GTEST_MAIN_LIBRARY ${INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}/libgtest_main.a)
     endif ()
 
     add_library(gtest STATIC IMPORTED)
@@ -37,7 +38,7 @@ else ()
     add_library(gtest_main STATIC IMPORTED)
     set_property(TARGET gtest_main PROPERTY IMPORTED_LOCATION ${GTEST_MAIN_LIBRARY})
     add_dependencies(gtest_main extern-googletest-project)
-    set(GTEST_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/install/include)
+    set(GTEST_INCLUDE_DIRS ${INSTALL_DIR}/include)
     set(GTEST_BOTH_LIBRARIES gtest gtest_main ${CMAKE_THREAD_LIBS_INIT})
 endif ()
 
