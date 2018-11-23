@@ -20,19 +20,19 @@ else ()
         BUILD_IN_SOURCE ON
         CONFIGURE_COMMAND ${CMAKE_COMMAND}
             -DCMAKE_DEBUG_POSTFIX=
-            -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/install
+            -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/extern-zlib-project-prefix
         )
     add_library(z STATIC IMPORTED)
-    if (WIN32)
-        set_property(TARGET z PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/install/lib/zlibstatic.lib)
-    else ()
-        set_property(TARGET z PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/install/lib/libz.a)
-    endif ()
-    add_dependencies(z extern-zlib-project)
+    ExternalProject_Get_Property(extern-zlib-project INSTALL_DIR)
 
-    set(ZLIB_INCLUDE_DIR
-        ${CMAKE_CURRENT_BINARY_DIR}/install/include
-        )
+    if (WIN32)
+        set_property(TARGET z PROPERTY IMPORTED_LOCATION ${INSTALL_DIR}/lib/zlibstatic.lib)
+    else ()
+        set_property(TARGET z PROPERTY IMPORTED_LOCATION ${INSTALL_DIR}/lib/libz.a)
+    endif ()
+
+    add_dependencies(z extern-zlib-project)
+    set(ZLIB_INCLUDE_DIR ${INSTALL_DIR}/include)
 endif ()
 
 add_library(zlib INTERFACE)
