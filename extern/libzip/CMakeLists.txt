@@ -14,14 +14,8 @@ else ()
 
     if (ODFSIG_INTERNAL_ZLIB)
         ExternalProject_Get_Property(extern-zlib-project INSTALL_DIR)
-        set(ZLIB_ROOT_OPTION -DZLIB_ROOT=${INSTALL_DIR})
+        set(ZLIB_ROOT -DZLIB_ROOT=${INSTALL_DIR})
     endif ()
-    if (WIN32)
-        set(LIBZIP_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/lib/zip.lib)
-    else ()
-        set(LIBZIP_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libzip.a)
-    endif ()
-
     ExternalProject_Add(extern-libzip-project
         URL https://libzip.org/download/libzip-${LIBZIP_VERSION}.tar.gz
         URL_HASH SHA256=${LIBZIP_SHA256SUM}
@@ -35,14 +29,22 @@ else ()
             -DENABLE_OPENSSL=OFF
             -DENABLE_COMMONCRYPTO=OFF
             -DENABLE_BZIP2=OFF
-            ${ZLIB_ROOT_OPTION}
-            -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/install
+            ${ZLIB_ROOT}
+            -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/extern-libzip-project-prefix
         DEPENDS extern-zlib-project
         )
+    ExternalProject_Get_Property(extern-libzip-project INSTALL_DIR)
+
+    if (WIN32)
+        set(LIBZIP_LIBRARY ${INSTALL_DIR}/lib/zip.lib)
+    else ()
+        set(LIBZIP_LIBRARY ${INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}/libzip.a)
+    endif ()
+
     add_library(zip STATIC IMPORTED)
     set_property(TARGET zip PROPERTY IMPORTED_LOCATION ${LIBZIP_LIBRARY})
     add_dependencies(zip extern-libzip-project)
-    set(LIBZIP_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/install/include)
+    set(LIBZIP_INCLUDE_DIRS ${INSTALL_DIR}/include)
     set(LIBZIP_LIBRARIES zip)
 endif ()
 
