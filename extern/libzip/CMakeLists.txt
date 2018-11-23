@@ -30,7 +30,7 @@ else ()
             -DENABLE_COMMONCRYPTO=OFF
             -DENABLE_BZIP2=OFF
             ${ZLIB_ROOT}
-            -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/extern-libzip-project-prefix
+            -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
         DEPENDS extern-zlib-project
         )
     ExternalProject_Get_Property(extern-libzip-project INSTALL_DIR)

@@ -26,7 +26,7 @@ else ()
             set(ICONV iconv)
         endif ()
         set(CONFIGURE_COMMAND ./configure
-            --prefix=${CMAKE_CURRENT_BINARY_DIR}/extern-libxml2-project-prefix
+            --prefix=<INSTALL_DIR>
             --disable-ipv6
             --without-python
             --without-zlib

@@ -19,7 +19,7 @@ else ()
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON
         CONFIGURE_COMMAND ${CMAKE_COMMAND}
-            -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/extern-googletest-project-prefix
+            -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
             -Dgtest_force_shared_crt=ON
         )
 

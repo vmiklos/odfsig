@@ -20,7 +20,7 @@ else ()
         BUILD_IN_SOURCE ON
         CONFIGURE_COMMAND ${CMAKE_COMMAND}
             -DCMAKE_DEBUG_POSTFIX=
-            -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/extern-zlib-project-prefix
+            -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
         )
     add_library(z STATIC IMPORTED)
     ExternalProject_Get_Property(extern-zlib-project INSTALL_DIR)

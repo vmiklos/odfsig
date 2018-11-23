@@ -40,7 +40,7 @@ else ()
         endif ()
         set(CONFIGURE_COMMAND ./configure
             ${ODFSIG_INTERNAL_XMLSEC_NSS}
-            --prefix=${CMAKE_CURRENT_BINARY_DIR}/extern-xmlsec-project-prefix
+            --prefix=<INSTALL_DIR>
             --with-pic
             --disable-shared
             --disable-crypto-dl
