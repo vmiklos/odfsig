@@ -40,7 +40,7 @@ else ()
         endif ()
         set(CONFIGURE_COMMAND ./configure
             ${ODFSIG_INTERNAL_XMLSEC_NSS}
-            --prefix=${CMAKE_CURRENT_BINARY_DIR}/install
+            --prefix=${CMAKE_CURRENT_BINARY_DIR}/extern-xmlsec-project-prefix
             --with-pic
             --disable-shared
             --disable-crypto-dl
@@ -71,6 +71,7 @@ else ()
         INSTALL_COMMAND ${INSTALL_COMMAND}
         DEPENDS ${ODFSIG_LIBXML2_PROJECT} ${ODFSIG_NSS_PROJECT}
         )
+    ExternalProject_Get_Property(extern-xmlsec-project INSTALL_DIR)
 
     if (WIN32)
         ExternalProject_Get_Property(extern-xmlsec-project SOURCE_DIR)
@@ -78,23 +79,21 @@ else ()
         set(XMLSEC_LIBRARY ${SOURCE_DIR}/win32/binaries/libxmlsec.lib)
         set(XMLSEC_CRYPTO_LIBRARY ${SOURCE_DIR}/win32/binaries/libxmlsec-mscng.lib)
     else ()
-        set(XMLSEC_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/install/include/xmlsec1)
-        set(XMLSEC_LIBRARY
-            ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxmlsec1.a)
-        set(XMLSEC_CRYPTO_LIBRARY
-            ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxmlsec1-nss.a)
+        set(XMLSEC_INCLUDE_DIRS ${INSTALL_DIR}/include/xmlsec1)
+        set(XMLSEC_LIBRARY ${INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}/libxmlsec1.a)
+        set(XMLSEC_CRYPTO_LIBRARY ${INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}/libxmlsec1-nss.a)
     endif ()
 
     add_library(xmlsec1 STATIC IMPORTED)
     set_property(TARGET xmlsec1 PROPERTY IMPORTED_LOCATION ${XMLSEC_LIBRARY})
     add_dependencies(xmlsec1 extern-xmlsec-project)
-    add_library(xmlsec1-nss STATIC IMPORTED)
-    set_property(TARGET xmlsec1-nss PROPERTY IMPORTED_LOCATION ${XMLSEC_CRYPTO_LIBRARY})
-    add_dependencies(xmlsec1-nss extern-xmlsec-project)
+    add_library(xmlsec1-crypto STATIC IMPORTED)
+    set_property(TARGET xmlsec1-crypto PROPERTY IMPORTED_LOCATION ${XMLSEC_CRYPTO_LIBRARY})
+    add_dependencies(xmlsec1-crypto extern-xmlsec-project)
 
     # nss after static libs to please --as-needed linkers.
     set(XMLSEC_LIBRARIES
-        xmlsec1-nss
+        xmlsec1-crypto
         xmlsec1
         libxml2
         ${NSS_LIBRARIES}
