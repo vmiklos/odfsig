@@ -92,6 +92,18 @@ bool printSignatures(
         }
 
         ostream << "  - Signature Verification: Succeeded." << std::endl;
+
+        if (type == "XAdES")
+        {
+            if (!signature->verifyXAdES())
+            {
+                ostream << "  - Certificate Hash Verification: Failed."
+                        << std::endl;
+                return false;
+            }
+            ostream << "  - Certificate Hash Verification: Succeeded."
+                    << std::endl;
+        }
     }
 
     return true;

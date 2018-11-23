@@ -24,6 +24,8 @@ class Signature
 
     virtual bool verify() = 0;
 
+    virtual bool verifyXAdES() = 0;
+
     virtual std::string getSubjectName() const = 0;
 
     virtual std::string getDate() const = 0;

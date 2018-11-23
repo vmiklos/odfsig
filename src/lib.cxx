@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstring>
 #include <sstream> // IWYU pragma: keep
 
 #include <libxml/globals.h>
@@ -54,6 +55,13 @@ template <> struct default_delete<xmlSecKeysMngr>
 template <> struct default_delete<xmlChar>
 {
     void operator()(xmlChar* ptr) { xmlFree(ptr); }
+};
+template <> struct default_delete<xmlSecTransformCtx>
+{
+    void operator()(xmlSecTransformCtxPtr ptr)
+    {
+        xmlSecTransformCtxDestroy(ptr);
+    }
 };
 }
 
@@ -202,6 +210,8 @@ class XmlSignature : public Signature
 
     bool verify() override;
 
+    bool verifyXAdES() override;
+
     std::string getSubjectName() const override;
 
     std::string getDate() const override;
@@ -222,7 +232,9 @@ class XmlSignature : public Signature
 
     std::string getDateContent(xmlNode* dateNode) const;
 
-    bool hasObjectCertDigest(xmlNode* objectNode) const;
+    xmlNodePtr getObjectCertDigestNode(xmlNode* objectNode) const;
+
+    xmlNodePtr getX509CertificateNode() const;
 
     std::string _errorString;
 
@@ -282,14 +294,146 @@ bool XmlSignature::verify()
     return dsigCtx->status == xmlSecDSigStatusSucceeded;
 }
 
-std::string XmlSignature::getSubjectName() const
+bool XmlSignature::verifyXAdES()
+{
+    // Look up the encoded certificate.
+    xmlNode* x509Certificate = getX509CertificateNode();
+    if (!x509Certificate)
+    {
+        _errorString = "could not find certificate node";
+        return false;
+    }
+
+    std::unique_ptr<xmlChar> certificateContent(
+        xmlNodeGetContent(x509Certificate));
+    if (!certificateContent || xmlSecIsEmptyString(certificateContent.get()))
+    {
+        _errorString = "certificate node is empty";
+        return false;
+    }
+
+    // Decode the certificate in-place.
+    int certSize = xmlSecBase64Decode(certificateContent.get(),
+                                      (xmlSecByte*)certificateContent.get(),
+                                      xmlStrlen(certificateContent.get()));
+    if (certSize < 0)
+    {
+        _errorString = "base64 decode of certificate failed";
+        return false;
+    }
+
+    // Look up the expected hash.
+    xmlNodePtr certDigestNode = nullptr;
+    for (xmlNode* signatureChild = _signatureNode->children; signatureChild;
+         signatureChild = signatureChild->next)
+    {
+        if (!xmlSecCheckNodeName(signatureChild, xmlSecNodeObject,
+                                 xmlSecDSigNs))
+            continue;
+
+        certDigestNode = getObjectCertDigestNode(signatureChild);
+        if (certDigestNode)
+            break;
+    }
+
+    if (!certDigestNode)
+    {
+        _errorString = "lookup of expected digest node failed";
+        return false;
+    }
+
+    xmlNode* digestValueNode =
+        xmlSecFindChild(certDigestNode, xmlSecNodeDigestValue, xmlSecDSigNs);
+    if (!digestValueNode)
+    {
+        _errorString = "lookup of expected digest value node failed";
+        return false;
+    }
+
+    std::unique_ptr<xmlChar> digestValueNodeContent(
+        xmlNodeGetContent(digestValueNode));
+    if (!digestValueNodeContent ||
+        xmlSecIsEmptyString(digestValueNodeContent.get()))
+    {
+        _errorString = "digest value node is empty";
+        return false;
+    }
+
+    // Decode the expected hash in-place.
+    int expectedDigestSize = xmlSecBase64Decode(
+        digestValueNodeContent.get(), (xmlSecByte*)digestValueNodeContent.get(),
+        xmlStrlen(digestValueNodeContent.get()));
+    if (expectedDigestSize < 0)
+    {
+        _errorString = "base64 decode of digest value failed";
+        return false;
+    }
+
+    // Look up the hash algo.
+    xmlNode* digestMethodNode =
+        xmlSecFindChild(certDigestNode, xmlSecNodeDigestMethod, xmlSecDSigNs);
+    if (!digestMethodNode)
+    {
+        _errorString = "lookup of expected digest method node failed";
+        return false;
+    }
+
+    std::unique_ptr<xmlChar> algo(
+        xmlGetProp(digestMethodNode, xmlSecAttrAlgorithm));
+    if (!algo)
+    {
+        _errorString = "lookup of digest method algorithm attribute failed";
+        return false;
+    }
+
+    // Hash the certificate.
+    std::unique_ptr<xmlSecTransformCtx> transform(xmlSecTransformCtxCreate());
+    if (!transform)
+    {
+        _errorString = "hash transform creation failed";
+        return false;
+    }
+
+    xmlSecTransformId transformId = xmlSecTransformIdListFindByHref(
+        xmlSecTransformIdsGet(), algo.get(), xmlSecTransformUsageDigestMethod);
+    if (transformId == xmlSecTransformIdUnknown)
+    {
+        _errorString = "unreconigzed hash algo";
+        return false;
+    }
+    xmlSecTransformPtr hash =
+        xmlSecTransformCtxCreateAndAppend(transform.get(), transformId);
+    if (!hash)
+    {
+        _errorString = "hash creation failed";
+        return false;
+    }
+
+    hash->operation = xmlSecTransformOperationSign;
+    if (xmlSecTransformCtxBinaryExecute(transform.get(),
+                                        certificateContent.get(), certSize) < 0)
+    {
+        _errorString = "hashing failed";
+        return false;
+    }
+
+    // Compare the hashes.
+    return std::memcmp(digestValueNodeContent.get(), transform->result->data,
+                       transform->result->size) == 0;
+}
+
+xmlNode* XmlSignature::getX509CertificateNode() const
 {
     xmlNode* keyInfoNode =
         xmlSecFindChild(_signatureNode, xmlSecNodeKeyInfo, xmlSecDSigNs);
     xmlNode* x509Data =
         xmlSecFindChild(keyInfoNode, xmlSecNodeX509Data, xmlSecDSigNs);
-    xmlNode* x509Certificate =
-        xmlSecFindChild(x509Data, xmlSecNodeX509Certificate, xmlSecDSigNs);
+    return xmlSecFindChild(x509Data, xmlSecNodeX509Certificate, xmlSecDSigNs);
+}
+
+std::string XmlSignature::getSubjectName() const
+{
+    xmlNode* x509Certificate = getX509CertificateNode();
     if (!x509Certificate)
         return std::string();
 
@@ -368,15 +512,15 @@ std::string XmlSignature::getType() const
                                  xmlSecDSigNs))
             continue;
 
-        bool hasCertDigest = hasObjectCertDigest(signatureChild);
-        if (hasCertDigest)
+        xmlNodePtr certDigest = getObjectCertDigestNode(signatureChild);
+        if (certDigest)
             return std::string("XAdES");
     }
 
     return std::string("XML-DSig");
 }
 
-bool XmlSignature::hasObjectCertDigest(xmlNode* objectNode) const
+xmlNodePtr XmlSignature::getObjectCertDigestNode(xmlNode* objectNode) const
 {
     const xmlChar* qualifyingPropertiesNodeName =
         BAD_CAST("QualifyingProperties");
@@ -390,27 +534,27 @@ bool XmlSignature::hasObjectCertDigest(xmlNode* objectNode) const
     xmlNode* qualifyingPropertiesNode =
         xmlSecFindChild(objectNode, qualifyingPropertiesNodeName, xadesNsName);
     if (!qualifyingPropertiesNode)
-        return false;
+        return nullptr;
 
     xmlNode* signedPropertiesNode = xmlSecFindChild(
         qualifyingPropertiesNode, signedPropertiesNodeName, xadesNsName);
     if (!signedPropertiesNode)
-        return false;
+        return nullptr;
 
     xmlNode* signedSignaturePropertiesNode = xmlSecFindChild(
         signedPropertiesNode, signedSignaturePropertiesNodeName, xadesNsName);
     if (!signedSignaturePropertiesNode)
-        return false;
+        return nullptr;
 
     xmlNode* signingCertificateNode = xmlSecFindChild(
         signedSignaturePropertiesNode, signingCertificateNodeName, xadesNsName);
     if (!signingCertificateNode)
-        return false;
+        return nullptr;
 
     xmlNode* certNode =
         xmlSecFindChild(signingCertificateNode, certNodeName, xadesNsName);
     if (!certNode)
-        return false;
+        return nullptr;
 
     return xmlSecFindChild(certNode, certDigestNodeName, xadesNsName);
 }
