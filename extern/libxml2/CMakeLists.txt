@@ -26,7 +26,7 @@ else ()
             set(ICONV iconv)
         endif ()
         set(CONFIGURE_COMMAND ./configure
-            --prefix=${CMAKE_CURRENT_BINARY_DIR}/install
+            --prefix=${CMAKE_CURRENT_BINARY_DIR}/extern-libxml2-project-prefix
             --disable-ipv6
             --without-python
             --without-zlib
@@ -52,8 +52,9 @@ else ()
         set(LIBXML2_INCLUDE_DIRS ${SOURCE_DIR}/include/)
         set(LIBXML2_LIBRARY ${SOURCE_DIR}/win32/bin.msvc/libxml2.lib)
     else ()
-        set(LIBXML2_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/install/include/libxml2)
-        set(LIBXML2_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_INSTALL_LIBDIR}/libxml2.a)
+        ExternalProject_Get_Property(extern-libxml2-project INSTALL_DIR)
+        set(LIBXML2_INCLUDE_DIRS ${INSTALL_DIR}/include/libxml2)
+        set(LIBXML2_LIBRARY ${INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}/libxml2.a)
     endif ()
 
     add_library(xml2 STATIC IMPORTED)
