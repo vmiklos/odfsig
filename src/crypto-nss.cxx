@@ -51,7 +51,9 @@ std::string getFirefoxProfile(const std::string& cryptoConfig)
 
     std::ifstream profilesIni(firefoxPath + "profiles.ini");
     if (!profilesIni.good())
+    {
         return std::string();
+    }
 
     std::string profilePath;
     const std::string pathPrefix("Path=");
@@ -59,10 +61,14 @@ std::string getFirefoxProfile(const std::string& cryptoConfig)
     while (std::getline(profilesIni, line))
     {
         if (odfsig::starts_with(line, pathPrefix))
+        {
             // Path= is expected to be before Default=.
             profilePath = line.substr(pathPrefix.size());
+        }
         else if (line == "Default=1")
+        {
             return firefoxPath + profilePath;
+        }
     }
 
     return std::string();
@@ -94,7 +100,9 @@ bool NssCrypto::initialize(const std::string& cryptoConfig)
     std::string firefoxProfile = getFirefoxProfile(cryptoConfig);
     const char* nssDb = nullptr;
     if (!firefoxProfile.empty())
+    {
         nssDb = firefoxProfile.c_str();
+    }
 
     return xmlSecNssAppInit(nssDb) >= 0;
 }
@@ -109,14 +117,18 @@ bool NssCrypto::initializeKeysManager(xmlSecKeysMngr* keysManager,
                                       std::vector<std::string> trustedDers)
 {
     if (xmlSecNssAppDefaultKeysMngrInit(keysManager) < 0)
+    {
         return false;
+    }
 
     for (const auto& trustedDer : trustedDers)
     {
         if (xmlSecNssAppKeysMngrCertLoad(keysManager, trustedDer.c_str(),
                                          xmlSecKeyDataFormatDer,
                                          xmlSecKeyDataTypeTrusted) < 0)
+        {
             return false;
+        }
     }
 
     return true;
@@ -132,7 +144,9 @@ std::string NssCrypto::getCertificateSubjectName(unsigned char* certificate,
     std::unique_ptr<CERTCertificate> cert(CERT_NewTempCertificate(
         CERT_GetDefaultCertDB(), &certItem, nullptr, PR_FALSE, PR_TRUE));
     if (!cert || !cert->subjectName)
+    {
         return std::string();
+    }
 
     return std::string(cert->subjectName);
 }

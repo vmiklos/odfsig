@@ -38,21 +38,29 @@ bool printSignatures(
 
         std::string subjectName = signature->getSubjectName();
         if (!subjectName.empty())
+        {
             ostream << "  - Signing Certificate Subject Name: " << subjectName
                     << std::endl;
+        }
 
         std::string date = signature->getDate();
         if (!date.empty())
+        {
             ostream << "  - Signing Date: " << date << std::endl;
+        }
 
         std::string method = signature->getMethod();
         if (!method.empty())
+        {
             ostream << "  - Signature Method Algorithm: " << method
                     << std::endl;
+        }
 
         std::string type = signature->getType();
         if (!type.empty())
+        {
             ostream << "  - Signature Type: " << type << std::endl;
+        }
 
         std::set<std::string> signedStreams = signature->getSignedStreams();
         if (!signedStreams.empty())
@@ -62,16 +70,22 @@ bool printSignatures(
             for (const auto& signedStream : signedStreams)
             {
                 if (first)
+                {
                     first = false;
+                }
                 else
+                {
                     ostream << ", ";
+                }
                 ostream << signedStream;
             }
             ostream << std::endl;
         }
 
         if (signedStreams == streams)
+        {
             ostream << "  - Total document signed." << std::endl;
+        }
         else
         {
             ostream << "  - Only part of the document is signed." << std::endl;
@@ -146,18 +160,26 @@ bool parseOptions(const std::vector<const char*>& args, Options& options,
     {
         std::string argString(arg);
         if (argString == "--trusted-der")
+        {
             inTrustedDer = true;
+        }
         else if (inTrustedDer)
         {
             inTrustedDer = false;
             options.appendTrustedDer(argString);
         }
         else if (argString == "--insecure")
+        {
             options.setInsecure(true);
+        }
         else if (argString == "--help")
+        {
             options.setHelp(true);
+        }
         else if (argString == "--version")
+        {
             options.setVersion(true);
+        }
         else if (odfsig::starts_with(argString, "--"))
         {
             ostream << "Error: unrecognized argument: " << argString
@@ -165,7 +187,9 @@ bool parseOptions(const std::vector<const char*>& args, Options& options,
             return false;
         }
         else
+        {
             options.setOdfPath(argString);
+        }
     }
 
     return true;
@@ -200,7 +224,9 @@ int main(const std::vector<const char*>& args, std::ostream& ostream)
 
     Options options;
     if (!parseOptions(args, options, ostream))
+    {
         return 2;
+    }
     if (options.isHelp())
     {
         usage(args[0], ostream);
@@ -212,7 +238,9 @@ int main(const std::vector<const char*>& args, std::ostream& ostream)
         ostream << "odfsig version " << ODFSIG_VERSION_MAJOR << "."
                 << ODFSIG_VERSION_MINOR;
         if (strsize(ODFSIG_VERSION_GIT))
+        {
             ostream << "-g" ODFSIG_VERSION_GIT;
+        }
         ostream << std::endl;
         return 0;
     }
@@ -220,7 +248,9 @@ int main(const std::vector<const char*>& args, std::ostream& ostream)
     std::string cryptoConfig;
     const char* home = getenv("HOME");
     if (home)
+    {
         cryptoConfig = home;
+    }
     std::unique_ptr<odfsig::Verifier> verifier(
         odfsig::Verifier::create(cryptoConfig));
     verifier->setTrustedDers(options.getTrustedDers());
@@ -243,7 +273,9 @@ int main(const std::vector<const char*>& args, std::ostream& ostream)
     std::set<std::string> streams = verifier->getStreams();
     if (!printSignatures(options.getOdfPath(), streams,
                          verifier->getSignatures(), ostream))
+    {
         return 1;
+    }
 
     return 0;
 }

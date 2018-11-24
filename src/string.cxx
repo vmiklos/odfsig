@@ -24,7 +24,9 @@ void replace_all(std::string& str, const std::string& from,
     {
         index = str.find(from, index);
         if (index == std::string::npos)
+        {
             break;
+        }
 
         str.replace(index, from.size(), to);
 

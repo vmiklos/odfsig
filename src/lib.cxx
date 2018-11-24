@@ -113,7 +113,9 @@ int match(const char* uri)
 
     zip_int64_t signatureZipIndex = zip_name_locate(zipArchive, uri, 0);
     if (signatureZipIndex < 0)
+    {
         return 0;
+    }
 
     return 1;
 }
@@ -124,11 +126,15 @@ void* open(const char* uri)
 
     zip_int64_t signatureZipIndex = zip_name_locate(zipArchive, uri, 0);
     if (signatureZipIndex < 0)
+    {
         return nullptr;
+    }
 
     zip_file_t* zipFile(zip_fopen_index(zipArchive, signatureZipIndex, 0));
     if (!zipFile)
+    {
         return nullptr;
+    }
 
     return zipFile;
 }
@@ -160,10 +166,14 @@ class XmlSecGuard
         // Initialize xmlsec.
         _good = xmlSecInit() >= 0;
         if (!_good)
+        {
             return;
+        }
 
         if (!_crypto.xmlSecInitialize())
+        {
             return;
+        }
 
         XmlSecIO::zipArchive = zipArchive;
         xmlSecIOCleanupCallbacks();
@@ -174,21 +184,29 @@ class XmlSecGuard
     ~XmlSecGuard()
     {
         if (!_good)
+        {
             return;
+        }
 
         xmlSecIOCleanupCallbacks();
         xmlSecIORegisterDefaultCallbacks();
         XmlSecIO::zipArchive = nullptr;
 
         if (!_crypto.xmlSecShutdown())
+        {
             return;
+        }
 
         _good = xmlSecShutdown() >= 0;
         if (!_good)
+        {
             return;
+        }
 
         if (!_crypto.shutdown())
+        {
             return;
+        }
     }
 
     bool isGood() const { return _good; }
@@ -294,8 +312,10 @@ bool XmlSignature::verify()
     }
 
     if (_insecure)
+    {
         dsigCtx->keyInfoReadCtx.flags |=
             XMLSEC_KEYINFO_FLAGS_X509DATA_DONT_VERIFY_CERTS;
+    }
 
     if (xmlSecDSigCtxVerify(dsigCtx.get(), _signatureNode) < 0)
     {
@@ -311,19 +331,25 @@ bool XmlSignature::getCertificateBinary(std::vector<xmlChar>& certificate) const
     // Look up the encoded certificate.
     xmlNode* x509Certificate = getX509CertificateNode();
     if (!x509Certificate)
+    {
         return false;
+    }
 
     std::unique_ptr<xmlChar> certificateContent(
         xmlNodeGetContent(x509Certificate));
     if (!certificateContent || xmlSecIsEmptyString(certificateContent.get()))
+    {
         return false;
+    }
 
     // Decode the certificate in-place.
     int certSize = xmlSecBase64Decode(certificateContent.get(),
                                       (xmlSecByte*)certificateContent.get(),
                                       xmlStrlen(certificateContent.get()));
     if (certSize < 0)
+    {
         return false;
+    }
 
     std::copy(certificateContent.get(), certificateContent.get() + certSize,
               std::back_inserter(certificate));
@@ -338,11 +364,15 @@ xmlNodePtr XmlSignature::getCertDigestNode() const
     {
         if (!xmlSecCheckNodeName(signatureChild, xmlSecNodeObject,
                                  xmlSecDSigNs))
+        {
             continue;
+        }
 
         certDigestNode = getObjectCertDigestNode(signatureChild);
         if (certDigestNode)
+        {
             break;
+        }
     }
 
     return certDigestNode;
@@ -354,20 +384,26 @@ bool XmlSignature::getDigestValue(xmlNodePtr certDigest,
     xmlNode* digestValueNode =
         xmlSecFindChild(certDigest, xmlSecNodeDigestValue, xmlSecDSigNs);
     if (!digestValueNode)
+    {
         return false;
+    }
 
     std::unique_ptr<xmlChar> digestValueNodeContent(
         xmlNodeGetContent(digestValueNode));
     if (!digestValueNodeContent ||
         xmlSecIsEmptyString(digestValueNodeContent.get()))
+    {
         return false;
+    }
 
     // Decode the expected hash in-place.
     int expectedDigestSize = xmlSecBase64Decode(
         digestValueNodeContent.get(), (xmlSecByte*)digestValueNodeContent.get(),
         xmlStrlen(digestValueNodeContent.get()));
     if (expectedDigestSize < 0)
+    {
         return false;
+    }
 
     std::copy(digestValueNodeContent.get(),
               digestValueNodeContent.get() + expectedDigestSize,
@@ -381,37 +417,50 @@ XmlSignature::getDigestAlgo(xmlNodePtr certDigest) const
     xmlNode* digestMethodNode =
         xmlSecFindChild(certDigest, xmlSecNodeDigestMethod, xmlSecDSigNs);
     if (!digestMethodNode)
+    {
         return nullptr;
+    }
 
     std::unique_ptr<xmlChar> algo(
         xmlGetProp(digestMethodNode, xmlSecAttrAlgorithm));
     if (!algo)
+    {
         return nullptr;
+    }
 
     return algo;
 }
+
 bool XmlSignature::hash(const std::vector<xmlChar>& in,
                         std::unique_ptr<xmlChar> algo,
                         std::vector<unsigned char>& out) const
 {
     std::unique_ptr<xmlSecTransformCtx> transform(xmlSecTransformCtxCreate());
     if (!transform)
+    {
         return false;
+    }
 
     xmlSecTransformId transformId = xmlSecTransformIdListFindByHref(
         xmlSecTransformIdsGet(), algo.get(), xmlSecTransformUsageDigestMethod);
     if (transformId == xmlSecTransformIdUnknown)
+    {
         return false;
+    }
 
     xmlSecTransformPtr hash =
         xmlSecTransformCtxCreateAndAppend(transform.get(), transformId);
     if (!hash)
+    {
         return false;
+    }
 
     hash->operation = xmlSecTransformOperationSign;
     if (xmlSecTransformCtxBinaryExecute(transform.get(), in.data(), in.size()) <
         0)
+    {
         return false;
+    }
 
     std::copy(transform->result->data,
               transform->result->data + transform->result->size,
@@ -473,7 +522,9 @@ std::string XmlSignature::getSubjectName() const
 {
     std::vector<xmlChar> certificate;
     if (!getCertificateBinary(certificate))
+    {
         return std::string();
+    }
 
     return _crypto.getCertificateSubjectName(certificate.data(),
                                              certificate.size());
@@ -486,18 +537,24 @@ std::string XmlSignature::getMethod() const
     xmlNode* signatureMethodNode = xmlSecFindChild(
         signedInfoNode, xmlSecNodeSignatureMethod, xmlSecDSigNs);
     if (!signatureMethodNode)
+    {
         return std::string();
+    }
 
     std::unique_ptr<xmlChar> href(
         xmlGetProp(signatureMethodNode, xmlSecAttrAlgorithm));
     if (!href)
+    {
         return std::string();
+    }
 
     xmlSecTransformId id =
         xmlSecTransformIdListFindByHref(xmlSecTransformIdsGet(), href.get(),
                                         xmlSecTransformUsageSignatureMethod);
     if (id == xmlSecTransformIdUnknown)
+    {
         return fromXmlChar(href.get());
+    }
 
     return std::string(fromXmlChar(xmlSecTransformKlassGetName(id)));
 }
@@ -507,7 +564,9 @@ std::set<std::string> XmlSignature::getSignedStreams() const
     xmlNode* signedInfoNode =
         xmlSecFindChild(_signatureNode, xmlSecNodeSignedInfo, xmlSecDSigNs);
     if (!signedInfoNode)
+    {
         return {};
+    }
 
     std::set<std::string> signedStreams;
     for (xmlNode* signedInfoChild = signedInfoNode->children; signedInfoChild;
@@ -515,16 +574,22 @@ std::set<std::string> XmlSignature::getSignedStreams() const
     {
         if (!xmlSecCheckNodeName(signedInfoChild, xmlSecNodeReference,
                                  xmlSecDSigNs))
+        {
             continue;
+        }
 
         std::unique_ptr<xmlChar> uriProp(
             xmlGetProp(signedInfoChild, xmlSecAttrURI));
         if (!uriProp)
+        {
             continue;
+        }
 
         std::string uri(fromXmlChar(uriProp.get()));
         if (starts_with(uri, "#"))
+        {
             continue;
+        }
 
         signedStreams.insert(uri);
     }
@@ -535,7 +600,9 @@ std::set<std::string> XmlSignature::getSignedStreams() const
 std::string XmlSignature::getType() const
 {
     if (getCertDigestNode())
+    {
         return std::string("XAdES");
+    }
 
     return std::string("XML-DSig");
 }
@@ -554,27 +621,37 @@ xmlNodePtr XmlSignature::getObjectCertDigestNode(xmlNode* objectNode) const
     xmlNode* qualifyingPropertiesNode =
         xmlSecFindChild(objectNode, qualifyingPropertiesNodeName, xadesNsName);
     if (!qualifyingPropertiesNode)
+    {
         return nullptr;
+    }
 
     xmlNode* signedPropertiesNode = xmlSecFindChild(
         qualifyingPropertiesNode, signedPropertiesNodeName, xadesNsName);
     if (!signedPropertiesNode)
+    {
         return nullptr;
+    }
 
     xmlNode* signedSignaturePropertiesNode = xmlSecFindChild(
         signedPropertiesNode, signedSignaturePropertiesNodeName, xadesNsName);
     if (!signedSignaturePropertiesNode)
+    {
         return nullptr;
+    }
 
     xmlNode* signingCertificateNode = xmlSecFindChild(
         signedSignaturePropertiesNode, signingCertificateNodeName, xadesNsName);
     if (!signingCertificateNode)
+    {
         return nullptr;
+    }
 
     xmlNode* certNode =
         xmlSecFindChild(signingCertificateNode, certNodeName, xadesNsName);
     if (!certNode)
+    {
         return nullptr;
+    }
 
     return xmlSecFindChild(certNode, certDigestNodeName, xadesNsName);
 }
@@ -586,11 +663,15 @@ std::string XmlSignature::getDate() const
     {
         if (!xmlSecCheckNodeName(signatureChild, xmlSecNodeObject,
                                  xmlSecDSigNs))
+        {
             continue;
+        }
 
         std::string date = getObjectDate(signatureChild);
         if (!date.empty())
+        {
             return date;
+        }
     }
 
     return std::string();
@@ -603,11 +684,15 @@ std::string XmlSignature::getObjectDate(xmlNode* objectNode) const
     {
         if (!xmlSecCheckNodeName(objectChild, xmlSecNodeSignatureProperties,
                                  xmlSecDSigNs))
+        {
             continue;
+        }
 
         std::string date = getSignaturePropertiesDate(objectChild);
         if (!date.empty())
+        {
             return date;
+        }
     }
 
     return std::string();
@@ -617,7 +702,9 @@ std::string XmlSignature::getDateContent(xmlNode* dateNode) const
 {
     std::unique_ptr<xmlChar> content(xmlNodeGetContent(dateNode));
     if (!content)
+    {
         return std::string();
+    }
 
     return std::string(fromXmlChar(content.get()));
 }
@@ -633,11 +720,15 @@ XmlSignature::getSignaturePropertiesDate(xmlNode* signaturePropertiesNode) const
     {
         if (!xmlSecCheckNodeName(signaturePropertiesChild,
                                  signaturePropertyNodeName, xmlSecDSigNs))
+        {
             continue;
+        }
 
         std::string date = getSignaturePropertyDate(signaturePropertiesChild);
         if (!date.empty())
+        {
             return date;
+        }
     }
 
     return std::string();
@@ -649,7 +740,9 @@ XmlSignature::getSignaturePropertyDate(xmlNode* signaturePropertyNode) const
     xmlNode* dateNode =
         xmlSecFindChild(signaturePropertyNode, dateNodeName, dateNsName);
     if (!dateNode)
+    {
         return std::string();
+    }
 
     return getDateContent(dateNode);
 }
@@ -743,8 +836,10 @@ void ZipVerifier::setInsecure(bool insecure) { _insecure = insecure; }
 bool ZipVerifier::parseSignatures()
 {
     if (!locateSignatures())
+    {
         // No problem, later getSignatures() will return an empty list.
         return true;
+    }
 
     _xmlGuard = std::make_unique<XmlGuard>();
 
@@ -809,8 +904,10 @@ bool ZipVerifier::parseSignatures()
 
     for (xmlNode* signatureNode = signaturesRoot->children; signatureNode;
          signatureNode = signatureNode->next)
+    {
         _signatures.push_back(std::unique_ptr<Signature>(new XmlSignature(
             signatureNode, *_crypto, _trustedDers, _insecure)));
+    }
 
     return true;
 }
@@ -825,20 +922,28 @@ std::set<std::string> ZipVerifier::getStreams() const
     std::set<std::string> streams;
     zip_int64_t numEntries = zip_get_num_entries(_zipArchive.get(), 0);
     if (numEntries < 0)
+    {
         return streams;
+    }
 
     for (zip_int64_t entry = 0; entry < numEntries; ++entry)
     {
         const char* name = zip_get_name(_zipArchive.get(), entry, 0);
         if (!name)
+        {
             continue;
+        }
 
         std::string stream(name);
         if (ends_with(stream, "/"))
+        {
             continue;
+        }
 
         if (stream == signaturesStreamName)
+        {
             continue;
+        }
 
         streams.insert(zip_get_name(_zipArchive.get(), entry, 0));
     }

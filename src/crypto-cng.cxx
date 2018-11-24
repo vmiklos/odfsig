@@ -61,14 +61,18 @@ bool CngCrypto::initializeKeysManager(xmlSecKeysMngr* keysManager,
                                       std::vector<std::string> trustedDers)
 {
     if (xmlSecMSCngAppDefaultKeysMngrInit(keysManager) < 0)
+    {
         return false;
+    }
 
     for (const auto& trustedDer : trustedDers)
     {
         if (xmlSecMSCngAppKeysMngrCertLoad(keysManager, trustedDer.c_str(),
                                            xmlSecKeyDataFormatDer,
                                            xmlSecKeyDataTypeTrusted) < 0)
+        {
             return false;
+        }
     }
 
     return true;
@@ -80,13 +84,17 @@ std::string CngCrypto::getCertificateSubjectName(unsigned char* certificate,
     std::unique_ptr<const CERT_CONTEXT> context(
         CertCreateCertificateContext(X509_ASN_ENCODING, certificate, size));
     if (!context->pCertInfo)
+    {
         return std::string();
+    }
 
     DWORD subjectSize = CertNameToStrW(
         X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, &context->pCertInfo->Subject,
         CERT_X500_NAME_STR | CERT_NAME_STR_REVERSE_FLAG, nullptr, 0);
     if (subjectSize <= 0)
+    {
         return std::string();
+    }
 
     std::vector<wchar_t> subject(subjectSize);
     subjectSize = CertNameToStrW(
@@ -94,7 +102,9 @@ std::string CngCrypto::getCertificateSubjectName(unsigned char* certificate,
         CERT_X500_NAME_STR | CERT_NAME_STR_REVERSE_FLAG, subject.data(),
         subject.size());
     if (subjectSize <= 0)
+    {
         return std::string();
+    }
 
     std::wstring_convert<std::codecvt_utf8<wchar_t>> convert;
     return convert.to_bytes(subject.data());
