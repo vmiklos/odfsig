@@ -234,6 +234,8 @@ class XmlSignature : public Signature
 
     xmlNodePtr getObjectCertDigestNode(xmlNode* objectNode) const;
 
+    xmlNodePtr getCertDigestNode() const;
+
     xmlNodePtr getX509CertificateNode() const;
 
     bool getCertificateBinary(std::vector<xmlChar>& certificate) const;
@@ -320,16 +322,8 @@ bool XmlSignature::getCertificateBinary(std::vector<xmlChar>& certificate) const
     return true;
 }
 
-bool XmlSignature::verifyXAdES()
+xmlNodePtr XmlSignature::getCertDigestNode() const
 {
-    std::vector<xmlChar> certificate;
-    if (!getCertificateBinary(certificate))
-    {
-        _errorString = "could not find certificate";
-        return false;
-    }
-
-    // Look up the expected hash.
     xmlNodePtr certDigestNode = nullptr;
     for (xmlNode* signatureChild = _signatureNode->children; signatureChild;
          signatureChild = signatureChild->next)
@@ -343,9 +337,22 @@ bool XmlSignature::verifyXAdES()
             break;
     }
 
+    return certDigestNode;
+}
+
+bool XmlSignature::verifyXAdES()
+{
+    std::vector<xmlChar> certificate;
+    if (!getCertificateBinary(certificate))
+    {
+        _errorString = "could not find certificate";
+        return false;
+    }
+
+    xmlNodePtr certDigestNode = getCertDigestNode();
     if (!certDigestNode)
     {
-        _errorString = "lookup of expected digest node failed";
+        _errorString = "could not find certificate digest node";
         return false;
     }
 
@@ -503,17 +510,8 @@ std::set<std::string> XmlSignature::getSignedStreams() const
 
 std::string XmlSignature::getType() const
 {
-    for (xmlNode* signatureChild = _signatureNode->children; signatureChild;
-         signatureChild = signatureChild->next)
-    {
-        if (!xmlSecCheckNodeName(signatureChild, xmlSecNodeObject,
-                                 xmlSecDSigNs))
-            continue;
-
-        xmlNodePtr certDigest = getObjectCertDigestNode(signatureChild);
-        if (certDigest)
-            return std::string("XAdES");
-    }
+    if (getCertDigestNode())
+        return std::string("XAdES");
 
     return std::string("XML-DSig");
 }
