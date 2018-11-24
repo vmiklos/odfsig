@@ -245,6 +245,9 @@ class XmlSignature : public Signature
 
     std::unique_ptr<xmlChar> getDigestAlgo(xmlNodePtr certDigest) const;
 
+    bool hash(const std::vector<xmlChar>& in, std::unique_ptr<xmlChar> algo,
+              std::vector<unsigned char>& out) const;
+
     std::string _errorString;
 
     xmlNode* _signatureNode = nullptr;
@@ -387,6 +390,34 @@ XmlSignature::getDigestAlgo(xmlNodePtr certDigest) const
 
     return algo;
 }
+bool XmlSignature::hash(const std::vector<xmlChar>& in,
+                        std::unique_ptr<xmlChar> algo,
+                        std::vector<unsigned char>& out) const
+{
+    std::unique_ptr<xmlSecTransformCtx> transform(xmlSecTransformCtxCreate());
+    if (!transform)
+        return false;
+
+    xmlSecTransformId transformId = xmlSecTransformIdListFindByHref(
+        xmlSecTransformIdsGet(), algo.get(), xmlSecTransformUsageDigestMethod);
+    if (transformId == xmlSecTransformIdUnknown)
+        return false;
+
+    xmlSecTransformPtr hash =
+        xmlSecTransformCtxCreateAndAppend(transform.get(), transformId);
+    if (!hash)
+        return false;
+
+    hash->operation = xmlSecTransformOperationSign;
+    if (xmlSecTransformCtxBinaryExecute(transform.get(), in.data(), in.size()) <
+        0)
+        return false;
+
+    std::copy(transform->result->data,
+              transform->result->data + transform->result->size,
+              std::back_inserter(out));
+    return true;
+}
 
 bool XmlSignature::verifyXAdES()
 {
@@ -418,40 +449,15 @@ bool XmlSignature::verifyXAdES()
         return false;
     }
 
-    // Hash the certificate.
-    std::unique_ptr<xmlSecTransformCtx> transform(xmlSecTransformCtxCreate());
-    if (!transform)
+    std::vector<unsigned char> actualDigest;
+    if (!hash(certificate, std::move(algo), actualDigest))
     {
-        _errorString = "hash transform creation failed";
+        _errorString = "could not hash certificate";
         return false;
     }
 
-    xmlSecTransformId transformId = xmlSecTransformIdListFindByHref(
-        xmlSecTransformIdsGet(), algo.get(), xmlSecTransformUsageDigestMethod);
-    if (transformId == xmlSecTransformIdUnknown)
-    {
-        _errorString = "unreconigzed hash algo";
-        return false;
-    }
-    xmlSecTransformPtr hash =
-        xmlSecTransformCtxCreateAndAppend(transform.get(), transformId);
-    if (!hash)
-    {
-        _errorString = "hash creation failed";
-        return false;
-    }
-
-    hash->operation = xmlSecTransformOperationSign;
-    if (xmlSecTransformCtxBinaryExecute(transform.get(), certificate.data(),
-                                        certificate.size()) < 0)
-    {
-        _errorString = "hashing failed";
-        return false;
-    }
-
-    // Compare the hashes.
-    return std::memcmp(expectedDigest.data(), transform->result->data,
-                       transform->result->size) == 0;
+    return std::memcmp(expectedDigest.data(), actualDigest.data(),
+                       actualDigest.size()) == 0;
 }
 
 xmlNode* XmlSignature::getX509CertificateNode() const
