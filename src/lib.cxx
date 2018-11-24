@@ -243,6 +243,8 @@ class XmlSignature : public Signature
     bool getDigestValue(xmlNodePtr certDigest,
                         std::vector<xmlChar>& value) const;
 
+    std::unique_ptr<xmlChar> getDigestAlgo(xmlNodePtr certDigest) const;
+
     std::string _errorString;
 
     xmlNode* _signatureNode = nullptr;
@@ -370,6 +372,22 @@ bool XmlSignature::getDigestValue(xmlNodePtr certDigest,
     return true;
 }
 
+std::unique_ptr<xmlChar>
+XmlSignature::getDigestAlgo(xmlNodePtr certDigest) const
+{
+    xmlNode* digestMethodNode =
+        xmlSecFindChild(certDigest, xmlSecNodeDigestMethod, xmlSecDSigNs);
+    if (!digestMethodNode)
+        return nullptr;
+
+    std::unique_ptr<xmlChar> algo(
+        xmlGetProp(digestMethodNode, xmlSecAttrAlgorithm));
+    if (!algo)
+        return nullptr;
+
+    return algo;
+}
+
 bool XmlSignature::verifyXAdES()
 {
     std::vector<xmlChar> certificate;
@@ -393,20 +411,10 @@ bool XmlSignature::verifyXAdES()
         return false;
     }
 
-    // Look up the hash algo.
-    xmlNode* digestMethodNode =
-        xmlSecFindChild(certDigestNode, xmlSecNodeDigestMethod, xmlSecDSigNs);
-    if (!digestMethodNode)
-    {
-        _errorString = "lookup of expected digest method node failed";
-        return false;
-    }
-
-    std::unique_ptr<xmlChar> algo(
-        xmlGetProp(digestMethodNode, xmlSecAttrAlgorithm));
+    std::unique_ptr<xmlChar> algo = getDigestAlgo(certDigestNode);
     if (!algo)
     {
-        _errorString = "lookup of digest method algorithm attribute failed";
+        _errorString = "could not find digest algo";
         return false;
     }
 
