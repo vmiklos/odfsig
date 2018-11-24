@@ -240,6 +240,9 @@ class XmlSignature : public Signature
 
     bool getCertificateBinary(std::vector<xmlChar>& certificate) const;
 
+    bool getDigestValue(xmlNodePtr certDigest,
+                        std::vector<xmlChar>& value) const;
+
     std::string _errorString;
 
     xmlNode* _signatureNode = nullptr;
@@ -340,6 +343,33 @@ xmlNodePtr XmlSignature::getCertDigestNode() const
     return certDigestNode;
 }
 
+bool XmlSignature::getDigestValue(xmlNodePtr certDigest,
+                                  std::vector<xmlChar>& value) const
+{
+    xmlNode* digestValueNode =
+        xmlSecFindChild(certDigest, xmlSecNodeDigestValue, xmlSecDSigNs);
+    if (!digestValueNode)
+        return false;
+
+    std::unique_ptr<xmlChar> digestValueNodeContent(
+        xmlNodeGetContent(digestValueNode));
+    if (!digestValueNodeContent ||
+        xmlSecIsEmptyString(digestValueNodeContent.get()))
+        return false;
+
+    // Decode the expected hash in-place.
+    int expectedDigestSize = xmlSecBase64Decode(
+        digestValueNodeContent.get(), (xmlSecByte*)digestValueNodeContent.get(),
+        xmlStrlen(digestValueNodeContent.get()));
+    if (expectedDigestSize < 0)
+        return false;
+
+    std::copy(digestValueNodeContent.get(),
+              digestValueNodeContent.get() + expectedDigestSize,
+              std::back_inserter(value));
+    return true;
+}
+
 bool XmlSignature::verifyXAdES()
 {
     std::vector<xmlChar> certificate;
@@ -356,30 +386,10 @@ bool XmlSignature::verifyXAdES()
         return false;
     }
 
-    xmlNode* digestValueNode =
-        xmlSecFindChild(certDigestNode, xmlSecNodeDigestValue, xmlSecDSigNs);
-    if (!digestValueNode)
+    std::vector<xmlChar> expectedDigest;
+    if (!getDigestValue(certDigestNode, expectedDigest))
     {
-        _errorString = "lookup of expected digest value node failed";
-        return false;
-    }
-
-    std::unique_ptr<xmlChar> digestValueNodeContent(
-        xmlNodeGetContent(digestValueNode));
-    if (!digestValueNodeContent ||
-        xmlSecIsEmptyString(digestValueNodeContent.get()))
-    {
-        _errorString = "digest value node is empty";
-        return false;
-    }
-
-    // Decode the expected hash in-place.
-    int expectedDigestSize = xmlSecBase64Decode(
-        digestValueNodeContent.get(), (xmlSecByte*)digestValueNodeContent.get(),
-        xmlStrlen(digestValueNodeContent.get()));
-    if (expectedDigestSize < 0)
-    {
-        _errorString = "base64 decode of digest value failed";
+        _errorString = "could not find digest value";
         return false;
     }
 
@@ -432,7 +442,7 @@ bool XmlSignature::verifyXAdES()
     }
 
     // Compare the hashes.
-    return std::memcmp(digestValueNodeContent.get(), transform->result->data,
+    return std::memcmp(expectedDigest.data(), transform->result->data,
                        transform->result->size) == 0;
 }
 
