@@ -236,6 +236,8 @@ class XmlSignature : public Signature
 
     xmlNodePtr getX509CertificateNode() const;
 
+    bool getCertificateBinary(std::vector<xmlChar>& certificate) const;
+
     std::string _errorString;
 
     xmlNode* _signatureNode = nullptr;
@@ -294,31 +296,36 @@ bool XmlSignature::verify()
     return dsigCtx->status == xmlSecDSigStatusSucceeded;
 }
 
-bool XmlSignature::verifyXAdES()
+bool XmlSignature::getCertificateBinary(std::vector<xmlChar>& certificate) const
 {
     // Look up the encoded certificate.
     xmlNode* x509Certificate = getX509CertificateNode();
     if (!x509Certificate)
-    {
-        _errorString = "could not find certificate node";
         return false;
-    }
 
     std::unique_ptr<xmlChar> certificateContent(
         xmlNodeGetContent(x509Certificate));
     if (!certificateContent || xmlSecIsEmptyString(certificateContent.get()))
-    {
-        _errorString = "certificate node is empty";
         return false;
-    }
 
     // Decode the certificate in-place.
     int certSize = xmlSecBase64Decode(certificateContent.get(),
                                       (xmlSecByte*)certificateContent.get(),
                                       xmlStrlen(certificateContent.get()));
     if (certSize < 0)
+        return false;
+
+    std::copy(certificateContent.get(), certificateContent.get() + certSize,
+              std::back_inserter(certificate));
+    return true;
+}
+
+bool XmlSignature::verifyXAdES()
+{
+    std::vector<xmlChar> certificate;
+    if (!getCertificateBinary(certificate))
     {
-        _errorString = "base64 decode of certificate failed";
+        _errorString = "could not find certificate";
         return false;
     }
 
@@ -410,8 +417,8 @@ bool XmlSignature::verifyXAdES()
     }
 
     hash->operation = xmlSecTransformOperationSign;
-    if (xmlSecTransformCtxBinaryExecute(transform.get(),
-                                        certificateContent.get(), certSize) < 0)
+    if (xmlSecTransformCtxBinaryExecute(transform.get(), certificate.data(),
+                                        certificate.size()) < 0)
     {
         _errorString = "hashing failed";
         return false;
@@ -433,21 +440,12 @@ xmlNode* XmlSignature::getX509CertificateNode() const
 
 std::string XmlSignature::getSubjectName() const
 {
-    xmlNode* x509Certificate = getX509CertificateNode();
-    if (!x509Certificate)
+    std::vector<xmlChar> certificate;
+    if (!getCertificateBinary(certificate))
         return std::string();
 
-    std::unique_ptr<xmlChar> content(xmlNodeGetContent(x509Certificate));
-    if (!content || xmlSecIsEmptyString(content.get()))
-        return std::string();
-
-    // Base64 decode in-place.
-    int size = xmlSecBase64Decode(content.get(), (xmlSecByte*)content.get(),
-                                  xmlStrlen(content.get()));
-    if (size < 0)
-        return std::string();
-
-    return _crypto.getCertificateSubjectName(content.get(), size);
+    return _crypto.getCertificateSubjectName(certificate.data(),
+                                             certificate.size());
 }
 
 std::string XmlSignature::getMethod() const
