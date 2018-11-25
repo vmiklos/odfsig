@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstring>
+#include <iterator>
 #include <sstream> // IWYU pragma: keep
 
 #include <libxml/globals.h>
@@ -16,6 +17,7 @@
 #include <libxml/xmlstring.h>
 #include <libxml/xmlversion.h>
 #include <xmlsec/base64.h>
+#include <xmlsec/buffer.h>
 #include <xmlsec/io.h>
 #include <xmlsec/keyinfo.h>
 #include <xmlsec/keysmngr.h>
