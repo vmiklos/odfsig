@@ -6,9 +6,9 @@
 
 #include <odfsig/crypto.hxx>
 
-#include <fstream> // IWYU pragma: keep
+#include <fstream>
 #include <memory>
-#include <sstream> // IWYU pragma: keep
+#include <sstream>
 #include <string>
 #include <vector>
 

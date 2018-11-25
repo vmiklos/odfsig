@@ -10,7 +10,7 @@
 #include <cassert>
 #include <cstring>
 #include <iterator>
-#include <sstream> // IWYU pragma: keep
+#include <sstream>
 
 #include <libxml/globals.h>
 #include <libxml/parser.h>

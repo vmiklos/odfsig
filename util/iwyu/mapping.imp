@@ -1,0 +1,8 @@
+[
+  # iwyu wrongly thinks that including <iosfwd> is sufficient.
+  { symbol: [ "std::stringstream", private, "<sstream>", public ] },
+  { symbol: [ "std::istringstream", private, "<sstream>", public ] },
+  { symbol: [ "std::ostringstream", private, "<sstream>", public ] },
+]
+
+# vim: set ft=toml:

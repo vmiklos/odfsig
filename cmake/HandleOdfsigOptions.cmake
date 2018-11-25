@@ -43,4 +43,14 @@ if (ODFSIG_ENABLE_GCOV)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
 endif ()
 
+option(ODFSIG_IWYU "Run include-what-you-use with the compiler." OFF)
+if(ODFSIG_IWYU)
+  find_program(IWYU_COMMAND NAMES include-what-you-use iwyu)
+  if(NOT IWYU_COMMAND)
+    message(FATAL_ERROR "ODFSIG_IWYU is ON but include-what-you-use is not found!")
+  endif()
+  set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE
+    "${IWYU_COMMAND};-Xiwyu;--mapping_file=${CMAKE_SOURCE_DIR}/util/iwyu/mapping.imp")
+endif()
+
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
