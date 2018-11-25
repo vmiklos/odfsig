@@ -237,7 +237,7 @@ int main(const std::vector<const char*>& args, std::ostream& ostream)
     {
         ostream << "odfsig version " << ODFSIG_VERSION_MAJOR << "."
                 << ODFSIG_VERSION_MINOR;
-        if (strsize(ODFSIG_VERSION_GIT))
+        if (strsize(ODFSIG_VERSION_GIT) != 0)
         {
             ostream << "-g" ODFSIG_VERSION_GIT;
         }
@@ -247,7 +247,7 @@ int main(const std::vector<const char*>& args, std::ostream& ostream)
 
     std::string cryptoConfig;
     const char* home = getenv("HOME");
-    if (home)
+    if (home != nullptr)
     {
         cryptoConfig = home;
     }

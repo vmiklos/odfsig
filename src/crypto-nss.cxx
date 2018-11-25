@@ -143,7 +143,7 @@ std::string NssCrypto::getCertificateSubjectName(unsigned char* certificate,
 
     std::unique_ptr<CERTCertificate> cert(CERT_NewTempCertificate(
         CERT_GetDefaultCertDB(), &certItem, nullptr, PR_FALSE, PR_TRUE));
-    if (!cert || !cert->subjectName)
+    if (!cert || (cert->subjectName == nullptr))
     {
         return std::string();
     }

@@ -8,7 +8,6 @@ modernize-*,\
 misc-*,\
 bugprone-*,\
 readability-*,\
--readability-implicit-bool-conversion,\
 -readability-implicit-bool-cast,\
 "
 WarningsAsErrors: '*'

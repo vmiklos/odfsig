@@ -83,7 +83,7 @@ std::string CngCrypto::getCertificateSubjectName(unsigned char* certificate,
 {
     std::unique_ptr<const CERT_CONTEXT> context(
         CertCreateCertificateContext(X509_ASN_ENCODING, certificate, size));
-    if (!context->pCertInfo)
+    if (context->pCertInfo == nullptr)
     {
         return std::string();
     }
