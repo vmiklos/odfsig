@@ -5,6 +5,7 @@
  */
 
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <memory>
 #include <set>
@@ -203,13 +204,6 @@ void usage(const std::string& self, std::ostream& ostream)
             << std::endl;
     ostream << "--insecure: do not validate certificates" << std::endl;
 }
-
-/// Build-time equivalent of strlen().
-/// NOLINTNEXTLINE(modernize-avoid-c-arrays)
-template <class T, size_t N> constexpr size_t strsize(T (&/*str*/)[N])
-{
-    return N - 1;
-}
 }
 
 namespace odfsig
@@ -237,7 +231,7 @@ int main(const std::vector<const char*>& args, std::ostream& ostream)
     {
         ostream << "odfsig version " << ODFSIG_VERSION_MAJOR << "."
                 << ODFSIG_VERSION_MINOR;
-        if (strsize(ODFSIG_VERSION_GIT) != 0)
+        if (std::strlen(ODFSIG_VERSION_GIT) > 0)
         {
             ostream << "-g" ODFSIG_VERSION_GIT;
         }
