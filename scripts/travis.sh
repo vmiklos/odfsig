@@ -12,4 +12,9 @@ fi
 
 scripts/build.sh "$@"
 
+if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+    cd workdir
+    make pack
+fi
+
 # vim:set shiftwidth=4 softtabstop=4 expandtab:

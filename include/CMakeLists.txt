@@ -20,8 +20,26 @@ configure_file(
 
 set(ODFSIG_ARCHIVE_NAME "odfsig-${ODFSIG_VERSION_MAJOR}.${ODFSIG_VERSION_MINOR}")
 add_custom_target(dist
-    COMMAND git archive --prefix=${ODFSIG_ARCHIVE_NAME}/ -o ${CMAKE_BINARY_DIR}/${ODFSIG_ARCHIVE_NAME}.tar.gz HEAD
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/dist
+    COMMAND git archive --prefix=${ODFSIG_ARCHIVE_NAME}/ -o ${CMAKE_BINARY_DIR}/dist/${ODFSIG_ARCHIVE_NAME}.tar.gz HEAD
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     )
+
+set(CPACK_PACKAGE_VERSION ${ODFSIG_VERSION_MAJOR}.${ODFSIG_VERSION_MINOR})
+set(CPACK_SYSTEM_NAME linux)
+set(CPACK_GENERATOR TGZ)
+include(CPack)
+
+if (WIN32)
+elseif (APPLE)
+else ()
+add_custom_target(pack
+    COMMAND cpack
+    COMMAND ${CMAKE_COMMAND} -E make_directory dist
+    COMMAND ${CMAKE_COMMAND} -E copy odfsig-${CPACK_PACKAGE_VERSION}-${CPACK_SYSTEM_NAME}.tar.gz dist/
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    )
+add_dependencies(pack dist)
+endif()
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:

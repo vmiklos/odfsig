@@ -33,3 +33,16 @@ addons:
         packages:
             - g++-7
             - clang-tidy-7
+deploy:
+  provider: releases
+  api_key:
+    secure: lSMlAWJQeJ/lLC04OsgsBAVTeTe99XwR+Fmxj6TMx4OYICxLA9HRBGL7eurdne0M1qgPCQO4XlFwzxuy0ElxSelX8zS5/+XDfX3SyifXO1j7G/mFsxEUN+ArKITfR82jEAaKMJ7Yl42GRqi2lKUnWqKGSFFtfY+S1jYDNfUoHRaeTClDAufHzJWvSp6QwGyF30I1Zmj12ZvOJp+dNjpGFOQCTQY8JvhfulGkB5XlwvajzLi9IB0/6itJ3hPwuRNy3nNWCtU9EIkLb+P9PzJRHJTnqDZF97oCkR5dFjTuqslRi3oLEBm7M0+sGBQ6JfvCS96SOgFmwDLyY1BO36MPdeUcwl2l7cIk8B9ns7VaZKrgDclm6YRhE7WnG+flllYo4MJMFfZnmFRqIO7rOfNXgF7Gkbgo3RbTpbaqlxGDns5HtwCOUIU9nylf1a7IDPAnz60PvSOrVq2BHBm116wsyigXIjbvgzHsZ6V8kXmyrhX5QXDpfYsfAKkVC0JYvAtD7vpsDtKU6j4NpdMdz/iQt4qquun8stmip5bLdnbjEIsR+vOAohBZ3G10U0YD37M/pwGTCKCf5QwwQjtlTGAMy3qUfvnjaNrBqNvI6jlQWOp6UlLTEBL0bj1hjT3OLtWOcBffQDNVpeV2MBukesMKgbo37Eggh2j5nub0l19Ixa8=
+  file_glob: true
+  file: dist/*
+  skip_cleanup: true
+  on:
+    condition:
+    - "$TRAVIS_OS_NAME == linux"
+    # only release config
+    - "$TRAVIS_ARGS == --werror"
+    tags: true
