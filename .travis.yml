@@ -19,11 +19,11 @@ matrix:
     env: TRAVIS_ARGS="--debug --werror --tidy"
   - name: "macos release"
     os: osx
-    osx_image: xcode8.3
+    osx_image: xcode9.3
     env: TRAVIS_ARGS="--werror"
   - name: "macos debug"
     os: osx
-    osx_image: xcode8.3
+    osx_image: xcode9.3
     env: TRAVIS_ARGS="--debug --werror"
 addons:
     apt:
