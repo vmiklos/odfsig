@@ -5,6 +5,7 @@
 
 cmake_args="-DCMAKE_INSTALL_PREFIX:PATH=$PWD/instdir"
 run_clang_tidy=""
+run_valgrind=""
 
 for arg in "$@"
 do
@@ -47,6 +48,9 @@ do
             fi
             export CCACHE_CPP2=1
             ;;
+        --valgrind)
+            run_valgrind="y"
+            ;;
         *)
             cmake_args+=" $arg"
     esac
@@ -58,7 +62,13 @@ mkdir workdir
 cd workdir
 cmake $cmake_args ..
 make -j$(getconf _NPROCESSORS_ONLN)
-make check
+if [ -n "$run_valgrind" ]; then
+    cd ..
+    valgrind --leak-check=full --error-exitcode=1 workdir/bin/odfsigtest
+    cd -
+else
+    make check
+fi
 make install
 cd ..
 ln -s workdir/compile_commands.json .

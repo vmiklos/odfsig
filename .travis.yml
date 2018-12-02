@@ -14,6 +14,9 @@ matrix:
     env: TRAVIS_ARGS="--debug --werror --asan-ubsan"
     # See <https://github.com/travis-ci/travis-ci/issues/9033>.
     sudo: true
+  - name: "linux valgrind"
+    os: linux
+    env: TRAVIS_ARGS="--debug --werror --valgrind"
   - name: "linux clang tidy"
     os: linux
     env: TRAVIS_ARGS="--debug --werror --tidy"
@@ -33,6 +36,7 @@ addons:
         packages:
             - g++-7
             - clang-tidy-7
+            - valgrind
 deploy:
   provider: releases
   api_key:
