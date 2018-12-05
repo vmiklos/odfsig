@@ -3,7 +3,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-# Baseline: Ubuntu Trusty 14.04 and macOS 10.12.
+# Baseline: Ubuntu Trusty 14.04 and macOS 10.13.
 
 if [ "$TRAVIS_OS_NAME" = "linux" ]; then
     export CC=gcc-7
@@ -12,7 +12,7 @@ fi
 
 scripts/build.sh "$@"
 
-if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+if [ "$TRAVIS_DEPLOY" = "y" ]; then
     cd workdir
     make pack
 fi

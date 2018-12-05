@@ -5,7 +5,7 @@ matrix:
   include:
   - name: "linux gcc release"
     os: linux
-    env: TRAVIS_ARGS="--werror"
+    env: TRAVIS_ARGS="--werror" TRAVIS_DEPLOY="y"
   - name: "linux clang debug"
     os: linux
     env: TRAVIS_ARGS="--debug --werror --clang"
@@ -23,7 +23,7 @@ matrix:
   - name: "macos release"
     os: osx
     osx_image: xcode9.3
-    env: TRAVIS_ARGS="--werror"
+    env: TRAVIS_ARGS="--werror" TRAVIS_DEPLOY="y"
   - name: "macos debug"
     os: osx
     osx_image: xcode9.3
@@ -46,7 +46,5 @@ deploy:
   skip_cleanup: true
   on:
     condition:
-    - "$TRAVIS_OS_NAME == linux"
-    # only release config
-    - "$TRAVIS_ARGS == --werror"
+    - "$TRAVIS_DEPLOY == y"
     tags: true
