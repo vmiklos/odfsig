@@ -26,20 +26,24 @@ add_custom_target(dist
     )
 
 set(CPACK_PACKAGE_VERSION ${ODFSIG_VERSION_MAJOR}.${ODFSIG_VERSION_MINOR})
-set(CPACK_SYSTEM_NAME linux)
+if (APPLE)
+    set(CPACK_SYSTEM_NAME macos)
+else ()
+    set(CPACK_SYSTEM_NAME linux)
+endif ()
 set(CPACK_GENERATOR TGZ)
 include(CPack)
 
-if (WIN32)
-elseif (APPLE)
-else ()
-add_custom_target(pack
-    COMMAND cpack
-    COMMAND ${CMAKE_COMMAND} -E make_directory dist
-    COMMAND ${CMAKE_COMMAND} -E copy odfsig-${CPACK_PACKAGE_VERSION}-${CPACK_SYSTEM_NAME}.tar.gz dist/
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    )
-add_dependencies(pack dist)
+if (NOT WIN32)
+    add_custom_target(pack
+        COMMAND cpack
+        COMMAND ${CMAKE_COMMAND} -E make_directory dist
+        COMMAND ${CMAKE_COMMAND} -E copy odfsig-${CPACK_PACKAGE_VERSION}-${CPACK_SYSTEM_NAME}.tar.gz dist/
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+    if (NOT APPLE)
+        add_dependencies(pack dist)
+    endif ()
 endif()
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:

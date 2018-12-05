@@ -58,23 +58,24 @@ else ()
             ${EXTERNALPROJECT_INSTALL_LINUX}
         )
 
-    if (WIN32)
-    elseif (APPLE)
-    else ()
+    if (NOT WIN32)
         install(PROGRAMS
             ${CMAKE_BINARY_DIR}/bin/libfreebl3${CMAKE_SHARED_LIBRARY_SUFFIX}
-            ${CMAKE_BINARY_DIR}/bin/libnspr4${CMAKE_SHARED_LIBRARY_SUFFIX}
             ${CMAKE_BINARY_DIR}/bin/libnss3${CMAKE_SHARED_LIBRARY_SUFFIX}
             ${CMAKE_BINARY_DIR}/bin/libnssckbi${CMAKE_SHARED_LIBRARY_SUFFIX}
             ${CMAKE_BINARY_DIR}/bin/libnssdbm3${CMAKE_SHARED_LIBRARY_SUFFIX}
             ${CMAKE_BINARY_DIR}/bin/libnssutil3${CMAKE_SHARED_LIBRARY_SUFFIX}
-            ${CMAKE_BINARY_DIR}/bin/libplc4${CMAKE_SHARED_LIBRARY_SUFFIX}
-            ${CMAKE_BINARY_DIR}/bin/libplds4${CMAKE_SHARED_LIBRARY_SUFFIX}
             ${CMAKE_BINARY_DIR}/bin/libsmime3${CMAKE_SHARED_LIBRARY_SUFFIX}
             ${CMAKE_BINARY_DIR}/bin/libsoftokn3${CMAKE_SHARED_LIBRARY_SUFFIX}
             ${CMAKE_BINARY_DIR}/bin/libssl3${CMAKE_SHARED_LIBRARY_SUFFIX}
             ${INSTALL_PROGRAMS_LINUX}
             DESTINATION ${CMAKE_INSTALL_BINDIR})
+        install(PROGRAMS
+            ${CMAKE_BINARY_DIR}/bin/libfreebl3${CMAKE_SHARED_LIBRARY_SUFFIX}
+	    ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}/libnspr4${CMAKE_SHARED_LIBRARY_SUFFIX}
+	    ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}/libplc4${CMAKE_SHARED_LIBRARY_SUFFIX}
+	    ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}/libplds4${CMAKE_SHARED_LIBRARY_SUFFIX}
+	    DESTINATION ${CMAKE_INSTALL_BINDIR}/${ODFSIG_MACOS_NSPR_SUBDIR})
     endif()
 
     # We link to a subset of the above libs, that subset is represented with
