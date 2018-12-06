@@ -51,6 +51,10 @@ else ()
         ExternalProject_Get_Property(extern-libxml2-project SOURCE_DIR)
         set(LIBXML2_INCLUDE_DIRS ${SOURCE_DIR}/include/)
         set(LIBXML2_LIBRARY ${SOURCE_DIR}/win32/bin.msvc/libxml2.lib)
+
+        install(PROGRAMS
+            ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/libxml2.dll
+            DESTINATION ${CMAKE_INSTALL_BINDIR})
     else ()
         ExternalProject_Get_Property(extern-libxml2-project INSTALL_DIR)
         set(LIBXML2_INCLUDE_DIRS ${INSTALL_DIR}/include/libxml2)

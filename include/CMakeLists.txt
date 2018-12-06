@@ -40,6 +40,8 @@ endif ()
 include(CPack)
 
 if (WIN32)
+    set(CMAKE_INSTALL_UCRT_LIBRARIES ON)
+    include(InstallRequiredSystemLibraries)
     add_custom_target(pack
         COMMAND cpack -C $<CONFIG>
         COMMAND ${CMAKE_COMMAND} -E make_directory dist

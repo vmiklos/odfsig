@@ -78,6 +78,11 @@ else ()
         set(XMLSEC_INCLUDE_DIRS ${SOURCE_DIR}/include)
         set(XMLSEC_LIBRARY ${SOURCE_DIR}/win32/binaries/libxmlsec.lib)
         set(XMLSEC_CRYPTO_LIBRARY ${SOURCE_DIR}/win32/binaries/libxmlsec-mscng.lib)
+
+        install(PROGRAMS
+            ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/libxmlsec.dll
+            ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/libxmlsec-mscng.dll
+            DESTINATION ${CMAKE_INSTALL_BINDIR})
     else ()
         set(XMLSEC_INCLUDE_DIRS ${INSTALL_DIR}/include/xmlsec1)
         set(XMLSEC_LIBRARY ${INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}/libxmlsec1.a)
