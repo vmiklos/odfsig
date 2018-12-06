@@ -26,15 +26,27 @@ add_custom_target(dist
     )
 
 set(CPACK_PACKAGE_VERSION ${ODFSIG_VERSION_MAJOR}.${ODFSIG_VERSION_MINOR})
-if (APPLE)
-    set(CPACK_SYSTEM_NAME macos)
+if (WIN32)
+    set(CPACK_SYSTEM_NAME windows)
+    set(CPACK_GENERATOR ZIP)
 else ()
-    set(CPACK_SYSTEM_NAME linux)
+    if (APPLE)
+        set(CPACK_SYSTEM_NAME macos)
+    else ()
+        set(CPACK_SYSTEM_NAME linux)
+    endif ()
+    set(CPACK_GENERATOR TGZ)
 endif ()
-set(CPACK_GENERATOR TGZ)
 include(CPack)
 
-if (NOT WIN32)
+if (WIN32)
+    add_custom_target(pack
+        COMMAND cpack -C $<CONFIG>
+        COMMAND ${CMAKE_COMMAND} -E make_directory dist
+        COMMAND ${CMAKE_COMMAND} -E copy odfsig-${CPACK_PACKAGE_VERSION}-${CPACK_SYSTEM_NAME}.zip dist/
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+else ()
     add_custom_target(pack
         COMMAND cpack
         COMMAND ${CMAKE_COMMAND} -E make_directory dist
