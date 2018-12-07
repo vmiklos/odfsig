@@ -18,6 +18,24 @@ build:
   parallel: true
   verbosity: normal
 
-test_script:
+after_build:
   - cd workdir
+  - cpack -C %CONFIGURATION%
+
+test_script:
   - ctest -V -C %CONFIGURATION%
+
+artifacts:
+  - path: workdir\odfsig-*.zip
+    name: Releases
+
+deploy:
+  provider: GitHub
+  auth_token:
+    secure: "H5xUFGYeaYpbbnEmicWbdGbZ1uWLe8BKokUu2sE6jCbdlGYi8lJi70ESYMFUv2fe"
+  artifact: /odfsig-.*\.zip/
+  draft: false
+  prerelease: false
+  on:
+    appveyor_repo_tag: true
+    configuration: Release
