@@ -23,6 +23,7 @@ after_build:
   - cpack -C %CONFIGURATION%
 
 test_script:
+  - cd tests
   - ctest -V -C %CONFIGURATION%
 
 artifacts:
