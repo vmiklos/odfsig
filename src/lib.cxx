@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstring>
+#include <fstream>
 #include <iterator>
 #include <sstream>
 
@@ -37,6 +38,10 @@ namespace std
 template <> struct default_delete<zip_t>
 {
     void operator()(zip_t* ptr) { zip_close(ptr); }
+};
+template <> struct default_delete<zip_source_t>
+{
+    void operator()(zip_source_t* ptr) { zip_source_free(ptr); }
 };
 template <> struct default_delete<zip_file_t>
 {
@@ -758,6 +763,8 @@ class ZipVerifier : public Verifier
 
     bool openZip(const std::string& path) override;
 
+    bool openZipMemory(void* data, size_t size) override;
+
     const std::string& getErrorString() const override;
 
     void setTrustedDers(const std::vector<std::string>& trustedDers) override;
@@ -772,6 +779,10 @@ class ZipVerifier : public Verifier
 
   private:
     bool locateSignatures();
+
+    std::vector<char> _zipContents;
+
+    std::unique_ptr<zip_source_t> _zipSource;
 
     std::unique_ptr<zip_t> _zipArchive;
 
@@ -812,13 +823,34 @@ ZipVerifier::ZipVerifier(const std::string& cryptoConfig)
 
 bool ZipVerifier::openZip(const std::string& path)
 {
+    std::ifstream stream(path, std::ios::binary);
+    if (!stream.is_open())
+    {
+        return false;
+    }
+
+    _zipContents = std::vector<char>((std::istreambuf_iterator<char>(stream)),
+                                     std::istreambuf_iterator<char>());
+    return openZipMemory(_zipContents.data(), _zipContents.size());
+}
+
+bool ZipVerifier::openZipMemory(void* data, size_t size)
+{
+    zip_error_t zipError;
+    _zipSource.reset(zip_source_buffer_create(data, size, 0, &zipError));
+    if (!_zipSource)
+    {
+        _errorString = zip_error_strerror(&zipError);
+        zip_error_fini(&zipError);
+        return false;
+    }
+
+    zip_source_keep(_zipSource.get());
     const int openFlags = 0;
-    int errorCode = 0;
-    _zipArchive.reset(zip_open(path.c_str(), openFlags, &errorCode));
+    _zipArchive.reset(
+        zip_open_from_source(_zipSource.get(), openFlags, &zipError));
     if (!_zipArchive)
     {
-        zip_error_t zipError;
-        zip_error_init_with_code(&zipError, errorCode);
         _errorString = zip_error_strerror(&zipError);
         zip_error_fini(&zipError);
         return false;
