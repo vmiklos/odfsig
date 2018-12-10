@@ -763,7 +763,7 @@ class ZipVerifier : public Verifier
 
     bool openZip(const std::string& path) override;
 
-    bool openZipMemory(void* data, size_t size) override;
+    bool openZipMemory(const void* data, size_t size) override;
 
     const std::string& getErrorString() const override;
 
@@ -834,7 +834,7 @@ bool ZipVerifier::openZip(const std::string& path)
     return openZipMemory(_zipContents.data(), _zipContents.size());
 }
 
-bool ZipVerifier::openZipMemory(void* data, size_t size)
+bool ZipVerifier::openZipMemory(const void* data, size_t size)
 {
     zip_error_t zipError;
     _zipSource.reset(zip_source_buffer_create(data, size, 0, &zipError));

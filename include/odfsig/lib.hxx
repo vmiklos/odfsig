@@ -47,7 +47,7 @@ class Verifier
     virtual bool openZip(const std::string& path) = 0;
 
     /// Opens in-memory data.
-    virtual bool openZipMemory(void* data, size_t size) = 0;
+    virtual bool openZipMemory(const void* data, size_t size) = 0;
 
     virtual const std::string& getErrorString() const = 0;
 
