@@ -43,7 +43,7 @@ do
 	    export CC="$HOME/git/llvm/instdir/bin/clang -fno-sanitize-recover=undefined,integer -fsanitize=address -fsanitize=undefined -fsanitize=local-bounds -fsanitize=fuzzer-no-link"
 	    export CXX="$HOME/git/llvm/instdir/bin/clang++ -fno-sanitize-recover=undefined,integer -fsanitize-recover=float-divide-by-zero -fsanitize=address -fsanitize=undefined -fsanitize=local-bounds -fsanitize=fuzzer-no-link"
 	    export CCACHE_CPP2=YES
-            cmake_args+=" -DODFSIG_INTERNAL_LIBS=ON -DODFSIG_FUZZ=ON"
+            cmake_args+=" -DODFSIG_INTERNAL_XMLSEC=ON -DODFSIG_FUZZ=ON"
             ;;
         --tidy)
             if [ "$CC" != "gcc-7" ]; then

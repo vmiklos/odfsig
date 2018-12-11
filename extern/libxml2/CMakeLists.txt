@@ -7,7 +7,7 @@ set(LIBXML2_SHA256SUM 0b74e51595654f958148759cfef0993114ddccccbb6f31aee018f3558e
 
 if (NOT ODFSIG_INTERNAL_LIBXML2)
     find_package(PkgConfig REQUIRED)
-    pkg_check_modules(LIBXML REQUIRED libxml-2.0)
+    pkg_check_modules(LIBXML2 REQUIRED libxml-2.0)
 else ()
     include(ExternalProject)
     include(GNUInstallDirs)

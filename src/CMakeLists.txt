@@ -7,6 +7,7 @@ if (WIN32)
     set(CRYPTO_LIBRARIES crypt32)
 else ()
     set(CRYPTO nss)
+    set(CRYPTO_LIBRARIES nss)
 endif()
 
 add_library(odfsigcore
@@ -28,6 +29,7 @@ endif ()
 target_link_libraries(odfsigcore
     libzip
     libxmlsec
+    libxml2
     ${CRYPTO_LIBRARIES}
     ${ODFSIG_RPATH}
     )
