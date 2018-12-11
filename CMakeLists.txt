@@ -31,6 +31,7 @@ if (NOT WIN32)
     option(ODFSIG_INTERNAL_NSS "Use internal nss." ${ODFSIG_INTERNAL_LIBS})
 endif ()
 option(ODFSIG_INTERNAL_ZLIB "Use internal zlib." ${ODFSIG_INTERNAL_LIBS})
+option(ODFSIG_FUZZ "Build a fuzz target." OFF)
 
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "No build type selected, default to Release")
