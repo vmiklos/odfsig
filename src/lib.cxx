@@ -837,6 +837,7 @@ bool ZipVerifier::openZip(const std::string& path)
 bool ZipVerifier::openZipMemory(const void* data, size_t size)
 {
     zip_error_t zipError;
+    zip_error_init(&zipError);
     _zipSource.reset(zip_source_buffer_create(data, size, 0, &zipError));
     if (!_zipSource)
     {
@@ -845,7 +846,6 @@ bool ZipVerifier::openZipMemory(const void* data, size_t size)
         return false;
     }
 
-    zip_source_keep(_zipSource.get());
     const int openFlags = 0;
     _zipArchive.reset(
         zip_open_from_source(_zipSource.get(), openFlags, &zipError));
@@ -856,6 +856,7 @@ bool ZipVerifier::openZipMemory(const void* data, size_t size)
         return false;
     }
 
+    zip_source_keep(_zipSource.get());
     return true;
 }
 

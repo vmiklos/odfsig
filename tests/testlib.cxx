@@ -162,7 +162,7 @@ TEST(OdfsigTest, testCmdlineBad)
 
 TEST(OdfsigTest, testCmdlineBadPath)
 {
-    // No signatures stream.
+    // Non-existing path.
     std::vector<const char*> args{"odfsig", "tests/data/asdf.odt"};
     std::stringstream ss;
     ASSERT_EQ(1, odfsig::main(args, ss));
@@ -185,6 +185,14 @@ TEST(OdfsigTest, testCmdlineBadArg)
     std::stringstream ss;
     // This was 1, bad argument was just ignored silently.
     ASSERT_EQ(2, odfsig::main(args, ss));
+}
+
+TEST(OdfsigTest, testCmdlineNonZip)
+{
+    // Input is not a ZIP file: this used to crash.
+    std::vector<const char*> args{"odfsig", "tests/data/non-zip.odt"};
+    std::stringstream ss;
+    ASSERT_EQ(1, odfsig::main(args, ss));
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
