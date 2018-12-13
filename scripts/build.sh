@@ -58,6 +58,7 @@ do
             export CCACHE_CPP2=1
             ;;
         --valgrind)
+            cmake_args+=" -DODFSIG_INTERNAL_XMLSEC=ON"
             run_valgrind="y"
             ;;
         *)
