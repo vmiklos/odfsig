@@ -46,14 +46,14 @@ do
             cmake_args+=" -DODFSIG_INTERNAL_XMLSEC=ON -DODFSIG_FUZZ=ON"
             ;;
         --tidy)
-            if [ "$CC" != "gcc-7" ]; then
-                export CC=clang
-                export CXX=clang++
-                run_clang_tidy=run-clang-tidy
-            else
+            if [ "$CC" = "gcc-7" ]; then
                 export CC=clang-7
                 export CXX=clang++-7
                 run_clang_tidy=run-clang-tidy-7
+            else
+                export CC=clang
+                export CXX=clang++
+                run_clang_tidy=run-clang-tidy
             fi
             export CCACHE_CPP2=1
             ;;
