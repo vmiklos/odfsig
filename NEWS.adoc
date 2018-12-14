@@ -1,6 +1,12 @@
 = Version descriptions
 
-== 2.0
+== 4.0
+
+- Initial XAdES certificate hash verify support
+- Automatic packaging on all platforms
+- Fix a crash found with fuzzing
+
+== 3.0
 
 - Runs on macOS
 - Don't silently ignore unrecognized arguments
