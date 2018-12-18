@@ -98,6 +98,8 @@ TEST(OdfsigTest, testBadCertificate)
     // Missing setTrustedDers() should result in failure.
     std::unique_ptr<odfsig::Verifier> verifier(
         odfsig::Verifier::create(std::string()));
+    std::stringstream ss;
+    verifier->setLogger(ss);
 
     ASSERT_TRUE(verifier->openZip("tests/data/good.odt"));
     ASSERT_TRUE(verifier->parseSignatures());

@@ -19,6 +19,7 @@
 #include <libxml/xmlversion.h>
 #include <xmlsec/base64.h>
 #include <xmlsec/buffer.h>
+#include <xmlsec/errors.h>
 #include <xmlsec/io.h>
 #include <xmlsec/keyinfo.h>
 #include <xmlsec/keysmngr.h>
@@ -108,6 +109,41 @@ class XmlGuard
     ~XmlGuard() { xmlCleanupParser(); }
 };
 
+/// The error callback works on this stream.
+thread_local std::ostream* xmlSecErrorStream;
+
+/// Provides a libxmlsec error callback.
+void xmlSecErrorsCallback(const char* file, int line, const char* func,
+                          const char* errorObject, const char* errorSubject,
+                          int reason, const char* msg)
+{
+    if (xmlSecErrorStream == nullptr)
+    {
+        return;
+    }
+
+    const char* errorMsg = nullptr;
+    for (xmlSecSize i = 0;
+         i < XMLSEC_ERRORS_MAX_NUMBER && xmlSecErrorsGetMsg(i) != nullptr; ++i)
+    {
+        if (xmlSecErrorsGetCode(i) == reason)
+        {
+            errorMsg = xmlSecErrorsGetMsg(i);
+            break;
+        }
+    }
+
+    std::ostream& ostream = *xmlSecErrorStream;
+    ostream << "func=" << (func != nullptr ? func : "unknown");
+    ostream << ":file=" << (file != nullptr ? file : "unknown");
+    ostream << ":line=" << line;
+    ostream << ":obj=" << (errorObject != nullptr ? errorObject : "unknown");
+    ostream << ":subj=" << (errorSubject != nullptr ? errorSubject : "unknown");
+    ostream << ":error=" << reason;
+    ostream << ":" << (errorMsg != nullptr ? errorMsg : "unknown");
+    ostream << ":" << (msg != nullptr ? msg : "") << std::endl;
+}
+
 /// Provides libxmlsec IO callbacks.
 namespace XmlSecIO
 {
@@ -168,7 +204,9 @@ int close(void* context)
 class XmlSecGuard
 {
   public:
-    explicit XmlSecGuard(zip_t* zipArchive, Crypto& crypto) : _crypto(crypto)
+    explicit XmlSecGuard(zip_t* zipArchive, std::ostream* errorStream,
+                         Crypto& crypto)
+        : _crypto(crypto)
     {
         // Initialize xmlsec.
         _good = xmlSecInit() >= 0;
@@ -186,6 +224,12 @@ class XmlSecGuard
         xmlSecIOCleanupCallbacks();
         xmlSecIORegisterCallbacks(XmlSecIO::match, XmlSecIO::open,
                                   XmlSecIO::read, XmlSecIO::close);
+
+        if (errorStream != nullptr)
+        {
+            xmlSecErrorStream = errorStream;
+            xmlSecErrorsSetCallback(xmlSecErrorsCallback);
+        }
     }
 
     ~XmlSecGuard()
@@ -193,6 +237,12 @@ class XmlSecGuard
         if (!_good)
         {
             return;
+        }
+
+        if (xmlSecErrorStream != nullptr)
+        {
+            xmlSecErrorsSetCallback(xmlSecErrorsDefaultCallback);
+            xmlSecErrorStream = nullptr;
         }
 
         xmlSecIOCleanupCallbacks();
@@ -771,6 +821,8 @@ class ZipVerifier : public Verifier
 
     void setInsecure(bool insecure) override;
 
+    void setLogger(std::ostream& logger) override;
+
     bool parseSignatures() override;
 
     std::vector<std::unique_ptr<Signature>>& getSignatures() override;
@@ -809,6 +861,8 @@ class ZipVerifier : public Verifier
     std::vector<std::string> _trustedDers;
 
     bool _insecure = false;
+
+    std::ostream* _logger = nullptr;
 };
 
 std::unique_ptr<Verifier> Verifier::create(const std::string& cryptoConfig)
@@ -869,6 +923,8 @@ void ZipVerifier::setTrustedDers(const std::vector<std::string>& trustedDers)
 
 void ZipVerifier::setInsecure(bool insecure) { _insecure = insecure; }
 
+void ZipVerifier::setLogger(std::ostream& logger) { _logger = &logger; }
+
 bool ZipVerifier::parseSignatures()
 {
     if (!locateSignatures())
@@ -886,7 +942,8 @@ bool ZipVerifier::parseSignatures()
         return false;
     }
 
-    _xmlSecGuard = std::make_unique<XmlSecGuard>(_zipArchive.get(), *_crypto);
+    _xmlSecGuard =
+        std::make_unique<XmlSecGuard>(_zipArchive.get(), _logger, *_crypto);
     if (!_xmlSecGuard->isGood())
     {
         _errorString = "Failed to initialize libxmlsec";

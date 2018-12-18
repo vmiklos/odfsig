@@ -61,6 +61,9 @@ class Verifier
     /// Sets if the certificate should be validated.
     virtual void setInsecure(bool insecure) = 0;
 
+    /// Sets logger to be invoked for error details.
+    virtual void setLogger(std::ostream& logger) = 0;
+
     virtual bool parseSignatures() = 0;
 
     virtual std::vector<std::unique_ptr<Signature>>& getSignatures() = 0;
