@@ -17,7 +17,7 @@ else ()
         set(ZLIB_ROOT -DZLIB_ROOT=${INSTALL_DIR})
     endif ()
     ExternalProject_Add(extern-libzip-project
-        URL https://libzip.org/download/libzip-${LIBZIP_VERSION}.tar.gz
+        URL https://github.com/vmiklos/odfsig/releases/download/v4.0/libzip-${LIBZIP_VERSION}.tar.gz
         URL_HASH SHA256=${LIBZIP_SHA256SUM}
         PATCH_COMMAND ${PATCH_EXECUTABLE}
             ${CMAKE_CURRENT_SOURCE_DIR}/add-an-option-to-disable-bzip2-support.patch
