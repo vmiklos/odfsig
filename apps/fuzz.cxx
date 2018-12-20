@@ -4,16 +4,12 @@
  * found in the LICENSE file.
  */
 
+#include <libxml/xmlerror.h>
+
 #include <odfsig/lib.hxx>
 
-namespace
-{
-class NullBuffer : public std::streambuf
-{
-  public:
-    int overflow(int c) { return c; }
-};
-}
+/// Error handler to avoid spam of error messages from libxml parser.
+void ignore(void* /*ctx*/, const char* /*msg*/, ...) {}
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -21,9 +17,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         odfsig::Verifier::create(std::string()));
     verifier->setInsecure(true);
 
-    NullBuffer nullBuffer;
-    std::ostream nullStream(&nullBuffer);
-    verifier->setLogger(nullStream);
+    xmlSetGenericErrorFunc(nullptr, &ignore);
 
     if (!verifier->openZipMemory(data, size))
     {
