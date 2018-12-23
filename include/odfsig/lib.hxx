@@ -1,5 +1,4 @@
-#ifndef _HAD_ODFSIG__LIB_H
-#define _HAD_ODFSIG__LIB_H
+#pragma once
 /*
  * Copyright 2018 Miklos Vajna. All rights reserved.
  * Use of this source code is governed by a BSD-style license that can be
@@ -84,6 +83,5 @@ class Verifier
 /// CLI wrapper around the C++ API.
 int main(const std::vector<const char*>& args, std::ostream& ostream);
 }
-#endif /* _HAD_ODFSIG_LIB_H */
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

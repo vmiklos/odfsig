@@ -1,5 +1,4 @@
-#ifndef _HAD_ODFSIG_CRYPTO_H
-#define _HAD_ODFSIG_CRYPTO_H
+#pragma once
 /*
  * Copyright 2018 Miklos Vajna. All rights reserved.
  * Use of this source code is governed by a BSD-style license that can be
@@ -44,6 +43,5 @@ class Crypto
     static std::unique_ptr<Crypto> create();
 };
 }
-#endif /* _HAD_ODFSIG_CRYPTO_H */
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
