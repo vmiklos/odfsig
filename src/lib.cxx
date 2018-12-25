@@ -12,6 +12,7 @@
 #include <fstream>
 #include <iterator>
 #include <sstream>
+#include <utility>
 
 #include <libxml/globals.h>
 #include <libxml/parser.h>

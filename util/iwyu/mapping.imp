@@ -3,6 +3,9 @@
   { symbol: [ "std::stringstream", private, "<sstream>", public ] },
   { symbol: [ "std::istringstream", private, "<sstream>", public ] },
   { symbol: [ "std::ostringstream", private, "<sstream>", public ] },
+
+  # iwyu wrongly thinks that including <fstream> is not needed.
+  { symbol: [ "std::ifstream", private, "<fstream>", public ] },
 ]
 
 # vim: set ft=toml:

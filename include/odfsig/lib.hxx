@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 
+#include <cstddef>
+
 namespace odfsig
 {
 /// Represents one specific signature in the document.

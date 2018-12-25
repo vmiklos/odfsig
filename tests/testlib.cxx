@@ -5,9 +5,9 @@
  */
 
 #include <cstddef>
-#include <iosfwd>
 #include <memory>
 #include <set>
+#include <sstream>
 #include <string>
 #include <vector>
 
