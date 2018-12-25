@@ -20,6 +20,10 @@ matrix:
   - name: "linux clang tidy"
     os: linux
     env: TRAVIS_ARGS="--debug --werror --tidy"
+  - name: "linux gcc iwyu"
+    os: linux
+    env: TRAVIS_ARGS="--debug --werror --iwyu"
+    sudo: true
   - name: "macos release"
     os: osx
     osx_image: xcode9.3
@@ -37,6 +41,10 @@ addons:
             - g++-7
             - clang-tidy-7
             - valgrind
+            # for iwyu
+            - llvm-7-dev
+            - libclang-7-dev
+            - clang-7
 deploy:
   provider: releases
   api_key:

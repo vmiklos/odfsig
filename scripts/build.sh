@@ -6,6 +6,7 @@
 cmake_args="-DCMAKE_INSTALL_PREFIX:PATH=$PWD/instdir"
 run_clang_tidy=""
 run_valgrind=""
+run_iwyu=""
 
 for arg in "$@"
 do
@@ -26,6 +27,25 @@ do
             ;;
         --iwyu)
             cmake_args+=" -DODFSIG_IWYU=ON"
+            run_iwyu="y"
+
+            if [ ! -e "/usr/bin/include-what-you-use" ]; then
+                TARNAME="include-what-you-use-0.11-x86_64-linux-gnu-ubuntu-14.04"
+                if [ ! -e $TARNAME.tar.gz ]; then
+                    wget https://github.com/vmiklos/odfsig/releases/download/v4.0/$TARNAME.tar.gz
+                fi
+                CWD=$PWD
+                cd /usr/lib/llvm-7
+                sudo tar xvf $CWD/$TARNAME.tar.gz
+                cd /usr/bin
+                sudo ln -s ../lib/llvm-7/bin/include-what-you-use .
+                # Make IWYU built against 7.0.0 work with 7.0.1 as well.
+                cd /usr/include/clang
+                sudo ln -s 7.0.1 7.0.0
+                # Log what is the selected GCC installation.
+                include-what-you-use -v || true
+                cd $CWD
+            fi
             ;;
         --asan-ubsan)
 	    export ASAN_OPTIONS=handle_ioctl=1:detect_leaks=1:allow_user_segv_handler=1:use_sigaltstack=0:detect_deadlocks=1:intercept_tls_get_addr=1:check_initialization_order=1:detect_stack_use_after_return=1:strict_init_order=1:detect_invalid_pointer_pairs=1
@@ -71,7 +91,15 @@ rm -f compile_commands.json
 mkdir workdir
 cd workdir
 cmake $cmake_args ..
-make -j$(getconf _NPROCESSORS_ONLN)
+if [ -n "$run_iwyu" ]; then
+    make -j$(getconf _NPROCESSORS_ONLN) 2>&1 | tee log
+    # see
+    # <https://stackoverflow.com/questions/15367674/bash-one-liner-to-exit-with-the-opposite-status-of-a-grep-command/31127157#31127157>,
+    # simple '!' doesn't work with set -e.
+    ! egrep 'should add|should remove' log || false
+else
+    make -j$(getconf _NPROCESSORS_ONLN)
+fi
 if [ -n "$run_valgrind" ]; then
     cd ..
     valgrind --leak-check=full --error-exitcode=1 workdir/bin/odfsigtest

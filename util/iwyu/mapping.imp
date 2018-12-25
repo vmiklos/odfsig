@@ -6,6 +6,9 @@
 
   # iwyu wrongly thinks that including <fstream> is not needed.
   { symbol: [ "std::ifstream", private, "<fstream>", public ] },
+
+  # gtest
+  { include: [ "\"gtest/gtest_pred_impl.h\"", private, "<gtest/gtest.h>", public ] }
 ]
 
 # vim: set ft=toml:
