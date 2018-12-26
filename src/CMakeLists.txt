@@ -15,6 +15,7 @@ add_library(odfsigcore
     lib.cxx
     main.cxx
     string.cxx
+    zip.cxx
     )
 target_include_directories(odfsigcore
     PUBLIC

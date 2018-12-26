@@ -35,6 +35,8 @@
 #include <odfsig/crypto.hxx>
 #include <odfsig/string.hxx>
 
+#include "zip.hxx"
+
 namespace std
 {
 template <> struct default_delete<zip_t>
@@ -48,14 +50,6 @@ template <> struct default_delete<zip_source_t>
 template <> struct default_delete<zip_file_t>
 {
     void operator()(zip_file_t* ptr) { zip_fclose(ptr); }
-};
-template <> struct default_delete<zip_error_t>
-{
-    void operator()(zip_error_t* ptr)
-    {
-        zip_error_fini(ptr);
-        delete ptr;
-    }
 };
 template <> struct default_delete<xmlDoc>
 {
@@ -899,21 +893,20 @@ bool ZipVerifier::openZip(const std::string& path)
 
 bool ZipVerifier::openZipMemory(const void* data, size_t size)
 {
-    auto zipError = std::make_unique<zip_error_t>();
-    zip_error_init(zipError.get());
-    _zipSource.reset(zip_source_buffer_create(data, size, 0, zipError.get()));
+    std::unique_ptr<zip::Error> zipError = zip::Error::create();
+    _zipSource.reset(zip_source_buffer_create(data, size, 0, zipError->get()));
     if (!_zipSource)
     {
-        _errorString = zip_error_strerror(zipError.get());
+        _errorString = zip_error_strerror(zipError->get());
         return false;
     }
 
     const int openFlags = 0;
     _zipArchive.reset(
-        zip_open_from_source(_zipSource.get(), openFlags, zipError.get()));
+        zip_open_from_source(_zipSource.get(), openFlags, zipError->get()));
     if (!_zipArchive)
     {
-        _errorString = zip_error_strerror(zipError.get());
+        _errorString = zip_error_strerror(zipError->get());
         return false;
     }
 
