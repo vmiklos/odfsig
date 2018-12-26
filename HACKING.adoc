@@ -24,13 +24,6 @@
 Ideally CI checks everything before a commit hits master, but here are a few
 things which are not part of CI:
 
-- IWYU:
-
-----
-./up.sh --iwyu 2>&1 |tee log
-egrep 'should add|should remove' log
-----
-
 - using system libraries: this works on latest stable openSUSE (Leap 15.0
   currently):
 
