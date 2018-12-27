@@ -43,10 +43,6 @@ template <> struct default_delete<zip_t>
 {
     void operator()(zip_t* ptr) { zip_close(ptr); }
 };
-template <> struct default_delete<zip_source_t>
-{
-    void operator()(zip_source_t* ptr) { zip_source_free(ptr); }
-};
 template <> struct default_delete<zip_file_t>
 {
     void operator()(zip_file_t* ptr) { zip_fclose(ptr); }
@@ -837,7 +833,7 @@ class ZipVerifier : public Verifier
 
     std::vector<char> _zipContents;
 
-    std::unique_ptr<zip_source_t> _zipSource;
+    std::unique_ptr<zip::Source> _zipSource;
 
     std::unique_ptr<zip_t> _zipArchive;
 
@@ -894,23 +890,23 @@ bool ZipVerifier::openZip(const std::string& path)
 bool ZipVerifier::openZipMemory(const void* data, size_t size)
 {
     std::unique_ptr<zip::Error> zipError = zip::Error::create();
-    _zipSource.reset(zip_source_buffer_create(data, size, 0, zipError->get()));
+    _zipSource = zip::Source::create(data, size, zipError.get());
     if (!_zipSource)
     {
-        _errorString = zip_error_strerror(zipError->get());
+        _errorString = zipError->getString();
         return false;
     }
 
     const int openFlags = 0;
     _zipArchive.reset(
-        zip_open_from_source(_zipSource.get(), openFlags, zipError->get()));
+        zip_open_from_source(_zipSource->get(), openFlags, zipError->get()));
     if (!_zipArchive)
     {
-        _errorString = zip_error_strerror(zipError->get());
+        _errorString = zipError->getString();
         return false;
     }
 
-    zip_source_keep(_zipSource.get());
+    zip_source_keep(_zipSource->get());
     return true;
 }
 
