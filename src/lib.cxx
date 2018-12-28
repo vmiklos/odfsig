@@ -39,10 +39,6 @@
 
 namespace std
 {
-template <> struct default_delete<zip_t>
-{
-    void operator()(zip_t* ptr) { zip_close(ptr); }
-};
 template <> struct default_delete<zip_file_t>
 {
     void operator()(zip_file_t* ptr) { zip_fclose(ptr); }
@@ -147,13 +143,13 @@ void xmlSecErrorsCallback(const char* file, int line, const char* func,
 namespace XmlSecIO
 {
 /// All callbacks work on this zip package.
-thread_local zip_t* zipArchive;
+thread_local zip::Archive* zipArchive;
 
 int match(const char* uri)
 {
     assert(zipArchive);
 
-    zip_int64_t signatureZipIndex = zip_name_locate(zipArchive, uri, 0);
+    zip_int64_t signatureZipIndex = zip_name_locate(zipArchive->get(), uri, 0);
     if (signatureZipIndex < 0)
     {
         return 0;
@@ -166,13 +162,14 @@ void* open(const char* uri)
 {
     assert(zipArchive);
 
-    zip_int64_t signatureZipIndex = zip_name_locate(zipArchive, uri, 0);
+    zip_int64_t signatureZipIndex = zip_name_locate(zipArchive->get(), uri, 0);
     if (signatureZipIndex < 0)
     {
         return nullptr;
     }
 
-    zip_file_t* zipFile(zip_fopen_index(zipArchive, signatureZipIndex, 0));
+    zip_file_t* zipFile(
+        zip_fopen_index(zipArchive->get(), signatureZipIndex, 0));
     if (zipFile == nullptr)
     {
         return nullptr;
@@ -203,7 +200,7 @@ int close(void* context)
 class XmlSecGuard
 {
   public:
-    explicit XmlSecGuard(zip_t* zipArchive, std::ostream* errorStream,
+    explicit XmlSecGuard(zip::Archive* zipArchive, std::ostream* errorStream,
                          Crypto& crypto)
         : _crypto(crypto)
     {
@@ -835,7 +832,7 @@ class ZipVerifier : public Verifier
 
     std::unique_ptr<zip::Source> _zipSource;
 
-    std::unique_ptr<zip_t> _zipArchive;
+    std::unique_ptr<zip::Archive> _zipArchive;
 
     std::string _errorString;
 
@@ -897,9 +894,7 @@ bool ZipVerifier::openZipMemory(const void* data, size_t size)
         return false;
     }
 
-    const int openFlags = 0;
-    _zipArchive.reset(
-        zip_open_from_source(_zipSource->get(), openFlags, zipError->get()));
+    _zipArchive = zip::Archive::create(_zipSource.get(), zipError.get());
     if (!_zipArchive)
     {
         _errorString = zipError->getString();
@@ -946,12 +941,12 @@ bool ZipVerifier::parseSignatures()
         return false;
     }
 
-    _zipFile.reset(zip_fopen_index(_zipArchive.get(), _signaturesZipIndex, 0));
+    _zipFile.reset(zip_fopen_index(_zipArchive->get(), _signaturesZipIndex, 0));
     if (!_zipFile)
     {
         std::stringstream ss;
         ss << "Can't open file at index " << _signaturesZipIndex << ":"
-           << zip_strerror(_zipArchive.get());
+           << zip_strerror(_zipArchive->get());
         _errorString = ss.str();
         return false;
     }
@@ -1009,7 +1004,7 @@ std::vector<std::unique_ptr<Signature>>& ZipVerifier::getSignatures()
 std::set<std::string> ZipVerifier::getStreams() const
 {
     std::set<std::string> streams;
-    zip_int64_t numEntries = zip_get_num_entries(_zipArchive.get(), 0);
+    zip_int64_t numEntries = zip_get_num_entries(_zipArchive->get(), 0);
     if (numEntries < 0)
     {
         return streams;
@@ -1017,7 +1012,7 @@ std::set<std::string> ZipVerifier::getStreams() const
 
     for (zip_int64_t entry = 0; entry < numEntries; ++entry)
     {
-        const char* name = zip_get_name(_zipArchive.get(), entry, 0);
+        const char* name = zip_get_name(_zipArchive->get(), entry, 0);
         if (name == nullptr)
         {
             continue;
@@ -1034,7 +1029,7 @@ std::set<std::string> ZipVerifier::getStreams() const
             continue;
         }
 
-        streams.insert(zip_get_name(_zipArchive.get(), entry, 0));
+        streams.insert(zip_get_name(_zipArchive->get(), entry, 0));
     }
     return streams;
 }
@@ -1043,7 +1038,7 @@ bool ZipVerifier::locateSignatures()
 {
     zip_flags_t locateFlags = 0;
     _signaturesZipIndex =
-        zip_name_locate(_zipArchive.get(), signaturesStreamName, locateFlags);
+        zip_name_locate(_zipArchive->get(), signaturesStreamName, locateFlags);
 
     return _signaturesZipIndex >= 0;
 }

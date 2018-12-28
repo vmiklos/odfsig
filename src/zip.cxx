@@ -79,6 +79,59 @@ std::unique_ptr<Source> Source::create(const void* data, size_t size,
 {
     return std::make_unique<ZipSource>(data, size, error);
 }
+
+/// Wrapper around libzip's zip_t.
+class ZipArchive : public Archive
+{
+  public:
+    ZipArchive(Source* source, Error* error);
+
+    ~ZipArchive() override;
+
+    zip_t* get() override;
+
+  private:
+    zip_t* _archive;
+};
+
+ZipArchive::ZipArchive(Source* source, Error* error) : _archive(nullptr)
+{
+    auto zipSource = dynamic_cast<zip::Source*>(source);
+    if (zipSource == nullptr)
+    {
+        return;
+    }
+
+    auto zipError = dynamic_cast<zip::Error*>(error);
+    if (zipError == nullptr)
+    {
+        return;
+    }
+
+    const int openFlags = 0;
+    _archive = zip_open_from_source(zipSource->get(), openFlags, error->get());
+}
+
+ZipArchive::~ZipArchive()
+{
+    if (_archive != nullptr)
+    {
+        zip_close(_archive);
+    }
+}
+
+zip_t* ZipArchive::get() { return _archive; }
+
+std::unique_ptr<Archive> Archive::create(Source* source, Error* error)
+{
+    auto archive = std::make_unique<ZipArchive>(source, error);
+    if (archive->get() != nullptr)
+    {
+        return archive;
+    }
+
+    return nullptr;
+}
 }
 }
 

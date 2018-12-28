@@ -14,6 +14,8 @@
 struct zip_error;
 // FIXME get rid of this
 struct zip_source;
+// FIXME get rid of this
+struct zip; // IWYU pragma: keep
 
 namespace odfsig
 {
@@ -45,6 +47,19 @@ class Source
 
     static std::unique_ptr<Source> create(const void* data, size_t size,
                                           Error* error);
+};
+
+/// Represents a ZIP archive, which consumes a source.
+class Archive
+{
+  public:
+    virtual ~Archive() = default;
+
+    // FIXME get rid of this
+    virtual struct zip* get() = 0;
+
+    /// Factory for this interface. If returns nullptr, error is set.
+    static std::unique_ptr<Archive> create(Source* source, Error* error);
 };
 }
 }
