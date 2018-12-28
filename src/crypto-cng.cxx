@@ -28,6 +28,10 @@ template <> struct default_delete<const CERT_CONTEXT>
 
 namespace odfsig
 {
+/**
+ * Crypto implementation using Microsoft Cryptography API: Next Generation
+ * (CNG).
+ */
 class CngCrypto : public Crypto
 {
   public:

@@ -77,6 +77,7 @@ std::string getFirefoxProfile(const std::string& cryptoConfig)
 
 namespace odfsig
 {
+/// Crypto implementation using Network Security Services (NSS).
 class NssCrypto : public Crypto
 {
   public:
