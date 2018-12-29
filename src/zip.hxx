@@ -6,6 +6,7 @@
  */
 
 #include <cstddef>
+#include <cstdint>
 
 #include <memory>
 #include <string>
@@ -16,6 +17,8 @@ struct zip_error;
 struct zip_source;
 // FIXME get rid of this
 struct zip; // IWYU pragma: keep
+// FIXME get rid of this
+struct zip_file; // IWYU pragma: keep
 
 namespace odfsig
 {
@@ -60,6 +63,19 @@ class Archive
 
     /// Factory for this interface. If returns nullptr, error is set.
     static std::unique_ptr<Archive> create(Source* source, Error* error);
+};
+
+/// Represents one stream in the ZIP archive.
+class File
+{
+  public:
+    virtual ~File() = default;
+
+    // FIXME get rid of this
+    virtual struct zip_file* get() = 0;
+
+    /// Factory for this interface. Returns nullptr, on failure.
+    static std::unique_ptr<File> create(Archive* archive, int64_t index);
 };
 }
 }

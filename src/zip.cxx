@@ -132,6 +132,52 @@ std::unique_ptr<Archive> Archive::create(Source* source, Error* error)
 
     return nullptr;
 }
+
+/// Wrapper around libzip's zip_file_t.
+class ZipFile : public File
+{
+  public:
+    ZipFile(Archive* archive, int64_t index);
+
+    ~ZipFile() override;
+
+    zip_file_t* get() override;
+
+  private:
+    zip_file_t* _file;
+};
+
+ZipFile::ZipFile(Archive* archive, int64_t index) : _file(nullptr)
+{
+    auto zipArchive = dynamic_cast<zip::Archive*>(archive);
+    if (zipArchive == nullptr)
+    {
+        return;
+    }
+
+    _file = zip_fopen_index(zipArchive->get(), index, 0);
+}
+
+ZipFile::~ZipFile()
+{
+    if (_file != nullptr)
+    {
+        zip_fclose(_file);
+    }
+}
+
+zip_file_t* ZipFile::get() { return _file; }
+
+std::unique_ptr<File> File::create(Archive* archive, int64_t index)
+{
+    auto file = std::make_unique<ZipFile>(archive, index);
+    if (file->get() != nullptr)
+    {
+        return file;
+    }
+
+    return nullptr;
+}
 }
 }
 

@@ -39,10 +39,6 @@
 
 namespace std
 {
-template <> struct default_delete<zip_file_t>
-{
-    void operator()(zip_file_t* ptr) { zip_fclose(ptr); }
-};
 template <> struct default_delete<xmlDoc>
 {
     void operator()(xmlDocPtr ptr) { xmlFreeDoc(ptr); }
@@ -168,30 +164,29 @@ void* open(const char* uri)
         return nullptr;
     }
 
-    zip_file_t* zipFile(
-        zip_fopen_index(zipArchive->get(), signatureZipIndex, 0));
+    std::unique_ptr<zip::File> zipFile =
+        zip::File::create(zipArchive, signatureZipIndex);
     if (zipFile == nullptr)
     {
         return nullptr;
     }
 
-    return zipFile;
+    return zipFile.release();
 }
 
 int read(void* context, char* buffer, int len)
 {
-    auto zipFile = static_cast<zip_file_t*>(context);
+    auto zipFile = static_cast<zip::File*>(context);
     assert(zipFile);
 
-    return zip_fread(zipFile, buffer, len);
+    return zip_fread(zipFile->get(), buffer, len);
 }
 
 int close(void* context)
 {
-    auto zipFile = static_cast<zip_file_t*>(context);
+    std::unique_ptr<zip::File> zipFile(static_cast<zip::File*>(context));
     assert(zipFile);
 
-    zip_fclose(zipFile);
     return 0;
 }
 };
@@ -844,7 +839,7 @@ class ZipVerifier : public Verifier
 
     std::unique_ptr<XmlSecGuard> _xmlSecGuard;
 
-    std::unique_ptr<zip_file_t> _zipFile;
+    std::unique_ptr<zip::File> _zipFile;
 
     std::vector<char> _signaturesBytes;
 
@@ -941,7 +936,7 @@ bool ZipVerifier::parseSignatures()
         return false;
     }
 
-    _zipFile.reset(zip_fopen_index(_zipArchive->get(), _signaturesZipIndex, 0));
+    _zipFile = zip::File::create(_zipArchive.get(), _signaturesZipIndex);
     if (!_zipFile)
     {
         std::stringstream ss;
@@ -954,7 +949,7 @@ bool ZipVerifier::parseSignatures()
     const int bufferSize = 8192;
     std::vector<char> readBuffer(bufferSize);
     zip_int64_t readSize;
-    while ((readSize = zip_fread(_zipFile.get(), readBuffer.data(),
+    while ((readSize = zip_fread(_zipFile->get(), readBuffer.data(),
                                  readBuffer.size())) > 0)
     {
         _signaturesBytes.insert(_signaturesBytes.end(), readBuffer.data(),
@@ -964,7 +959,7 @@ bool ZipVerifier::parseSignatures()
     {
         std::stringstream ss;
         ss << "Can't read file at index " << _signaturesZipIndex << ": "
-           << zip_file_strerror(_zipFile.get());
+           << zip_file_strerror(_zipFile->get());
         _errorString = ss.str();
         return false;
     }
