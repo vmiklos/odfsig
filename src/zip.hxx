@@ -17,8 +17,6 @@ struct zip_error;
 struct zip_source;
 // FIXME get rid of this
 struct zip; // IWYU pragma: keep
-// FIXME get rid of this
-struct zip_file; // IWYU pragma: keep
 
 namespace odfsig
 {
@@ -71,8 +69,9 @@ class File
   public:
     virtual ~File() = default;
 
-    // FIXME get rid of this
-    virtual struct zip_file* get() = 0;
+    virtual int64_t read(void* buffer, uint64_t length) = 0;
+
+    virtual std::string getErrorString() = 0;
 
     /// Factory for this interface. Returns nullptr, on failure.
     static std::unique_ptr<File> create(Archive* archive, int64_t index);

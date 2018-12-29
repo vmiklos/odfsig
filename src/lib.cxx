@@ -179,7 +179,7 @@ int read(void* context, char* buffer, int len)
     auto zipFile = static_cast<zip::File*>(context);
     assert(zipFile);
 
-    return zip_fread(zipFile->get(), buffer, len);
+    return zipFile->read(buffer, len);
 }
 
 int close(void* context)
@@ -949,8 +949,8 @@ bool ZipVerifier::parseSignatures()
     const int bufferSize = 8192;
     std::vector<char> readBuffer(bufferSize);
     zip_int64_t readSize;
-    while ((readSize = zip_fread(_zipFile->get(), readBuffer.data(),
-                                 readBuffer.size())) > 0)
+    while ((readSize = _zipFile->read(readBuffer.data(), readBuffer.size())) >
+           0)
     {
         _signaturesBytes.insert(_signaturesBytes.end(), readBuffer.data(),
                                 readBuffer.data() + readSize);
@@ -959,7 +959,7 @@ bool ZipVerifier::parseSignatures()
     {
         std::stringstream ss;
         ss << "Can't read file at index " << _signaturesZipIndex << ": "
-           << zip_file_strerror(_zipFile->get());
+           << _zipFile->getErrorString();
         _errorString = ss.str();
         return false;
     }

@@ -6,6 +6,8 @@
 
 #include "zip.hxx"
 
+#include <cassert>
+
 #include <zip.h>
 
 namespace odfsig
@@ -141,7 +143,11 @@ class ZipFile : public File
 
     ~ZipFile() override;
 
-    zip_file_t* get() override;
+    int64_t read(void* buffer, uint64_t length) override;
+
+    std::string getErrorString() override;
+
+    zip_file_t* get();
 
   private:
     zip_file_t* _file;
@@ -164,6 +170,20 @@ ZipFile::~ZipFile()
     {
         zip_fclose(_file);
     }
+}
+
+int64_t ZipFile::read(void* buffer, uint64_t length)
+{
+    assert(_file);
+
+    return zip_fread(_file, buffer, length);
+}
+
+std::string ZipFile::getErrorString()
+{
+    assert(_file);
+
+    return zip_file_strerror(_file);
 }
 
 zip_file_t* ZipFile::get() { return _file; }
