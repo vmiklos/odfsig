@@ -11,11 +11,6 @@
 #include <memory>
 #include <string>
 
-// FIXME get rid of this
-struct zip_error;
-// FIXME get rid of this
-struct zip_source;
-
 namespace odfsig
 {
 namespace zip
@@ -29,9 +24,6 @@ class Error
 
     virtual std::string getString() = 0;
 
-    // FIXME get rid of this
-    virtual zip_error* get() = 0;
-
     static std::unique_ptr<Error> create();
 };
 
@@ -40,9 +32,6 @@ class Source
 {
   public:
     virtual ~Source() = default;
-
-    // FIXME get rid of this
-    virtual zip_source* get() = 0;
 
     static std::unique_ptr<Source> create(const void* data, size_t size,
                                           Error* error);

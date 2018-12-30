@@ -30,8 +30,6 @@
 #include <xmlsec/xmldsig.h>
 #include <xmlsec/xmlsec.h>
 #include <xmlsec/xmltree.h>
-#include <zip.h>
-#include <zipconf.h>
 
 #include <odfsig/crypto.hxx>
 #include <odfsig/string.hxx>
@@ -832,7 +830,7 @@ class ZipVerifier : public Verifier
 
     std::string _errorString;
 
-    zip_int64_t _signaturesZipIndex = 0;
+    int64_t _signaturesZipIndex = 0;
 
     std::unique_ptr<XmlGuard> _xmlGuard;
 
@@ -897,7 +895,6 @@ bool ZipVerifier::openZipMemory(const void* data, size_t size)
         return false;
     }
 
-    zip_source_keep(_zipSource->get());
     return true;
 }
 
@@ -949,7 +946,7 @@ bool ZipVerifier::parseSignatures()
 
     const int bufferSize = 8192;
     std::vector<char> readBuffer(bufferSize);
-    zip_int64_t readSize;
+    int64_t readSize;
     while ((readSize = _zipFile->read(readBuffer.data(), readBuffer.size())) >
            0)
     {
@@ -1000,13 +997,13 @@ std::vector<std::unique_ptr<Signature>>& ZipVerifier::getSignatures()
 std::set<std::string> ZipVerifier::getStreams() const
 {
     std::set<std::string> streams;
-    zip_int64_t numEntries = _zipArchive->getNumEntries();
+    int64_t numEntries = _zipArchive->getNumEntries();
     if (numEntries < 0)
     {
         return streams;
     }
 
-    for (zip_int64_t entry = 0; entry < numEntries; ++entry)
+    for (int64_t entry = 0; entry < numEntries; ++entry)
     {
         std::string name = _zipArchive->getName(entry);
         if (ends_with(name, "/"))

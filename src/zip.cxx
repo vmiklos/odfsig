@@ -24,7 +24,7 @@ class ZipError : public Error
 
     std::string getString() override;
 
-    zip_error* get() override;
+    zip_error* get();
 
   private:
     zip_error_t _error;
@@ -48,7 +48,7 @@ class ZipSource : public Source
 
     ~ZipSource() override;
 
-    zip_source* get() override;
+    zip_source_t* get();
 
   private:
     zip_source_t* _source;
@@ -57,13 +57,13 @@ class ZipSource : public Source
 ZipSource::ZipSource(const void* data, size_t size, Error* error)
     : _source(nullptr)
 {
-    auto zipError = dynamic_cast<zip::Error*>(error);
+    auto zipError = dynamic_cast<zip::ZipError*>(error);
     if (zipError == nullptr)
     {
         return;
     }
 
-    _source = zip_source_buffer_create(data, size, 0, error->get());
+    _source = zip_source_buffer_create(data, size, 0, zipError->get());
 }
 
 ZipSource::~ZipSource()
@@ -74,7 +74,7 @@ ZipSource::~ZipSource()
     }
 }
 
-zip_source* ZipSource::get() { return _source; }
+zip_source_t* ZipSource::get() { return _source; }
 
 std::unique_ptr<Source> Source::create(const void* data, size_t size,
                                        Error* error)
@@ -106,20 +106,21 @@ class ZipArchive : public Archive
 
 ZipArchive::ZipArchive(Source* source, Error* error) : _archive(nullptr)
 {
-    auto zipSource = dynamic_cast<zip::Source*>(source);
+    auto zipSource = dynamic_cast<zip::ZipSource*>(source);
     if (zipSource == nullptr)
     {
         return;
     }
 
-    auto zipError = dynamic_cast<zip::Error*>(error);
+    auto zipError = dynamic_cast<zip::ZipError*>(error);
     if (zipError == nullptr)
     {
         return;
     }
 
     const int openFlags = 0;
-    _archive = zip_open_from_source(zipSource->get(), openFlags, error->get());
+    _archive =
+        zip_open_from_source(zipSource->get(), openFlags, zipError->get());
 }
 
 ZipArchive::~ZipArchive()
@@ -168,9 +169,11 @@ zip_t* ZipArchive::get() { return _archive; }
 
 std::unique_ptr<Archive> Archive::create(Source* source, Error* error)
 {
+    auto zipSource = dynamic_cast<zip::ZipSource*>(source);
     auto archive = std::make_unique<ZipArchive>(source, error);
     if (archive->get() != nullptr)
     {
+        zip_source_keep(zipSource->get());
         return archive;
     }
 
