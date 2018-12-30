@@ -35,15 +35,11 @@ do
                     wget https://github.com/vmiklos/odfsig/releases/download/v4.0/$TARNAME.tar.gz
                 fi
                 CWD=$PWD
-                cd /usr/lib/llvm-7
+                cd /usr
                 sudo tar xvf $CWD/$TARNAME.tar.gz
-                cd /usr/bin
-                sudo ln -s ../lib/llvm-7/bin/include-what-you-use .
                 # Make IWYU built against 7.0.0 work with 7.0.1 as well.
                 cd /usr/include/clang
                 sudo ln -s 7.0.1 7.0.0
-                # Log what is the selected GCC installation.
-                include-what-you-use -v || true
                 cd $CWD
             fi
             ;;
