@@ -15,8 +15,6 @@
 struct zip_error;
 // FIXME get rid of this
 struct zip_source;
-// FIXME get rid of this
-struct zip; // IWYU pragma: keep
 
 namespace odfsig
 {
@@ -56,8 +54,13 @@ class Archive
   public:
     virtual ~Archive() = default;
 
-    // FIXME get rid of this
-    virtual struct zip* get() = 0;
+    virtual int64_t locateName(const char* name) = 0;
+
+    virtual std::string getErrorString() = 0;
+
+    virtual int64_t getNumEntries() = 0;
+
+    virtual std::string getName(int64_t index) = 0;
 
     /// Factory for this interface. If returns nullptr, error is set.
     static std::unique_ptr<Archive> create(Source* source, Error* error);

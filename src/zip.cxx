@@ -90,7 +90,15 @@ class ZipArchive : public Archive
 
     ~ZipArchive() override;
 
-    zip_t* get() override;
+    int64_t locateName(const char* name) override;
+
+    std::string getErrorString() override;
+
+    int64_t getNumEntries() override;
+
+    std::string getName(int64_t index) override;
+
+    zip_t* get();
 
   private:
     zip_t* _archive;
@@ -120,6 +128,40 @@ ZipArchive::~ZipArchive()
     {
         zip_close(_archive);
     }
+}
+
+int64_t ZipArchive::locateName(const char* name)
+{
+    assert(_archive);
+
+    return zip_name_locate(_archive, name, 0);
+}
+
+std::string ZipArchive::getErrorString()
+{
+    assert(_archive);
+
+    return zip_strerror(_archive);
+}
+
+int64_t ZipArchive::getNumEntries()
+{
+    assert(_archive);
+
+    return zip_get_num_entries(_archive, 0);
+}
+
+std::string ZipArchive::getName(int64_t index)
+{
+    assert(_archive);
+
+    const char* name = zip_get_name(_archive, index, 0);
+    if (name == nullptr)
+    {
+        return std::string();
+    }
+
+    return name;
 }
 
 zip_t* ZipArchive::get() { return _archive; }
@@ -155,7 +197,7 @@ class ZipFile : public File
 
 ZipFile::ZipFile(Archive* archive, int64_t index) : _file(nullptr)
 {
-    auto zipArchive = dynamic_cast<zip::Archive*>(archive);
+    auto zipArchive = dynamic_cast<zip::ZipArchive*>(archive);
     if (zipArchive == nullptr)
     {
         return;

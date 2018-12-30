@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstdint>
 #include <cstring>
 #include <fstream>
 #include <iterator>
@@ -145,7 +146,7 @@ int match(const char* uri)
 {
     assert(zipArchive);
 
-    zip_int64_t signatureZipIndex = zip_name_locate(zipArchive->get(), uri, 0);
+    int64_t signatureZipIndex = zipArchive->locateName(uri);
     if (signatureZipIndex < 0)
     {
         return 0;
@@ -158,7 +159,7 @@ void* open(const char* uri)
 {
     assert(zipArchive);
 
-    zip_int64_t signatureZipIndex = zip_name_locate(zipArchive->get(), uri, 0);
+    int64_t signatureZipIndex = zipArchive->locateName(uri);
     if (signatureZipIndex < 0)
     {
         return nullptr;
@@ -941,7 +942,7 @@ bool ZipVerifier::parseSignatures()
     {
         std::stringstream ss;
         ss << "Can't open file at index " << _signaturesZipIndex << ":"
-           << zip_strerror(_zipArchive->get());
+           << _zipArchive->getErrorString();
         _errorString = ss.str();
         return false;
     }
@@ -999,7 +1000,7 @@ std::vector<std::unique_ptr<Signature>>& ZipVerifier::getSignatures()
 std::set<std::string> ZipVerifier::getStreams() const
 {
     std::set<std::string> streams;
-    zip_int64_t numEntries = zip_get_num_entries(_zipArchive->get(), 0);
+    zip_int64_t numEntries = _zipArchive->getNumEntries();
     if (numEntries < 0)
     {
         return streams;
@@ -1007,33 +1008,25 @@ std::set<std::string> ZipVerifier::getStreams() const
 
     for (zip_int64_t entry = 0; entry < numEntries; ++entry)
     {
-        const char* name = zip_get_name(_zipArchive->get(), entry, 0);
-        if (name == nullptr)
+        std::string name = _zipArchive->getName(entry);
+        if (ends_with(name, "/"))
         {
             continue;
         }
 
-        std::string stream(name);
-        if (ends_with(stream, "/"))
+        if (name == signaturesStreamName)
         {
             continue;
         }
 
-        if (stream == signaturesStreamName)
-        {
-            continue;
-        }
-
-        streams.insert(zip_get_name(_zipArchive->get(), entry, 0));
+        streams.insert(name);
     }
     return streams;
 }
 
 bool ZipVerifier::locateSignatures()
 {
-    zip_flags_t locateFlags = 0;
-    _signaturesZipIndex =
-        zip_name_locate(_zipArchive->get(), signaturesStreamName, locateFlags);
+    _signaturesZipIndex = _zipArchive->locateName(signaturesStreamName);
 
     return _signaturesZipIndex >= 0;
 }
