@@ -29,17 +29,33 @@ do
             cmake_args+=" -DODFSIG_IWYU=ON"
             run_iwyu="y"
 
-            if [ ! -e "/usr/bin/include-what-you-use" ]; then
-                TARNAME="include-what-you-use-0.11-x86_64-linux-gnu-ubuntu-14.04"
-                if [ ! -e $TARNAME.tar.gz ]; then
-                    wget https://github.com/vmiklos/odfsig/releases/download/v4.0/$TARNAME.tar.gz
-                fi
+            if [ -z "$(type -p include-what-you-use)" ]; then
                 CWD=$PWD
-                cd /usr
-                sudo tar xvf $CWD/$TARNAME.tar.gz
-                # Make IWYU built against 7.0.0 work with 7.0.1 as well.
-                cd /usr/include/clang
-                sudo ln -s 7.0.1 7.0.0
+                TARNAME="include-what-you-use-0.11.src.tar.gz"
+                TARPATH="$CWD/extern/tarballs/$TARNAME"
+                if [ ! -e $TARPATH ]; then
+                    mkdir -p extern/tarballs
+                    wget -O $TARPATH https://include-what-you-use.org/downloads/$TARNAME
+                fi
+                rm -rf iwyu
+                mkdir -p iwyu
+                cd iwyu
+                tar xvf $TARPATH
+                cd include-what-you-use
+                mkdir workdir
+                cd workdir
+                cmake \
+                    -DCMAKE_INSTALL_PREFIX=$CWD/iwyu/install \
+                    -DCMAKE_BUILD_TYPE=Release \
+                    -DCMAKE_PREFIX_PATH=/usr/lib/llvm-7 \
+                    -DCMAKE_C_COMPILER="clang-7" \
+                    -DCMAKE_CXX_COMPILER="clang++-7" \
+                    ..
+                make -j$(getconf _NPROCESSORS_ONLN)
+                make install
+                cd $CWD/iwyu/install
+                ln -s /usr/lib .
+                export PATH=$PATH:$CWD/iwyu/install/bin
                 cd $CWD
             fi
             ;;
