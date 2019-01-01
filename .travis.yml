@@ -23,7 +23,6 @@ matrix:
   - name: "linux gcc iwyu"
     os: linux
     env: TRAVIS_ARGS="--debug --werror --iwyu"
-    sudo: true
   - name: "macos release"
     os: osx
     osx_image: xcode9.3
@@ -41,7 +40,7 @@ addons:
             - g++-7
             - clang-tidy-7
             - valgrind
-            # for iwyu
+            # iwyu build-time dependencies
             - llvm-7-dev
             - libclang-7-dev
             - clang-7
