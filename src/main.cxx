@@ -249,7 +249,6 @@ int main(const std::vector<const char*>& args, std::ostream& ostream)
         odfsig::Verifier::create(cryptoConfig));
     verifier->setTrustedDers(options.getTrustedDers());
     verifier->setInsecure(options.isInsecure());
-    verifier->setLogger(ostream);
 
     if (!verifier->openZip(options.getOdfPath()))
     {
