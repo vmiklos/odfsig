@@ -21,21 +21,21 @@ class Signature
   public:
     virtual ~Signature() = default;
 
-    virtual const std::string& getErrorString() const = 0;
+    [[nodiscard]] virtual const std::string& getErrorString() const = 0;
 
     virtual bool verify() = 0;
 
     virtual bool verifyXAdES() = 0;
 
-    virtual std::string getSubjectName() const = 0;
+    [[nodiscard]] virtual std::string getSubjectName() const = 0;
 
-    virtual std::string getDate() const = 0;
+    [[nodiscard]] virtual std::string getDate() const = 0;
 
-    virtual std::string getMethod() const = 0;
+    [[nodiscard]] virtual std::string getMethod() const = 0;
 
-    virtual std::string getType() const = 0;
+    [[nodiscard]] virtual std::string getType() const = 0;
 
-    virtual std::set<std::string> getSignedStreams() const = 0;
+    [[nodiscard]] virtual std::set<std::string> getSignedStreams() const = 0;
 };
 
 /// Verifies signatures of an ODF document.
@@ -50,7 +50,7 @@ class Verifier
     /// Opens in-memory data.
     virtual bool openZipMemory(const void* data, size_t size) = 0;
 
-    virtual const std::string& getErrorString() const = 0;
+    [[nodiscard]] virtual const std::string& getErrorString() const = 0;
 
     /**
      * List of file paths representing DER CA chains to trust, useful when the
@@ -70,7 +70,7 @@ class Verifier
      * Returns all streams in an ODF document (except the signature stream
      * itself).
      */
-    virtual std::set<std::string> getStreams() const = 0;
+    [[nodiscard]] virtual std::set<std::string> getStreams() const = 0;
 
     /**
      * cryptoConfig can be a path to a crypto DB, in which case no need to

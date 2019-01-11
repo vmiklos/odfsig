@@ -207,7 +207,7 @@ class XmlSecGuard
         }
     }
 
-    bool isGood() const { return _good; }
+    [[nodiscard]] bool isGood() const { return _good; }
 
   private:
     bool _good = false;
@@ -222,21 +222,21 @@ class XmlSignature : public Signature
                           std::vector<std::string> trustedDers, bool insecure);
     ~XmlSignature() override;
 
-    const std::string& getErrorString() const override;
+    [[nodiscard]] const std::string& getErrorString() const override;
 
     bool verify() override;
 
     bool verifyXAdES() override;
 
-    std::string getSubjectName() const override;
+    [[nodiscard]] std::string getSubjectName() const override;
 
-    std::string getDate() const override;
+    [[nodiscard]] std::string getDate() const override;
 
-    std::string getMethod() const override;
+    [[nodiscard]] std::string getMethod() const override;
 
-    std::string getType() const override;
+    [[nodiscard]] std::string getType() const override;
 
-    std::set<std::string> getSignedStreams() const override;
+    [[nodiscard]] std::set<std::string> getSignedStreams() const override;
 
   private:
     std::string getObjectDate(xmlNode* objectNode) const;
@@ -250,9 +250,9 @@ class XmlSignature : public Signature
 
     xmlNodePtr getObjectCertDigestNode(xmlNode* objectNode) const;
 
-    xmlNodePtr getCertDigestNode() const;
+    [[nodiscard]] xmlNodePtr getCertDigestNode() const;
 
-    xmlNodePtr getX509CertificateNode() const;
+    [[nodiscard]] xmlNodePtr getX509CertificateNode() const;
 
     bool getCertificateBinary(std::vector<xmlChar>& certificate) const;
 
@@ -756,7 +756,7 @@ class ZipVerifier : public Verifier
 
     bool openZipMemory(const void* data, size_t size) override;
 
-    const std::string& getErrorString() const override;
+    [[nodiscard]] const std::string& getErrorString() const override;
 
     void setTrustedDers(const std::vector<std::string>& trustedDers) override;
 
@@ -766,7 +766,7 @@ class ZipVerifier : public Verifier
 
     std::vector<std::unique_ptr<Signature>>& getSignatures() override;
 
-    std::set<std::string> getStreams() const override;
+    [[nodiscard]] std::set<std::string> getStreams() const override;
 
   private:
     bool locateSignatures();

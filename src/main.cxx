@@ -128,21 +128,21 @@ class Options
 {
   public:
     void setOdfPath(const std::string& odfPath) { _odfPath = odfPath; }
-    const std::string& getOdfPath() const { return _odfPath; }
+    [[nodiscard]] const std::string& getOdfPath() const { return _odfPath; }
     void appendTrustedDer(const std::string& trustedDer)
     {
         _trustedDers.push_back(trustedDer);
     }
-    const std::vector<std::string>& getTrustedDers() const
+    [[nodiscard]] const std::vector<std::string>& getTrustedDers() const
     {
         return _trustedDers;
     }
     void setInsecure(bool insecure) { _insecure = insecure; }
-    bool isInsecure() const { return _insecure; }
+    [[nodiscard]] bool isInsecure() const { return _insecure; }
     void setHelp(bool help) { _help = help; }
-    bool isHelp() const { return _help; }
+    [[nodiscard]] bool isHelp() const { return _help; }
     void setVersion(bool version) { _version = version; }
-    bool isVersion() const { return _version; }
+    [[nodiscard]] bool isVersion() const { return _version; }
 
   private:
     std::string _odfPath;
