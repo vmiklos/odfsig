@@ -9,12 +9,14 @@ if (ODFSIG_ENABLE_CCACHE)
     endif ()
 endif ()
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 if (WIN32)
     # more or less equivalent of the below -Wall and -Wextra
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
     # would warn on e.g. getenv()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_CRT_SECURE_NO_DEPRECATE")
+    # would warn on <codecvt> usage
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING")
     # possible loss of data, libzip vs libxml2 different int types
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -wd4244")
     if (ODFSIG_ENABLE_WERROR)
