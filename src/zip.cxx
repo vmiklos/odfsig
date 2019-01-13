@@ -10,9 +10,7 @@
 
 #include <zip.h>
 
-namespace odfsig
-{
-namespace zip
+namespace odfsig::zip
 {
 /// Wrapper around libzip's zip_error_t.
 class ZipError : public Error
@@ -242,7 +240,6 @@ std::unique_ptr<File> File::create(Archive* archive, int64_t index)
     }
 
     return nullptr;
-}
 }
 }
 
