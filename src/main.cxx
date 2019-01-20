@@ -124,27 +124,8 @@ bool printSignatures(
     return true;
 }
 
-class Options
+struct Options
 {
-  public:
-    void setOdfPath(const std::string& odfPath) { _odfPath = odfPath; }
-    [[nodiscard]] const std::string& getOdfPath() const { return _odfPath; }
-    void appendTrustedDer(const std::string& trustedDer)
-    {
-        _trustedDers.push_back(trustedDer);
-    }
-    [[nodiscard]] const std::vector<std::string>& getTrustedDers() const
-    {
-        return _trustedDers;
-    }
-    void setInsecure(bool insecure) { _insecure = insecure; }
-    [[nodiscard]] bool isInsecure() const { return _insecure; }
-    void setHelp(bool help) { _help = help; }
-    [[nodiscard]] bool isHelp() const { return _help; }
-    void setVersion(bool version) { _version = version; }
-    [[nodiscard]] bool isVersion() const { return _version; }
-
-  private:
     std::string _odfPath;
     std::vector<std::string> _trustedDers;
     bool _insecure = false;
@@ -167,19 +148,19 @@ bool parseOptions(const std::vector<const char*>& args, Options& options,
         else if (inTrustedDer)
         {
             inTrustedDer = false;
-            options.appendTrustedDer(argString);
+            options._trustedDers.push_back(argString);
         }
         else if (argString == "--insecure")
         {
-            options.setInsecure(true);
+            options._insecure = true;
         }
         else if (argString == "--help")
         {
-            options.setHelp(true);
+            options._help = true;
         }
         else if (argString == "--version")
         {
-            options.setVersion(true);
+            options._version = true;
         }
         else if (odfsig::starts_with(argString, "--"))
         {
@@ -189,7 +170,7 @@ bool parseOptions(const std::vector<const char*>& args, Options& options,
         }
         else
         {
-            options.setOdfPath(argString);
+            options._odfPath = argString;
         }
     }
 
@@ -221,13 +202,13 @@ int main(const std::vector<const char*>& args, std::ostream& ostream)
     {
         return 2;
     }
-    if (options.isHelp())
+    if (options._help)
     {
         usage(args[0], ostream);
         return 0;
     }
 
-    if (options.isVersion())
+    if (options._version)
     {
         ostream << "odfsig version " << ODFSIG_VERSION_MAJOR << "."
                 << ODFSIG_VERSION_MINOR;
@@ -247,12 +228,12 @@ int main(const std::vector<const char*>& args, std::ostream& ostream)
     }
     std::unique_ptr<odfsig::Verifier> verifier(
         odfsig::Verifier::create(cryptoConfig));
-    verifier->setTrustedDers(options.getTrustedDers());
-    verifier->setInsecure(options.isInsecure());
+    verifier->setTrustedDers(options._trustedDers);
+    verifier->setInsecure(options._insecure);
 
-    if (!verifier->openZip(options.getOdfPath()))
+    if (!verifier->openZip(options._odfPath))
     {
-        ostream << "Can't open zip archive '" << options.getOdfPath()
+        ostream << "Can't open zip archive '" << options._odfPath
                 << "': " << verifier->getErrorString() << "." << std::endl;
         return 1;
     }
@@ -265,8 +246,8 @@ int main(const std::vector<const char*>& args, std::ostream& ostream)
     }
 
     std::set<std::string> streams = verifier->getStreams();
-    if (!printSignatures(options.getOdfPath(), streams,
-                         verifier->getSignatures(), ostream))
+    if (!printSignatures(options._odfPath, streams, verifier->getSignatures(),
+                         ostream))
     {
         return 1;
     }
