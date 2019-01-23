@@ -126,7 +126,7 @@ bool printSignatures(
 
 struct Options
 {
-    std::string _odfPath;
+    std::vector<std::string> _odfPaths;
     std::vector<std::string> _trustedDers;
     bool _insecure = false;
     bool _help = false;
@@ -138,8 +138,15 @@ bool parseOptions(const std::vector<const char*>& args, Options& options,
                   std::ostream& ostream)
 {
     bool inTrustedDer = false;
+    bool first = true;
     for (const auto& arg : args)
     {
+        if (first)
+        {
+            first = false;
+            continue;
+        }
+
         std::string argString(arg);
         if (argString == "--trusted-der")
         {
@@ -170,7 +177,7 @@ bool parseOptions(const std::vector<const char*>& args, Options& options,
         }
         else
         {
-            options._odfPath = argString;
+            options._odfPaths.push_back(argString);
         }
     }
 
@@ -226,30 +233,34 @@ int main(const std::vector<const char*>& args, std::ostream& ostream)
     {
         cryptoConfig = home;
     }
-    std::unique_ptr<odfsig::Verifier> verifier(
-        odfsig::Verifier::create(cryptoConfig));
-    verifier->setTrustedDers(options._trustedDers);
-    verifier->setInsecure(options._insecure);
 
-    if (!verifier->openZip(options._odfPath))
+    for (const auto& odfPath : options._odfPaths)
     {
-        ostream << "Can't open zip archive '" << options._odfPath
-                << "': " << verifier->getErrorString() << "." << std::endl;
-        return 1;
-    }
+        std::unique_ptr<odfsig::Verifier> verifier(
+            odfsig::Verifier::create(cryptoConfig));
+        verifier->setTrustedDers(options._trustedDers);
+        verifier->setInsecure(options._insecure);
 
-    if (!verifier->parseSignatures())
-    {
-        ostream << "Failed to parse signatures: " << verifier->getErrorString()
-                << "." << std::endl;
-        return 1;
-    }
+        if (!verifier->openZip(odfPath))
+        {
+            ostream << "Can't open zip archive '" << odfPath
+                    << "': " << verifier->getErrorString() << "." << std::endl;
+            return 1;
+        }
 
-    std::set<std::string> streams = verifier->getStreams();
-    if (!printSignatures(options._odfPath, streams, verifier->getSignatures(),
-                         ostream))
-    {
-        return 1;
+        if (!verifier->parseSignatures())
+        {
+            ostream << "Failed to parse signatures: "
+                    << verifier->getErrorString() << "." << std::endl;
+            return 1;
+        }
+
+        std::set<std::string> streams = verifier->getStreams();
+        if (!printSignatures(odfPath, streams, verifier->getSignatures(),
+                             ostream))
+        {
+            return 1;
+        }
     }
 
     return 0;

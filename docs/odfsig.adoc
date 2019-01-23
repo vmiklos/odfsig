@@ -6,7 +6,7 @@ odfsig - Open Document Format (ODF) digital signatures tool
 
 == SYNOPSIS
 
-odfsig [options] <ODF-file>
+odfsig [options] <ODF-file>...
 
 == DESCRIPTION
 
@@ -32,8 +32,8 @@ following locations:
 
 == EXIT STATUS
 
-The exit status is 0 if all signatures are valid, 1 if at least one signature
-is invalid, and 2 if an error occurred.
+The exit status is 0 if all signatures of all files are valid, 1 if at least
+one signature is invalid, and 2 if an error occurred.
 
 == LICENSE
 

@@ -160,6 +160,17 @@ TEST(OdfsigTest, testCmdlineBad)
     ASSERT_EQ(1, odfsig::main(args, ss));
 }
 
+TEST(OdfsigTest, testCmdlineBadMulti)
+{
+    // Bad and good files.
+    std::vector<const char*> args{"odfsig", "--trusted-der",
+                                  "tests/keys/ca-chain.cert.der",
+                                  "tests/data/bad.odt", "tests/data/good.odt"};
+    std::stringstream ss;
+    // This failed, only the last file was verified.
+    ASSERT_EQ(1, odfsig::main(args, ss));
+}
+
 TEST(OdfsigTest, testCmdlineBadPath)
 {
     // Non-existing path.
