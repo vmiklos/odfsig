@@ -1,5 +1,9 @@
 = Version descriptions
 
+== 5.0
+
+- Can validate multiple files in one go
+
 == 4.0
 
 - Initial XAdES certificate hash verify support
