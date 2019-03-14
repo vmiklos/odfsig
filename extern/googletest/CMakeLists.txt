@@ -17,10 +17,10 @@ else ()
         PATCH_COMMAND ${PATCH_EXECUTABLE}
             ${CMAKE_CURRENT_SOURCE_DIR}/msvc-debug.patch
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
-        BUILD_IN_SOURCE ON
         CONFIGURE_COMMAND ${CMAKE_COMMAND}
             -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
             -Dgtest_force_shared_crt=ON
+            <SOURCE_DIR>
         )
 
     ExternalProject_Get_Property(extern-googletest-project INSTALL_DIR)

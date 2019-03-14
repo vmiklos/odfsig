@@ -17,10 +17,10 @@ else ()
         PATCH_COMMAND ${PATCH_EXECUTABLE}
             ${CMAKE_CURRENT_SOURCE_DIR}/msvc-debug.patch
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
-        BUILD_IN_SOURCE ON
         CONFIGURE_COMMAND ${CMAKE_COMMAND}
             -DCMAKE_DEBUG_POSTFIX=
             -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+            <SOURCE_DIR>
         )
     add_library(z STATIC IMPORTED)
     ExternalProject_Get_Property(extern-zlib-project INSTALL_DIR)

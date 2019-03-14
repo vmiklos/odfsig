@@ -1,9 +1,9 @@
-# Copyright 2018 Miklos Vajna. All rights reserved.
+# Copyright 2019 Miklos Vajna. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-set(LIBZIP_VERSION 1.5.1)
-set(LIBZIP_SHA256SUM 47eaa45faa448c72bd6906e5a096846c469a185f293cafd8456abb165841b3f2)
+set(LIBZIP_VERSION 1.5.2)
+set(LIBZIP_SHA256SUM be694a4abb2ffe5ec02074146757c8b56084dbcebf329123c84b205417435e15)
 
 if (NOT ODFSIG_INTERNAL_LIBZIP)
     find_package(PkgConfig REQUIRED)
@@ -17,20 +17,19 @@ else ()
         set(ZLIB_ROOT -DZLIB_ROOT=${INSTALL_DIR})
     endif ()
     ExternalProject_Add(extern-libzip-project
-        URL https://github.com/vmiklos/odfsig/releases/download/v4.0/libzip-${LIBZIP_VERSION}.tar.gz
+        URL https://libzip.org/download/libzip-${LIBZIP_VERSION}.tar.gz
         URL_HASH SHA256=${LIBZIP_SHA256SUM}
-        PATCH_COMMAND ${PATCH_EXECUTABLE}
-            ${CMAKE_CURRENT_SOURCE_DIR}/add-an-option-to-disable-bzip2-support.patch
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
-        BUILD_IN_SOURCE ON
         CONFIGURE_COMMAND ${CMAKE_COMMAND}
             -DBUILD_SHARED_LIBS=OFF
             -DENABLE_GNUTLS=OFF
             -DENABLE_OPENSSL=OFF
             -DENABLE_COMMONCRYPTO=OFF
+            -DENABLE_WINDOWS_CRYPTO=OFF
             -DENABLE_BZIP2=OFF
             ${ZLIB_ROOT}
             -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+            <SOURCE_DIR>
         DEPENDS extern-zlib-project
         )
     ExternalProject_Get_Property(extern-libzip-project INSTALL_DIR)
