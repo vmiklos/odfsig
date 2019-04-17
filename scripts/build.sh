@@ -31,7 +31,7 @@ do
 
             if [ -z "$(type -p include-what-you-use)" ]; then
                 CWD=$PWD
-                TARNAME="include-what-you-use-0.11.src.tar.gz"
+                TARNAME="include-what-you-use-0.12.src.tar.gz"
                 TARPATH="$CWD/extern/tarballs/$TARNAME"
                 if [ ! -e $TARPATH ]; then
                     mkdir -p extern/tarballs
@@ -47,9 +47,9 @@ do
                 cmake \
                     -DCMAKE_INSTALL_PREFIX=$CWD/iwyu/install \
                     -DCMAKE_BUILD_TYPE=Release \
-                    -DCMAKE_PREFIX_PATH=/usr/lib/llvm-7 \
-                    -DCMAKE_C_COMPILER="clang-7" \
-                    -DCMAKE_CXX_COMPILER="clang++-7" \
+                    -DCMAKE_PREFIX_PATH=/usr/lib/llvm-8 \
+                    -DCMAKE_C_COMPILER="clang-8" \
+                    -DCMAKE_CXX_COMPILER="clang++-8" \
                     ..
                 make -j$(getconf _NPROCESSORS_ONLN)
                 make install
@@ -75,9 +75,9 @@ do
             ;;
         --tidy)
             if [ "$CC" = "gcc-7" ]; then
-                export CC=clang-7
-                export CXX=clang++-7
-                run_clang_tidy=run-clang-tidy-7
+                export CC=clang-8
+                export CXX=clang++-8
+                run_clang_tidy=run-clang-tidy-8
             else
                 export CC=clang
                 export CXX=clang++

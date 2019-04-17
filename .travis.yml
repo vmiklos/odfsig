@@ -35,15 +35,15 @@ addons:
     apt:
         sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-7
+            - llvm-toolchain-trusty-8
         packages:
             - g++-7
-            - clang-tidy-7
+            - clang-tidy-8
             - valgrind
             # iwyu build-time dependencies
-            - llvm-7-dev
-            - libclang-7-dev
-            - clang-7
+            - llvm-8-dev
+            - libclang-8-dev
+            - clang-8
 deploy:
   provider: releases
   api_key:
