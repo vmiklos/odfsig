@@ -820,9 +820,18 @@ bool ZipVerifier::openZip(const std::string& path)
         return false;
     }
 
-    _zipContents = std::vector<char>((std::istreambuf_iterator<char>(stream)),
-                                     std::istreambuf_iterator<char>());
-    return openZipMemory(_zipContents.data(), _zipContents.size());
+    try
+    {
+        _zipContents =
+            std::vector<char>((std::istreambuf_iterator<char>(stream)),
+                              std::istreambuf_iterator<char>());
+        return openZipMemory(_zipContents.data(), _zipContents.size());
+    }
+    catch (std::ios_base::failure& failure)
+    {
+        _errorString = failure.what();
+        return false;
+    }
 }
 
 bool ZipVerifier::openZipMemory(const void* data, size_t size)

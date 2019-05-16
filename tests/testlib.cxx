@@ -198,6 +198,14 @@ TEST(OdfsigTest, testCmdlineBadArg)
     ASSERT_EQ(2, odfsig::main(args, ss));
 }
 
+TEST(OdfsigTest, testCmdlineDirArg)
+{
+    // Directory argument.
+    std::vector<const char*> args{"odfsig", "tests/data/"};
+    std::stringstream ss;
+    ASSERT_EQ(1, odfsig::main(args, ss));
+}
+
 TEST(OdfsigTest, testCmdlineNonZip)
 {
     // Input is not a ZIP file: this used to crash.
