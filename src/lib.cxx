@@ -239,16 +239,16 @@ class XmlSignature : public Signature
     [[nodiscard]] std::set<std::string> getSignedStreams() const override;
 
   private:
-    std::string getObjectDate(xmlNode* objectNode) const;
+    static std::string getObjectDate(xmlNode* objectNode);
 
-    std::string
-    getSignaturePropertiesDate(xmlNode* signaturePropertiesNode) const;
+    static std::string
+    getSignaturePropertiesDate(xmlNode* signaturePropertiesNode);
 
-    std::string getSignaturePropertyDate(xmlNode* signaturePropertyNode) const;
+    static std::string getSignaturePropertyDate(xmlNode* signaturePropertyNode);
 
-    std::string getDateContent(xmlNode* dateNode) const;
+    static std::string getDateContent(xmlNode* dateNode);
 
-    xmlNodePtr getObjectCertDigestNode(xmlNode* objectNode) const;
+    static xmlNodePtr getObjectCertDigestNode(xmlNode* objectNode);
 
     [[nodiscard]] xmlNodePtr getCertDigestNode() const;
 
@@ -256,13 +256,13 @@ class XmlSignature : public Signature
 
     bool getCertificateBinary(std::vector<xmlChar>& certificate) const;
 
-    bool getDigestValue(xmlNodePtr certDigest,
-                        std::vector<xmlChar>& value) const;
+    static bool getDigestValue(xmlNodePtr certDigest,
+                        std::vector<xmlChar>& value);
 
-    std::unique_ptr<xmlChar> getDigestAlgo(xmlNodePtr certDigest) const;
+    static std::unique_ptr<xmlChar> getDigestAlgo(xmlNodePtr certDigest);
 
-    bool hash(const std::vector<xmlChar>& in, std::unique_ptr<xmlChar> algo,
-              std::vector<unsigned char>& out) const;
+    static bool hash(const std::vector<xmlChar>& in, std::unique_ptr<xmlChar> algo,
+              std::vector<unsigned char>& out);
 
     std::string _errorString;
 
@@ -378,7 +378,7 @@ xmlNodePtr XmlSignature::getCertDigestNode() const
 }
 
 bool XmlSignature::getDigestValue(xmlNodePtr certDigest,
-                                  std::vector<xmlChar>& value) const
+                                  std::vector<xmlChar>& value)
 {
     xmlNode* digestValueNode =
         xmlSecFindChild(certDigest, xmlSecNodeDigestValue, xmlSecDSigNs);
@@ -411,7 +411,7 @@ bool XmlSignature::getDigestValue(xmlNodePtr certDigest,
 }
 
 std::unique_ptr<xmlChar>
-XmlSignature::getDigestAlgo(xmlNodePtr certDigest) const
+XmlSignature::getDigestAlgo(xmlNodePtr certDigest)
 {
     xmlNode* digestMethodNode =
         xmlSecFindChild(certDigest, xmlSecNodeDigestMethod, xmlSecDSigNs);
@@ -432,7 +432,7 @@ XmlSignature::getDigestAlgo(xmlNodePtr certDigest) const
 
 bool XmlSignature::hash(const std::vector<xmlChar>& in,
                         std::unique_ptr<xmlChar> algo,
-                        std::vector<unsigned char>& out) const
+                        std::vector<unsigned char>& out)
 {
     std::unique_ptr<xmlSecTransformCtx> transform(xmlSecTransformCtxCreate());
     if (!transform)
@@ -606,7 +606,7 @@ std::string XmlSignature::getType() const
     return std::string("XML-DSig");
 }
 
-xmlNodePtr XmlSignature::getObjectCertDigestNode(xmlNode* objectNode) const
+xmlNodePtr XmlSignature::getObjectCertDigestNode(xmlNode* objectNode)
 {
     const xmlChar* qualifyingPropertiesNodeName =
         BAD_CAST("QualifyingProperties");
@@ -676,7 +676,7 @@ std::string XmlSignature::getDate() const
     return std::string();
 }
 
-std::string XmlSignature::getObjectDate(xmlNode* objectNode) const
+std::string XmlSignature::getObjectDate(xmlNode* objectNode)
 {
     for (xmlNode* objectChild = objectNode->children; objectChild != nullptr;
          objectChild = objectChild->next)
@@ -697,7 +697,7 @@ std::string XmlSignature::getObjectDate(xmlNode* objectNode) const
     return std::string();
 }
 
-std::string XmlSignature::getDateContent(xmlNode* dateNode) const
+std::string XmlSignature::getDateContent(xmlNode* dateNode)
 {
     std::unique_ptr<xmlChar> content(xmlNodeGetContent(dateNode));
     if (!content)
@@ -709,7 +709,7 @@ std::string XmlSignature::getDateContent(xmlNode* dateNode) const
 }
 
 std::string
-XmlSignature::getSignaturePropertiesDate(xmlNode* signaturePropertiesNode) const
+XmlSignature::getSignaturePropertiesDate(xmlNode* signaturePropertiesNode)
 {
     const xmlChar* signaturePropertyNodeName = BAD_CAST("SignatureProperty");
 
@@ -734,7 +734,7 @@ XmlSignature::getSignaturePropertiesDate(xmlNode* signaturePropertiesNode) const
 }
 
 std::string
-XmlSignature::getSignaturePropertyDate(xmlNode* signaturePropertyNode) const
+XmlSignature::getSignaturePropertyDate(xmlNode* signaturePropertyNode)
 {
     xmlNode* dateNode =
         xmlSecFindChild(signaturePropertyNode, dateNodeName, dateNsName);
