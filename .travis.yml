@@ -20,9 +20,9 @@ matrix:
   - name: "linux clang tidy"
     os: linux
     env: TRAVIS_ARGS="--debug --werror --tidy"
-  - name: "linux gcc iwyu"
-    os: linux
-    env: TRAVIS_ARGS="--debug --werror --iwyu"
+#  - name: "linux gcc iwyu"
+#    os: linux
+#    env: TRAVIS_ARGS="--debug --werror --iwyu"
   - name: "macos release"
     os: osx
     osx_image: xcode9.3
