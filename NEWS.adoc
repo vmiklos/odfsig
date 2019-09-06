@@ -1,5 +1,9 @@
 = Version descriptions
 
+== 6.0
+
+- Don't crash on directory argument
+
 == 5.0
 
 - Can validate multiple files in one go
