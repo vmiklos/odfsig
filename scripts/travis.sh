@@ -6,8 +6,8 @@
 # Baseline: Ubuntu Trusty 14.04 and macOS 10.13.
 
 if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-    export CC=gcc-7
-    export CXX=g++-7
+    export CC=gcc-8
+    export CXX=g++-8
 fi
 
 scripts/build.sh "$@"

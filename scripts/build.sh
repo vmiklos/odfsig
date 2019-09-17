@@ -74,7 +74,7 @@ do
             cmake_args+=" -DODFSIG_INTERNAL_XMLSEC=ON -DODFSIG_INTERNAL_LIBXML2=ON -DODFSIG_FUZZ=ON"
             ;;
         --tidy)
-            if [ "$CC" = "gcc-7" ]; then
+            if [ "$CC" = "gcc-8" ]; then
                 export CC=clang-8
                 export CXX=clang++-8
                 run_clang_tidy=run-clang-tidy-8
