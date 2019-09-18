@@ -37,7 +37,7 @@ addons:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-trusty-8
         packages:
-            - g++-8
+            - g++-9
             - clang-tidy-8
             - valgrind
             # iwyu build-time dependencies
