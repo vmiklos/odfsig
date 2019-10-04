@@ -1,8 +1,8 @@
 diff --git a/googletest/cmake/internal_utils.cmake b/googletest/cmake/internal_utils.cmake
-index 8c1f9ba..0b3722f 100644
+index 2f70f0b0..fb5c54e8 100644
 --- a/googletest/cmake/internal_utils.cmake
 +++ b/googletest/cmake/internal_utils.cmake
-@@ -163,10 +163,6 @@ function(cxx_library_with_type name type cxx_flags)
+@@ -151,10 +151,6 @@ function(cxx_library_with_type name type cxx_flags)
    set_target_properties(${name}
      PROPERTIES
      COMPILE_FLAGS "${cxx_flags}")
@@ -10,6 +10,6 @@ index 8c1f9ba..0b3722f 100644
 -  set_target_properties(${name}
 -    PROPERTIES
 -    DEBUG_POSTFIX "d")
-   if (BUILD_SHARED_LIBS OR type STREQUAL "SHARED")
-     set_target_properties(${name}
-       PROPERTIES
+   # Set the output directory for build artifacts
+   set_target_properties(${name}
+     PROPERTIES
