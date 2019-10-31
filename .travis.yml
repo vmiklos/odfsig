@@ -1,3 +1,4 @@
+dist: xenial
 language: cpp
 script:
     - scripts/travis.sh $TRAVIS_ARGS --internal-libs
@@ -35,15 +36,16 @@ addons:
     apt:
         sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-8
+            - sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
+              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
         packages:
             - g++-9
-            - clang-tidy-8
+            - clang-tidy-9
             - valgrind
             # iwyu build-time dependencies
-            - llvm-8-dev
-            - libclang-8-dev
-            - clang-8
+            - llvm-9-dev
+            - libclang-9-dev
+            - clang-9
 deploy:
   provider: releases
   api_key:

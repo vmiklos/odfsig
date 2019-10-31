@@ -3,7 +3,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-# Baseline: Ubuntu Trusty 14.04 and macOS 10.13.
+# Baseline: Ubuntu Xenial 16.04 and macOS 10.13.
 
 if [ "$TRAVIS_OS_NAME" = "linux" ]; then
     export CC=gcc-9
