@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-set(LIBXML2_VERSION 2.9.9)
-set(LIBXML2_SHA256SUM 94fb70890143e3c6549f265cee93ec064c80a84c42ad0f23e85ee1fd6540a871)
+set(LIBXML2_VERSION 2.9.10)
+set(LIBXML2_SHA256SUM aafee193ffb8fe0c82d4afef6ef91972cbaf5feea100edc2f262750611b4be1f)
 
 if (NOT ODFSIG_INTERNAL_LIBXML2)
     find_package(PkgConfig REQUIRED)
