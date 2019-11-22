@@ -2,6 +2,7 @@
 
 image:https://travis-ci.com/vmiklos/odfsig.svg?branch=master["Build Status", link="https://travis-ci.com/vmiklos/odfsig"]
 image:https://ci.appveyor.com/api/projects/status/l0wvhclvvo0hi46o/branch/master?svg=true["Build Status", link="https://ci.appveyor.com/project/MiklosVajna/odfsig/branch/master"]
+image:https://tokei.rs/b1/github/vmiklos/odfsig?category=code["LoC"]
 
 Open Document Format (ODF) digital signatures tool
 
