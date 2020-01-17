@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-set(NSS_VERSION 3.48)
-set(NSS_SHA256SUM a97f96d81c77954fd7aba7ab7310b2e9ab066347bc604c3c5174877113c47f4c)
+set(NSS_VERSION 3.49.1)
+set(NSS_SHA256SUM c4bb99762b3edaea1cb69329a698b8bbf06ee1647e0e4a51aa2469ee1a3ae36c)
 
 if (NOT ODFSIG_INTERNAL_NSS)
     find_package(PkgConfig REQUIRED)
@@ -34,7 +34,7 @@ else ()
 
     # NSS_DISABLE_GTESTS=1 gives us a 2m13s speedup.
     ExternalProject_Add(extern-nss-project
-        URL https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_48_RTM/src/nss-${NSS_VERSION}-with-nspr-4.24.tar.gz
+        URL https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_49_1_RTM/src/nss-${NSS_VERSION}-with-nspr-4.24.tar.gz
         URL_HASH SHA256=${NSS_SHA256SUM}
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON
