@@ -60,7 +60,7 @@ template <> struct default_delete<xmlSecTransformCtx>
         xmlSecTransformCtxDestroy(ptr);
     }
 };
-}
+} // namespace std
 
 namespace
 {
@@ -81,7 +81,7 @@ const char* fromXmlChar(const xmlChar* s)
 {
     return reinterpret_cast<const char*>(s);
 }
-}
+} // namespace
 
 namespace odfsig
 {
@@ -139,7 +139,7 @@ void* open(const char* uri)
 
 int read(void* context, char* buffer, int len)
 {
-    auto zipFile = static_cast<zip::File*>(context);
+    auto* zipFile = static_cast<zip::File*>(context);
     assert(zipFile);
 
     return zipFile->read(buffer, len);
@@ -152,7 +152,7 @@ int close(void* context)
 
     return 0;
 }
-};
+}; // namespace XmlSecIO
 
 /// Performs libxmlsec init/deinit.
 class XmlSecGuard
@@ -257,12 +257,13 @@ class XmlSignature : public Signature
     bool getCertificateBinary(std::vector<xmlChar>& certificate) const;
 
     static bool getDigestValue(xmlNodePtr certDigest,
-                        std::vector<xmlChar>& value);
+                               std::vector<xmlChar>& value);
 
     static std::unique_ptr<xmlChar> getDigestAlgo(xmlNodePtr certDigest);
 
-    static bool hash(const std::vector<xmlChar>& in, std::unique_ptr<xmlChar> algo,
-              std::vector<unsigned char>& out);
+    static bool hash(const std::vector<xmlChar>& in,
+                     std::unique_ptr<xmlChar> algo,
+                     std::vector<unsigned char>& out);
 
     std::string _errorString;
 
@@ -410,8 +411,7 @@ bool XmlSignature::getDigestValue(xmlNodePtr certDigest,
     return true;
 }
 
-std::unique_ptr<xmlChar>
-XmlSignature::getDigestAlgo(xmlNodePtr certDigest)
+std::unique_ptr<xmlChar> XmlSignature::getDigestAlgo(xmlNodePtr certDigest)
 {
     xmlNode* digestMethodNode =
         xmlSecFindChild(certDigest, xmlSecNodeDigestMethod, xmlSecDSigNs);
@@ -980,6 +980,6 @@ bool ZipVerifier::locateSignatures()
 
     return _signaturesZipIndex >= 0;
 }
-}
+} // namespace odfsig
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

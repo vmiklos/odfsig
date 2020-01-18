@@ -55,7 +55,7 @@ class ZipSource : public Source
 ZipSource::ZipSource(const void* data, size_t size, Error* error)
     : _source(nullptr)
 {
-    auto zipError = dynamic_cast<zip::ZipError*>(error);
+    auto* zipError = dynamic_cast<zip::ZipError*>(error);
     if (zipError == nullptr)
     {
         return;
@@ -104,13 +104,13 @@ class ZipArchive : public Archive
 
 ZipArchive::ZipArchive(Source* source, Error* error) : _archive(nullptr)
 {
-    auto zipSource = dynamic_cast<zip::ZipSource*>(source);
+    auto* zipSource = dynamic_cast<zip::ZipSource*>(source);
     if (zipSource == nullptr)
     {
         return;
     }
 
-    auto zipError = dynamic_cast<zip::ZipError*>(error);
+    auto* zipError = dynamic_cast<zip::ZipError*>(error);
     if (zipError == nullptr)
     {
         return;
@@ -167,7 +167,7 @@ zip_t* ZipArchive::get() { return _archive; }
 
 std::unique_ptr<Archive> Archive::create(Source* source, Error* error)
 {
-    auto zipSource = dynamic_cast<zip::ZipSource*>(source);
+    auto* zipSource = dynamic_cast<zip::ZipSource*>(source);
     auto archive = std::make_unique<ZipArchive>(source, error);
     if (archive->get() != nullptr)
     {
@@ -198,7 +198,7 @@ class ZipFile : public File
 
 ZipFile::ZipFile(Archive* archive, int64_t index) : _file(nullptr)
 {
-    auto zipArchive = dynamic_cast<zip::ZipArchive*>(archive);
+    auto* zipArchive = dynamic_cast<zip::ZipArchive*>(archive);
     if (zipArchive == nullptr)
     {
         return;
@@ -241,6 +241,6 @@ std::unique_ptr<File> File::create(Archive* archive, int64_t index)
 
     return nullptr;
 }
-}
+} // namespace odfsig::zip
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
