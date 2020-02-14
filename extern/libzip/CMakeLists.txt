@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-set(LIBZIP_VERSION 1.6.0)
-set(LIBZIP_SHA256SUM 70c4bb351dec256fb727053a161faa14c6fe244988b12943800aafc5ccbf5aff)
+set(LIBZIP_VERSION 1.6.1)
+set(LIBZIP_SHA256SUM 06eb8e9141fd19e2788cabaea9c9c2fd4d488d9e1484eb474bbfcac78e7b1d88)
 
 if (NOT ODFSIG_INTERNAL_LIBZIP)
     find_package(PkgConfig REQUIRED)
