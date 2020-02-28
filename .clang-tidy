@@ -1,12 +1,10 @@
 ---
-# modernize-use-equals-delete will ignore macros only in LLVM 8
 # modernize-use-trailing-return-type: more cost than benefit
 # bugprone-reserved-identifier produces errors for legit xmlsec code
 Checks: "clang-diagnostic-*,\
 performance-*,\
 unused-*,\
 modernize-*,\
--modernize-use-equals-delete,\
 -modernize-use-trailing-return-type,\
 misc-*,\
 bugprone-*,\
