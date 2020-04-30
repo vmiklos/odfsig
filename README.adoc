@@ -39,3 +39,7 @@ odfsig has been used on a variety of platforms:
 
 Use of this source code is governed by a BSD-style license that can be found in
 the LICENSE file.
+
+== Download
+
+From https://github.com/vmiklos/odfsig[GitHub].
