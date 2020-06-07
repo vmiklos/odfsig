@@ -36,16 +36,16 @@ addons:
     apt:
         sources:
             - ubuntu-toolchain-r-test
-            - sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
+            - sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-10 main'
               key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
         packages:
             - g++-9
-            - clang-tidy-9
+            - clang-tidy-10
             - valgrind
             # iwyu build-time dependencies
-            - llvm-9-dev
-            - libclang-9-dev
-            - clang-9
+            - llvm-10-dev
+            - libclang-10-dev
+            - clang-10
 deploy:
   provider: releases
   api_key:
