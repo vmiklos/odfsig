@@ -68,7 +68,7 @@ class File
     /// Factory for this interface. Returns nullptr, on failure.
     static std::unique_ptr<File> create(Archive* archive, int64_t index);
 };
-}
-}
+} // namespace zip
+} // namespace odfsig
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

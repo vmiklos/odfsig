@@ -24,7 +24,7 @@ template <> struct default_delete<const CERT_CONTEXT>
         CertFreeCertificateContext(ptr);
     }
 };
-}
+} // namespace std
 
 namespace odfsig
 {
@@ -118,6 +118,6 @@ std::unique_ptr<Crypto> Crypto::create()
 {
     return std::unique_ptr<Crypto>(new CngCrypto());
 }
-}
+} // namespace odfsig
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

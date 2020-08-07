@@ -30,7 +30,7 @@ template <> struct default_delete<CERTCertificate>
 {
     void operator()(CERTCertificate* ptr) { CERT_DestroyCertificate(ptr); }
 };
-}
+} // namespace std
 
 namespace
 {
@@ -74,7 +74,7 @@ std::string getFirefoxProfile(const std::string& cryptoConfig)
 
     return std::string();
 }
-}
+} // namespace
 
 namespace odfsig
 {
@@ -155,6 +155,6 @@ std::unique_ptr<Crypto> Crypto::create()
 {
     return std::unique_ptr<Crypto>(new NssCrypto());
 }
-}
+} // namespace odfsig
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -33,6 +33,6 @@ void replace_all(std::string& str, const std::string& from,
         index += to.size();
     }
 }
-}
+} // namespace odfsig
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

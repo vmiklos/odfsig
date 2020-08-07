@@ -42,6 +42,6 @@ class Crypto
 
     static std::unique_ptr<Crypto> create();
 };
-}
+} // namespace odfsig
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

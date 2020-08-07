@@ -192,7 +192,7 @@ void usage(const std::string& self, std::ostream& ostream)
             << std::endl;
     ostream << "--insecure: do not validate certificates" << std::endl;
 }
-}
+} // namespace
 
 namespace odfsig
 {
@@ -265,6 +265,6 @@ int main(const std::vector<const char*>& args, std::ostream& ostream)
 
     return 0;
 }
-}
+} // namespace odfsig
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
