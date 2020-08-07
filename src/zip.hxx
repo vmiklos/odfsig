@@ -11,9 +11,7 @@
 #include <memory>
 #include <string>
 
-namespace odfsig
-{
-namespace zip
+namespace odfsig::zip
 {
 
 /// Represents a ZIP error.
@@ -68,7 +66,6 @@ class File
     /// Factory for this interface. Returns nullptr, on failure.
     static std::unique_ptr<File> create(Archive* archive, int64_t index);
 };
-} // namespace zip
-} // namespace odfsig
+} // namespace odfsig::zip
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
