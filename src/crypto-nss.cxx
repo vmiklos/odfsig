@@ -6,6 +6,7 @@
 
 #include <odfsig/crypto.hxx>
 
+#include <algorithm>
 #include <fstream>
 #include <memory>
 #include <sstream>
@@ -122,15 +123,13 @@ bool NssCrypto::initializeKeysManager(xmlSecKeysMngr* keysManager,
         return false;
     }
 
-    for (const auto& trustedDer : trustedDers)
-    {
-        if (xmlSecNssAppKeysMngrCertLoad(keysManager, trustedDer.c_str(),
-                                         xmlSecKeyDataFormatDer,
-                                         xmlSecKeyDataTypeTrusted) < 0)
-        {
-            return false;
-        }
-    }
+    return std::all_of(trustedDers.begin(), trustedDers.end(),
+                       [keysManager](const std::string& trustedDer) {
+                           return xmlSecNssAppKeysMngrCertLoad(
+                                      keysManager, trustedDer.c_str(),
+                                      xmlSecKeyDataFormatDer,
+                                      xmlSecKeyDataTypeTrusted) >= 0;
+                       });
 
     return true;
 }
