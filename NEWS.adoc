@@ -1,5 +1,9 @@
 = Version descriptions
 
+== master
+
+- Update bundled googletest, libxml2, libxmlsec, libzip, nss and xmlsec to latest versions
+
 == 6.0
 
 - Don't crash on directory argument
