@@ -1,6 +1,6 @@
 = Version descriptions
 
-== master
+== 7.0
 
 - Update bundled googletest, libxml2, libxmlsec, libzip, nss and xmlsec to latest versions
 
