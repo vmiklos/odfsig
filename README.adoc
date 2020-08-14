@@ -5,6 +5,9 @@ image:https://ci.appveyor.com/api/projects/status/l0wvhclvvo0hi46o/branch/master
 
 Open Document Format (ODF) digital signatures tool
 
+The latest version is v7.0, released on 2020-08-08.  See the
+https://github.com/vmiklos/odfsig/blob/master/NEWS.adoc[release notes].
+
 == Description
 
 odfsig verifies the digital signatures in an ODF document.
