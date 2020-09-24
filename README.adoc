@@ -1,0 +1,21 @@
+= pdfiumsig
+
+Example code, demoing how to use the set of pdfium signature APIs from
+<https://pdfium.googlesource.com/pdfium/+/refs/heads/master/public/fpdf_signature.h>.
+
+The test files:
+
+- 2good.pdf: 2 good signatures. Technically the 1st signature doesn't cover the whole document, but
+  it's considered as a complete signature at high-level.
+
+- bad.pdf: digest mismatch
+
+- good.pdf: matching digest
+
+- partial-in-between.pdf: 1st signature is partial
+
+- reason.pdf: custom signature reason
+
+This is not complete signature verification, for example no verification of the x509 certificate is
+done. NSS is used for crypto operations, mostly because that's what I (Miklos) am familiar with.
+Could be anything else as well. ;-)
