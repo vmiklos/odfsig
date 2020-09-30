@@ -57,3 +57,6 @@ deploy:
     condition:
     - "$TRAVIS_DEPLOY == y"
     tags: true
+branches:
+  only:
+    - master
