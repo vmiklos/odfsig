@@ -43,5 +43,5 @@ deploy:
 
 branches:
   except:
-    # build e.g. master, but not for/master
-    - /for\/.*/
+    # build e.g. master, but not private/vmiklos/master
+    - /private\/.*/
