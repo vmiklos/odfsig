@@ -40,3 +40,8 @@ deploy:
   on:
     appveyor_repo_tag: true
     configuration: Release
+
+branches:
+  except:
+    # build e.g. master, but not for/master
+    - /for\/.*/
