@@ -58,5 +58,6 @@ deploy:
     - "$TRAVIS_DEPLOY == y"
     tags: true
 branches:
-  only:
-    - master
+  except:
+    # build e.g. master, but not for/master
+    - /for\/.*/
