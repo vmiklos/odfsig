@@ -45,4 +45,4 @@ scripts/extern.py
 workdir/bin/odfsigfuzz -max_len=16384 tests/data/
 ----
 
-NOTE: this requires a `--fuzz` build.
+NOTE: This requires a `--fuzz` build.
