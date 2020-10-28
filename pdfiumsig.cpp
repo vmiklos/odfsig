@@ -290,6 +290,11 @@ void validateSignature(const std::vector<unsigned char>& bytes,
     std::cerr << "  - Signature Time: " << time_buf.data() << std::endl;
   }
 
+  int docmdp_permission = FPDFSignatureObj_GetDocMDPPermission(signature);
+  if (docmdp_permission > 0) {
+    std::cerr << "  - DocMDP Permission: " << docmdp_permission << std::endl;
+  }
+
   validateByteRanges(bytes, byte_ranges, contents);
 }
 
