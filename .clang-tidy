@@ -1,6 +1,7 @@
 ---
 # modernize-use-trailing-return-type: more cost than benefit
 # bugprone-reserved-identifier produces errors for legit xmlsec code
+# readability-function-cognitive-complexity too noisy
 Checks: "clang-diagnostic-*,\
 performance-*,\
 unused-*,\
@@ -10,6 +11,7 @@ misc-*,\
 bugprone-*,\
 -bugprone-reserved-identifier,\
 readability-*,\
+-readability-function-cognitive-complexity,\
 "
 WarningsAsErrors: '*'
 
