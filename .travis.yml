@@ -46,6 +46,9 @@ addons:
             - llvm-10-dev
             - libclang-10-dev
             - clang-10
+            # nss build-time dependencies
+            - gyp
+            - ninja
 deploy:
   provider: releases
   api_key:

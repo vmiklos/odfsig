@@ -31,8 +31,15 @@ else ()
     else ()
         if (ODFSIG_INTERNAL_NSS)
             ExternalProject_Get_Property(extern-nss-project SOURCE_DIR)
+            if (APPLE)
+                set(ODFSIG_XMLSEC_NSS_OBJDIR out)
+                set(ODFSIG_XMLSEC_NSS_NSPR_CFLAGS -I${SOURCE_DIR}/dist/${ODFSIG_XMLSEC_NSS_OBJDIR}/include)
+            else ()
+                set(ODFSIG_XMLSEC_NSS_OBJDIR Release)
+                set(ODFSIG_XMLSEC_NSS_NSPR_CFLAGS -I${SOURCE_DIR}/dist/${ODFSIG_XMLSEC_NSS_OBJDIR}/include/nspr)
+            endif ()
             set(ODFSIG_INTERNAL_XMLSEC_NSS
-                NSPR_CFLAGS=-I${SOURCE_DIR}/dist/out/include
+                NSPR_CFLAGS=${ODFSIG_XMLSEC_NSS_NSPR_CFLAGS}
                 NSPR_LIBS=-L${CMAKE_BINARY_DIR}/bin\ -lnspr4
                 NSS_CFLAGS=-I${SOURCE_DIR}/dist/public/nss
                 NSS_LIBS=-L${CMAKE_BINARY_DIR}/bin\ -lsmime3\ -lnss3\ -lnssutil3

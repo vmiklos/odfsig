@@ -16,23 +16,38 @@ else ()
     elseif (APPLE)
         set(ODFSIG_MACOS_SDK MACOS_SDK_DIR=${CMAKE_OSX_SYSROOT})
         set(ODFSIG_MACOS_NSPR_SUBDIR out/)
+        set(ODFSIG_NSS_OBJDIR_NAME out)
+        set(ODFSIG_NSS_LIBDIR lib)
+        # NSS_DISABLE_GTESTS=1 gives us a 2m13s speedup.
+        set(ODFSIG_NSS_BUILD_COMMAND $(MAKE) -j1 -C nss nss_build_all BUILD_OPT=1 USE_64=1 OBJDIR_NAME=out NSS_DISABLE_GTESTS=1 ${ODFSIG_LINUX_CC} ${ODFSIG_LINUX_CXX} ${ODFSIG_MACOS_SDK})
+        set(EXTERNALPROJECT_INSTALL_MACOS
+            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/lib/libnssdbm3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+        )
+        set(INSTALL_PROGRAMS_MACOS
+            ${CMAKE_BINARY_DIR}/bin/libnssdbm3${CMAKE_SHARED_LIBRARY_SUFFIX}
+        )
+        set(ODFSIG_NSS_NSPR_INCLUDE dist/${ODFSIG_NSS_OBJDIR_NAME}/include)
     else ()
 	# Drop compiler arguments (e.g. sanitizers) on Linux, as NSS build
 	# would break with them.
         set(ODFSIG_LINUX_CC CC=${CMAKE_C_COMPILER})
         set(ODFSIG_LINUX_CXX CXX=${CMAKE_CXX_COMPILER})
 
+        # TODO: --static
+        set(ODFSIG_NSS_BUILD_COMMAND nss/build.sh --opt --disable-tests)
+        set(ODFSIG_NSS_OBJDIR_NAME Release)
+        set(ODFSIG_NSS_LIBDIR lib64)
         set(EXTERNALPROJECT_INSTALL_LINUX
-            COMMAND install -v -m755 dist/out/lib/libfreeblpriv3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libsqlite3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/Release/lib/libfreeblpriv3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/Release/lib/libsqlite3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
         )
         set(INSTALL_PROGRAMS_LINUX
             ${CMAKE_BINARY_DIR}/bin/libfreeblpriv3${CMAKE_SHARED_LIBRARY_SUFFIX}
             ${CMAKE_BINARY_DIR}/bin/libsqlite3${CMAKE_SHARED_LIBRARY_SUFFIX}
         )
+        set(ODFSIG_NSS_NSPR_INCLUDE dist/${ODFSIG_NSS_OBJDIR_NAME}/include/nspr)
     endif ()
 
-    # NSS_DISABLE_GTESTS=1 gives us a 2m13s speedup.
     ExternalProject_Add(extern-nss-project
         URL https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_59_RTM/src/nss-${NSS_VERSION}-with-nspr-4.29.tar.gz
         URL_HASH SHA256=${NSS_SHA256SUM}
@@ -41,21 +56,21 @@ else ()
         CONFIGURE_COMMAND
             echo NOP
         BUILD_COMMAND
-            $(MAKE) -j1 -C nss nss_build_all BUILD_OPT=1 USE_64=1 OBJDIR_NAME=out NSS_DISABLE_GTESTS=1 ${ODFSIG_LINUX_CC} ${ODFSIG_LINUX_CXX} ${ODFSIG_MACOS_SDK}
+            ${ODFSIG_NSS_BUILD_COMMAND}
         INSTALL_COMMAND
             COMMAND mkdir -p ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}
-            COMMAND install -v -m755 dist/out/lib/libfreebl3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libnspr4${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}
-            COMMAND install -v -m755 dist/out/lib/libnss3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libnssckbi${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libnssdbm3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libnssutil3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libplc4${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}
-            COMMAND install -v -m755 dist/out/lib/libplds4${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}
-            COMMAND install -v -m755 dist/out/lib/libsmime3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libsoftokn3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/out/lib/libssl3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/lib/libfreebl3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/${ODFSIG_NSS_LIBDIR}/libnspr4${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}
+            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/lib/libnss3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/lib/libnssckbi${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/lib/libnssutil3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/${ODFSIG_NSS_LIBDIR}/libplc4${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}
+            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/${ODFSIG_NSS_LIBDIR}/libplds4${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}
+            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/lib/libsmime3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/lib/libsoftokn3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
+            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/lib/libssl3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
             ${EXTERNALPROJECT_INSTALL_LINUX}
+            ${EXTERNALPROJECT_INSTALL_MACOS}
         )
 
     if (NOT WIN32)
@@ -63,12 +78,12 @@ else ()
             ${CMAKE_BINARY_DIR}/bin/libfreebl3${CMAKE_SHARED_LIBRARY_SUFFIX}
             ${CMAKE_BINARY_DIR}/bin/libnss3${CMAKE_SHARED_LIBRARY_SUFFIX}
             ${CMAKE_BINARY_DIR}/bin/libnssckbi${CMAKE_SHARED_LIBRARY_SUFFIX}
-            ${CMAKE_BINARY_DIR}/bin/libnssdbm3${CMAKE_SHARED_LIBRARY_SUFFIX}
             ${CMAKE_BINARY_DIR}/bin/libnssutil3${CMAKE_SHARED_LIBRARY_SUFFIX}
             ${CMAKE_BINARY_DIR}/bin/libsmime3${CMAKE_SHARED_LIBRARY_SUFFIX}
             ${CMAKE_BINARY_DIR}/bin/libsoftokn3${CMAKE_SHARED_LIBRARY_SUFFIX}
             ${CMAKE_BINARY_DIR}/bin/libssl3${CMAKE_SHARED_LIBRARY_SUFFIX}
             ${INSTALL_PROGRAMS_LINUX}
+            ${INSTALL_PROGRAMS_MACOS}
             DESTINATION ${CMAKE_INSTALL_BINDIR})
         install(PROGRAMS
             ${CMAKE_BINARY_DIR}/bin/libfreebl3${CMAKE_SHARED_LIBRARY_SUFFIX}
@@ -106,7 +121,7 @@ else ()
 
     ExternalProject_Get_Property(extern-nss-project SOURCE_DIR)
     set(NSS_INCLUDE_DIRS
-        ${SOURCE_DIR}/dist/out/include
+        ${SOURCE_DIR}/${ODFSIG_NSS_NSPR_INCLUDE}
         ${SOURCE_DIR}/dist/public/nss
         )
     set(NSS_LIBRARIES
