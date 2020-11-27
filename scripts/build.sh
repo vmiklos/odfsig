@@ -113,6 +113,10 @@ if [ -n "$run_valgrind" ]; then
     valgrind --leak-check=full --error-exitcode=1 workdir/bin/odfsigtest
     cd -
 else
+    if [ "$(uname -s)" == "Linux" ]; then
+        # TODO link NSS statically or fix the rpath on libnss3.so.
+        export LD_LIBRARY_PATH=$PWD/bin
+    fi
     make check
 fi
 make install
