@@ -1,0 +1,23 @@
+name: tests
+on:
+  push:
+    branches-ignore:
+      - 'private/**'
+  pull_request:
+    branches-ignore:
+      - 'private/**'
+jobs:
+  linux-gcc-release:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run make check
+        run: |
+          scripts/ci-build.sh
+  # TODO: linux-clang-debug
+  # TODO: linux-clang-asan-ubsan
+  # TODO: linux-valgrind
+  # TODO: linux-clang-tidy
+  # TODO: linux-gcc-iwyu
+  # TODO: macos-release
+  # TODO: macos-debug
