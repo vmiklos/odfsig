@@ -5,7 +5,11 @@
 
 # Baseline: Ubuntu 18.04 and macOS 10.13.
 
-scripts/build.sh "$@" --internal-libs
+if [ "$GITHUB_JOB" == "linux-gcc-release" ]; then
+    CI_ARGS="--werror"
+fi
+
+scripts/build.sh "$@" $CI_ARGS --internal-libs
 
 # TODO
 #if [ "$TRAVIS_DEPLOY" = "y" ]; then
