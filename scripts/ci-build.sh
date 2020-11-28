@@ -13,6 +13,8 @@ if [ "$GITHUB_JOB" == "linux-gcc-release" ]; then
     CI_ARGS="--werror"
 elif [ "$GITHUB_JOB" == "linux-clang-debug" ]; then
     CI_ARGS="--debug --werror --clang"
+elif [ "$GITHUB_JOB" == "linux-clang-asan-ubsan" ]; then
+    CI_ARGS="--debug --werror --asan-ubsan"
 fi
 
 scripts/build.sh "$@" $CI_ARGS --internal-libs

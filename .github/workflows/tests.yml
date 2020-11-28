@@ -21,7 +21,13 @@ jobs:
       - name: Run make check
         run: |
           scripts/ci-build.sh
-  # TODO: linux-clang-asan-ubsan
+  linux-clang-asan-ubsan:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run make check
+        run: |
+          scripts/ci-build.sh
   # TODO: linux-valgrind
   # TODO: linux-clang-tidy
   # TODO: linux-gcc-iwyu
