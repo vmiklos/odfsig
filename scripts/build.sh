@@ -108,15 +108,15 @@ if [ -n "$run_iwyu" ]; then
 else
     make -j$(getconf _NPROCESSORS_ONLN)
 fi
+if [ "$(uname -s)" == "Linux" ]; then
+    # TODO link NSS statically or fix the rpath on libnss3.so.
+    export LD_LIBRARY_PATH=$PWD/bin
+fi
 if [ -n "$run_valgrind" ]; then
     cd ..
     valgrind --leak-check=full --error-exitcode=1 workdir/bin/odfsigtest
     cd -
 else
-    if [ "$(uname -s)" == "Linux" ]; then
-        # TODO link NSS statically or fix the rpath on libnss3.so.
-        export LD_LIBRARY_PATH=$PWD/bin
-    fi
     make check
 fi
 make install

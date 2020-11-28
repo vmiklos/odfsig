@@ -28,7 +28,13 @@ jobs:
       - name: Run make check
         run: |
           scripts/ci-build.sh
-  # TODO: linux-valgrind
+  linux-valgrind:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run make check
+        run: |
+          scripts/ci-build.sh
   # TODO: linux-clang-tidy
   # TODO: linux-gcc-iwyu
   # TODO: macos-release
