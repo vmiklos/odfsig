@@ -6,7 +6,10 @@
 # Baseline: Ubuntu 18.04 and macOS 10.13.
 
 if [ -n "${GITHUB_WORKFLOW}" -a "$(uname -s)" == "Linux" ]; then
-    sudo apt-get install clang-tidy
+    sudo apt-get install \
+        clang-tidy \
+        valgrind \
+
 fi
 
 if [ "$GITHUB_JOB" == "linux-gcc-release" ]; then
@@ -15,6 +18,8 @@ elif [ "$GITHUB_JOB" == "linux-clang-debug" ]; then
     CI_ARGS="--debug --werror --clang"
 elif [ "$GITHUB_JOB" == "linux-clang-asan-ubsan" ]; then
     CI_ARGS="--debug --werror --asan-ubsan"
+elif [ "$GITHUB_JOB" == "linux-valgrind" ]; then
+    CI_ARGS="--debug --werror --valgrind"
 fi
 
 scripts/build.sh "$@" $CI_ARGS --internal-libs
