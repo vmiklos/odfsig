@@ -20,6 +20,8 @@ elif [ "$GITHUB_JOB" == "linux-clang-asan-ubsan" ]; then
     CI_ARGS="--debug --werror --asan-ubsan"
 elif [ "$GITHUB_JOB" == "linux-valgrind" ]; then
     CI_ARGS="--debug --werror --valgrind"
+elif [ "$GITHUB_JOB" == "linux-clang-tidy" ]; then
+    CI_ARGS="--debug --werror --tidy"
 fi
 
 scripts/build.sh "$@" $CI_ARGS --internal-libs
