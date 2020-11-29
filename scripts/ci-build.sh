@@ -22,13 +22,15 @@ elif [ "$GITHUB_JOB" == "linux-valgrind" ]; then
     CI_ARGS="--debug --werror --valgrind"
 elif [ "$GITHUB_JOB" == "linux-clang-tidy" ]; then
     CI_ARGS="--debug --werror --tidy"
-elif [ "$GITHUB_JOB" == "mac-release" ]; then
+elif [ "$GITHUB_JOB" == "macos-release" ]; then
     CI_ARGS="--werror"
+elif [ "$GITHUB_JOB" == "macos-debug" ]; then
+    CI_ARGS="--debug --werror"
 fi
 
 scripts/build.sh "$@" $CI_ARGS --internal-libs
 
-# TODO
+# TODO figure out deploy with github actions
 #if [ "$TRAVIS_DEPLOY" = "y" ]; then
 #    cd workdir
 #    make pack

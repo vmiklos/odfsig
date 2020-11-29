@@ -42,7 +42,7 @@ jobs:
       - name: Run make check
         run: |
           scripts/ci-build.sh
-  # TODO: linux-gcc-iwyu
+  #linux-gcc-iwyu:
   macos-release:
     runs-on: macos-10.15
     steps:
@@ -50,4 +50,10 @@ jobs:
       - name: Run make check
         run: |
           scripts/ci-build.sh
-  # TODO: macos-debug
+  macos-debug:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run make check
+        run: |
+          scripts/ci-build.sh
