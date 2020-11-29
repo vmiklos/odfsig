@@ -35,7 +35,13 @@ jobs:
       - name: Run make check
         run: |
           scripts/ci-build.sh
-  # TODO: linux-clang-tidy
+  linux-clang-tidy:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run make check
+        run: |
+          scripts/ci-build.sh
   # TODO: linux-gcc-iwyu
   # TODO: macos-release
   # TODO: macos-debug
