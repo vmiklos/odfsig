@@ -3,7 +3,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-# Baseline: Ubuntu 18.04 and macOS 10.13.
+# Baseline: Ubuntu 18.04 and macOS 10.15.
 
 if [ -n "${GITHUB_WORKFLOW}" -a "$(uname -s)" == "Linux" ]; then
     sudo apt-get install \
@@ -30,10 +30,10 @@ fi
 
 scripts/build.sh "$@" $CI_ARGS --internal-libs
 
-# TODO figure out deploy with github actions
-#if [ "$TRAVIS_DEPLOY" = "y" ]; then
-#    cd workdir
-#    make pack
-#fi
+# TODO macos deploy
+if [ "$GITHUB_JOB" == "linux-gcc-release" ]; then
+    cd workdir
+    make pack
+fi
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
