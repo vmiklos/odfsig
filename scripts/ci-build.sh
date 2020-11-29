@@ -30,8 +30,7 @@ fi
 
 scripts/build.sh "$@" $CI_ARGS --internal-libs
 
-# TODO macos deploy
-if [ "$GITHUB_JOB" == "linux-gcc-release" ]; then
+if [ "$GITHUB_JOB" == "linux-gcc-release" -o "$GITHUB_JOB" == "macos-release" ]; then
     cd workdir
     make pack
 fi
