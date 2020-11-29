@@ -6,8 +6,11 @@
 # Baseline: Ubuntu 18.04 and macOS 10.13.
 
 if [ -n "${GITHUB_WORKFLOW}" -a "$(uname -s)" == "Linux" ]; then
+    # iwyu is built against clang-5.0
     sudo apt-get install \
+        clang-5.0 \
         clang-tidy \
+        iwyu \
         valgrind \
 
 fi
@@ -22,6 +25,8 @@ elif [ "$GITHUB_JOB" == "linux-valgrind" ]; then
     CI_ARGS="--debug --werror --valgrind"
 elif [ "$GITHUB_JOB" == "linux-clang-tidy" ]; then
     CI_ARGS="--debug --werror --tidy"
+elif [ "$GITHUB_JOB" == "linux-gcc-iwyu" ]; then
+    CI_ARGS="--debug --werror --iwyu"
 fi
 
 scripts/build.sh "$@" $CI_ARGS --internal-libs
