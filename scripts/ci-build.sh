@@ -8,6 +8,8 @@
 if [ -n "${GITHUB_WORKFLOW}" -a "$(uname -s)" == "Linux" ]; then
     sudo apt-get install \
         clang-tidy \
+        gyp \
+        ninja-build \
         valgrind \
 
 fi
