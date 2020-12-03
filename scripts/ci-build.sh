@@ -5,13 +5,26 @@
 
 # Baseline: Ubuntu 18.04 and macOS 10.15.
 
-if [ -n "${GITHUB_WORKFLOW}" -a "$(uname -s)" == "Linux" ]; then
+if [ -n "${GITHUB_JOB}" -a "$(uname -s)" == "Linux" ]; then
     sudo apt-get install \
         clang-tidy \
         gyp \
         ninja-build \
         valgrind \
 
+fi
+
+if [ -n "${GITHUB_JOB}" -a "$(uname -s)" == "Darwin" ]; then
+    git clone https://chromium.googlesource.com/external/gyp.git
+    cd gyp
+    python setup.py build
+    # See
+    # <https://stackoverflow.com/questions/4495120/combine-user-with-prefix-error-with-setup-py-install>
+    # on why '--prefix=' is necessary.
+    python setup.py install --user --prefix=
+    export PATH=$PATH:$HOME/Library/Python/2.7/bin
+    cd -
+    brew install ninja
 fi
 
 if [ "$GITHUB_JOB" == "linux-gcc-release" ]; then
