@@ -94,7 +94,7 @@ do
     esac
 done
 
-rm -rf workdir
+rm -rf workdir instdir
 rm -f compile_commands.json
 mkdir workdir
 cd workdir
