@@ -16,12 +16,6 @@ else ()
     elseif (APPLE)
         set(ODFSIG_MACOS_NSPR_SUBDIR out/)
         set(ODFSIG_NSS_LIBDIR lib)
-        #set(EXTERNALPROJECT_INSTALL_MACOS
-        #    COMMAND install -v -m755 dist/Release/lib/libnssdbm3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
-        #)
-        #set(INSTALL_PROGRAMS_MACOS
-        #    ${CMAKE_BINARY_DIR}/bin/libnssdbm3${CMAKE_SHARED_LIBRARY_SUFFIX}
-        #)
     else ()
 	# Drop compiler arguments (e.g. sanitizers) on Linux, as NSS build
 	# would break with them.
@@ -42,8 +36,7 @@ else ()
             ${CMAKE_BINARY_DIR}/bin/libsqlite3${CMAKE_SHARED_LIBRARY_SUFFIX}
         )
     endif ()
-    # TODO: --static
-    set(ODFSIG_NSS_BUILD_COMMAND ${ODFSIG_LINUX_CC} ${ODFSIG_LINUX_CXX} nss/build.sh --opt --disable-tests)
+    # Dynamic nss could be avoided with --static.
     set(ODFSIG_NSS_OBJDIR_NAME Release)
     set(ODFSIG_NSS_NSPR_INCLUDE dist/${ODFSIG_NSS_OBJDIR_NAME}/include/nspr)
 
@@ -55,7 +48,7 @@ else ()
         CONFIGURE_COMMAND
             echo NOP
         BUILD_COMMAND
-            ${ODFSIG_NSS_BUILD_COMMAND}
+	    ${ODFSIG_LINUX_CC} ${ODFSIG_LINUX_CXX} nss/build.sh --opt --disable-tests
         INSTALL_COMMAND
             COMMAND mkdir -p ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}
             COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/lib/libfreebl3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
@@ -70,7 +63,6 @@ else ()
             COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/lib/libsoftokn3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
             COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/lib/libssl3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
             ${EXTERNALPROJECT_INSTALL_LINUX}
-            ${EXTERNALPROJECT_INSTALL_MACOS}
         )
 
     if (NOT WIN32)
@@ -87,8 +79,8 @@ else ()
 	    ${CMAKE_BINARY_DIR}/bin/libplc4${CMAKE_SHARED_LIBRARY_SUFFIX}
 	    ${CMAKE_BINARY_DIR}/bin/libplds4${CMAKE_SHARED_LIBRARY_SUFFIX}
             ${INSTALL_PROGRAMS_LINUX}
-            ${INSTALL_PROGRAMS_MACOS}
             DESTINATION ${CMAKE_INSTALL_BINDIR})
+        # Only needed for dynamic nss, only on macOS.
         install(PROGRAMS
 	    ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}/libnspr4${CMAKE_SHARED_LIBRARY_SUFFIX}
 	    DESTINATION ${CMAKE_INSTALL_BINDIR}/${ODFSIG_MACOS_NSPR_SUBDIR})
