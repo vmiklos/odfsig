@@ -11,11 +11,14 @@ if (NOT ODFSIG_INTERNAL_NSS)
 else ()
     include(ExternalProject)
     include(GNUInstallDirs)
+    find_package(Threads REQUIRED)
 
     if (WIN32)
     elseif (APPLE)
         set(ODFSIG_MACOS_NSPR_SUBDIR out/)
         set(ODFSIG_NSS_LIBDIR lib)
+        set(START_GROUP "")
+        set(END_GROUP "")
     else ()
 	# Drop compiler arguments (e.g. sanitizers) on Linux, as NSS build
 	# would break with them.
@@ -27,14 +30,8 @@ else ()
         else()
             set(ODFSIG_NSS_LIBDIR lib64)
         endif()
-        set(EXTERNALPROJECT_INSTALL_LINUX
-            COMMAND install -v -m755 dist/Release/lib/libfreeblpriv3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/Release/lib/libsqlite3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
-        )
-        set(INSTALL_PROGRAMS_LINUX
-            ${CMAKE_BINARY_DIR}/bin/libfreeblpriv3${CMAKE_SHARED_LIBRARY_SUFFIX}
-            ${CMAKE_BINARY_DIR}/bin/libsqlite3${CMAKE_SHARED_LIBRARY_SUFFIX}
-        )
+        set(START_GROUP "-Wl,--start-group")
+        set(END_GROUP "-Wl,--end-group")
     endif ()
     # Dynamic nss could be avoided with --static.
     set(ODFSIG_NSS_OBJDIR_NAME Release)
@@ -48,82 +45,122 @@ else ()
         CONFIGURE_COMMAND
             echo NOP
         BUILD_COMMAND
-	    ${ODFSIG_LINUX_CC} ${ODFSIG_LINUX_CXX} nss/build.sh --opt --disable-tests
+	    ${ODFSIG_LINUX_CC} ${ODFSIG_LINUX_CXX} nss/build.sh --opt --static --disable-tests -Duse_system_sqlite=0
         INSTALL_COMMAND
-            COMMAND mkdir -p ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}
-            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/lib/libfreebl3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/${ODFSIG_NSS_LIBDIR}/libnspr4${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin
-            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/${ODFSIG_NSS_LIBDIR}/libnspr4${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}
-            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/lib/libnss3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/lib/libnssckbi${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/lib/libnssutil3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/${ODFSIG_NSS_LIBDIR}/libplc4${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin
-            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/${ODFSIG_NSS_LIBDIR}/libplds4${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin
-            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/lib/libsmime3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/lib/libsoftokn3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
-            COMMAND install -v -m755 dist/${ODFSIG_NSS_OBJDIR_NAME}/lib/libssl3${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/bin/
-            ${EXTERNALPROJECT_INSTALL_LINUX}
+            echo NOP
         )
 
-    if (NOT WIN32)
-        install(PROGRAMS
-            ${CMAKE_BINARY_DIR}/bin/libfreebl3${CMAKE_SHARED_LIBRARY_SUFFIX}
-            ${CMAKE_BINARY_DIR}/bin/libnss3${CMAKE_SHARED_LIBRARY_SUFFIX}
-            ${CMAKE_BINARY_DIR}/bin/libnssckbi${CMAKE_SHARED_LIBRARY_SUFFIX}
-            ${CMAKE_BINARY_DIR}/bin/libnssutil3${CMAKE_SHARED_LIBRARY_SUFFIX}
-            ${CMAKE_BINARY_DIR}/bin/libsmime3${CMAKE_SHARED_LIBRARY_SUFFIX}
-            ${CMAKE_BINARY_DIR}/bin/libsoftokn3${CMAKE_SHARED_LIBRARY_SUFFIX}
-            ${CMAKE_BINARY_DIR}/bin/libssl3${CMAKE_SHARED_LIBRARY_SUFFIX}
-            ${CMAKE_BINARY_DIR}/bin/libfreebl3${CMAKE_SHARED_LIBRARY_SUFFIX}
-	    ${CMAKE_BINARY_DIR}/bin/libnspr4${CMAKE_SHARED_LIBRARY_SUFFIX}
-	    ${CMAKE_BINARY_DIR}/bin/libplc4${CMAKE_SHARED_LIBRARY_SUFFIX}
-	    ${CMAKE_BINARY_DIR}/bin/libplds4${CMAKE_SHARED_LIBRARY_SUFFIX}
-            ${INSTALL_PROGRAMS_LINUX}
-            DESTINATION ${CMAKE_INSTALL_BINDIR})
-        # Only needed for dynamic nss, only on macOS.
-        install(PROGRAMS
-	    ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}/libnspr4${CMAKE_SHARED_LIBRARY_SUFFIX}
-	    DESTINATION ${CMAKE_INSTALL_BINDIR}/${ODFSIG_MACOS_NSPR_SUBDIR})
-    endif()
+    ExternalProject_Get_Property(extern-nss-project SOURCE_DIR)
 
-    # We link to a subset of the above libs, that subset is represented with
-    # imported libraries as well.
-    add_library(smime3 STATIC IMPORTED)
-    set_property(TARGET smime3 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/libsmime3${CMAKE_SHARED_LIBRARY_SUFFIX})
-    add_dependencies(smime3 extern-nss-project)
+    add_library(nss_static STATIC IMPORTED)
+    set_property(TARGET nss_static PROPERTY IMPORTED_LOCATION ${SOURCE_DIR}/dist/Release/lib/libnss_static.a)
+    add_dependencies(nss_static extern-nss-project)
 
-    add_library(nss3 STATIC IMPORTED)
-    set_property(TARGET nss3 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/libnss3${CMAKE_SHARED_LIBRARY_SUFFIX})
-    add_dependencies(nss3 extern-nss-project)
+    add_library(certdb STATIC IMPORTED)
+    set_property(TARGET certdb PROPERTY IMPORTED_LOCATION ${SOURCE_DIR}/dist/Release/lib/libcertdb.a)
+    add_dependencies(certdb extern-nss-project)
 
-    add_library(nssutil3 STATIC IMPORTED)
-    set_property(TARGET nssutil3 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/libnssutil3${CMAKE_SHARED_LIBRARY_SUFFIX})
-    add_dependencies(nssutil3 extern-nss-project)
+    add_library(nspr4 STATIC IMPORTED)
+    set_property(TARGET nspr4 PROPERTY IMPORTED_LOCATION ${SOURCE_DIR}/nspr/Release/dist/lib/libnspr4.a)
+    add_dependencies(nspr4 extern-nss-project)
+
+    add_library(pkcs12 STATIC IMPORTED)
+    set_property(TARGET pkcs12 PROPERTY IMPORTED_LOCATION ${SOURCE_DIR}/dist/Release/lib/libpkcs12.a)
+    add_dependencies(pkcs12 extern-nss-project)
+
+    add_library(pk11wrap_static STATIC IMPORTED)
+    set_property(TARGET pk11wrap_static PROPERTY IMPORTED_LOCATION ${SOURCE_DIR}/dist/Release/lib/libpk11wrap_static.a)
+    add_dependencies(pk11wrap_static extern-nss-project)
+
+    add_library(cryptohi STATIC IMPORTED)
+    set_property(TARGET cryptohi PROPERTY IMPORTED_LOCATION ${SOURCE_DIR}/dist/Release/lib/libcryptohi.a)
+    add_dependencies(cryptohi extern-nss-project)
+
+    add_library(certhi STATIC IMPORTED)
+    set_property(TARGET certhi PROPERTY IMPORTED_LOCATION ${SOURCE_DIR}/dist/Release/lib/libcerthi.a)
+    add_dependencies(certhi extern-nss-project)
+
+    add_library(nssutil STATIC IMPORTED)
+    set_property(TARGET nssutil PROPERTY IMPORTED_LOCATION ${SOURCE_DIR}/dist/Release/lib/libnssutil.a)
+    add_dependencies(nssutil extern-nss-project)
+
+    add_library(nssb STATIC IMPORTED)
+    set_property(TARGET nssb PROPERTY IMPORTED_LOCATION ${SOURCE_DIR}/dist/Release/lib/libnssb.a)
+    add_dependencies(nssb extern-nss-project)
+
+    add_library(nsspki STATIC IMPORTED)
+    set_property(TARGET nsspki PROPERTY IMPORTED_LOCATION ${SOURCE_DIR}/dist/Release/lib/libnsspki.a)
+    add_dependencies(nsspki extern-nss-project)
 
     add_library(plc4 STATIC IMPORTED)
-    set_property(TARGET plc4 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/libplc4${CMAKE_SHARED_LIBRARY_SUFFIX})
+    set_property(TARGET plc4 PROPERTY IMPORTED_LOCATION ${SOURCE_DIR}/nspr/Release/dist/lib/libplc4.a)
     add_dependencies(plc4 extern-nss-project)
 
     add_library(plds4 STATIC IMPORTED)
-    set_property(TARGET plds4 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/libplds4${CMAKE_SHARED_LIBRARY_SUFFIX})
+    set_property(TARGET plds4 PROPERTY IMPORTED_LOCATION ${SOURCE_DIR}/nspr/Release/dist/lib/libplds4.a)
     add_dependencies(plds4 extern-nss-project)
 
-    add_library(nspr4 STATIC IMPORTED)
-    set_property(TARGET nspr4 PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/${ODFSIG_MACOS_NSPR_SUBDIR}libnspr4${CMAKE_SHARED_LIBRARY_SUFFIX})
-    add_dependencies(nspr4 extern-nss-project)
+    add_library(nssdev STATIC IMPORTED)
+    set_property(TARGET nssdev PROPERTY IMPORTED_LOCATION ${SOURCE_DIR}/dist/Release/lib/libnssdev.a)
+    add_dependencies(nssdev extern-nss-project)
 
-    ExternalProject_Get_Property(extern-nss-project SOURCE_DIR)
+    add_library(pkcs7 STATIC IMPORTED)
+    set_property(TARGET pkcs7 PROPERTY IMPORTED_LOCATION ${SOURCE_DIR}/dist/Release/lib/libpkcs7.a)
+    add_dependencies(pkcs7 extern-nss-project)
+
+    add_library(softokn_static STATIC IMPORTED)
+    set_property(TARGET softokn_static PROPERTY IMPORTED_LOCATION ${SOURCE_DIR}/dist/Release/lib/libsoftokn_static.a)
+    add_dependencies(softokn_static extern-nss-project)
+
+    add_library(freebl STATIC IMPORTED)
+    set_property(TARGET freebl PROPERTY IMPORTED_LOCATION ${SOURCE_DIR}/dist/Release/lib/libfreebl_static.a)
+    add_dependencies(freebl extern-nss-project)
+
+    add_library(sqlite STATIC IMPORTED)
+    set_property(TARGET sqlite PROPERTY IMPORTED_LOCATION ${SOURCE_DIR}/dist/Release/lib/libsqlite.a)
+    add_dependencies(sqlite extern-nss-project)
+
+    add_library(hw-acc-crypto-avx2 STATIC IMPORTED)
+    set_property(TARGET hw-acc-crypto-avx2 PROPERTY IMPORTED_LOCATION ${SOURCE_DIR}/dist/Release/lib/libhw-acc-crypto-avx2.a)
+    add_dependencies(hw-acc-crypto-avx2 extern-nss-project)
+
+    add_library(hw-acc-crypto-avx STATIC IMPORTED)
+    set_property(TARGET hw-acc-crypto-avx PROPERTY IMPORTED_LOCATION ${SOURCE_DIR}/dist/Release/lib/libhw-acc-crypto-avx.a)
+    add_dependencies(hw-acc-crypto-avx extern-nss-project)
+
+    add_library(gcm-aes-x86_c_lib STATIC IMPORTED)
+    set_property(TARGET gcm-aes-x86_c_lib PROPERTY IMPORTED_LOCATION ${SOURCE_DIR}/dist/Release/lib/libgcm-aes-x86_c_lib.a)
+    add_dependencies(gcm-aes-x86_c_lib extern-nss-project)
+
     set(NSS_INCLUDE_DIRS
         ${SOURCE_DIR}/${ODFSIG_NSS_NSPR_INCLUDE}
         ${SOURCE_DIR}/dist/public/nss
         )
     set(NSS_LIBRARIES
-        smime3
-        nss3
-        nssutil3
+        ${START_GROUP}
+        certdb
+        certhi
+        cryptohi
+        freebl
+        gcm-aes-x86_c_lib
+        hw-acc-crypto-avx
+        hw-acc-crypto-avx2
+        nspr4
+        nss_static
+        nssb
+        nssdev
+        nsspki
+        nssutil
+        pk11wrap_static
+        pkcs12
+        pkcs7
         plc4
         plds4
-        nspr4
+        softokn_static
+        sqlite
+        ${END_GROUP}
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${CMAKE_DL_LIBS}
         )
 endif ()
 
