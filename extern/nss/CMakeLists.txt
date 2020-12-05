@@ -27,8 +27,7 @@ else ()
         set(END_GROUP "-Wl,--end-group")
     endif ()
     # Dynamic nss could be avoided with --static.
-    set(ODFSIG_NSS_OBJDIR_NAME Release)
-    set(ODFSIG_NSS_NSPR_INCLUDE dist/${ODFSIG_NSS_OBJDIR_NAME}/include/nspr)
+    set(ODFSIG_NSS_NSPR_INCLUDE dist/Release/include/nspr)
 
     ExternalProject_Add(extern-nss-project
         URL https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_59_RTM/src/nss-${NSS_VERSION}-with-nspr-4.29.tar.gz
