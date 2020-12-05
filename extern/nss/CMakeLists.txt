@@ -33,12 +33,10 @@ else ()
         URL_HASH SHA256=${NSS_SHA256SUM}
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON
-        CONFIGURE_COMMAND
-            echo NOP
+        CONFIGURE_COMMAND ""
         BUILD_COMMAND
 	    ${ODFSIG_LINUX_CC} ${ODFSIG_LINUX_CXX} nss/build.sh --opt --static --disable-tests -Duse_system_sqlite=0
-        INSTALL_COMMAND
-            echo NOP
+        INSTALL_COMMAND ""
         )
 
     ExternalProject_Get_Property(extern-nss-project SOURCE_DIR)
