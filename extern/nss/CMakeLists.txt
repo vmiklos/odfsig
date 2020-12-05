@@ -26,9 +26,8 @@ else ()
         set(START_GROUP "-Wl,--start-group")
         set(END_GROUP "-Wl,--end-group")
     endif ()
-    # Dynamic nss could be avoided with --static.
-    set(ODFSIG_NSS_NSPR_INCLUDE dist/Release/include/nspr)
 
+    # Dynamic nss could be avoided with --static.
     ExternalProject_Add(extern-nss-project
         URL https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_59_RTM/src/nss-${NSS_VERSION}-with-nspr-4.29.tar.gz
         URL_HASH SHA256=${NSS_SHA256SUM}
@@ -125,7 +124,7 @@ else ()
     add_dependencies(gcm-aes-x86_c_lib extern-nss-project)
 
     set(NSS_INCLUDE_DIRS
-        ${SOURCE_DIR}/${ODFSIG_NSS_NSPR_INCLUDE}
+        ${SOURCE_DIR}/dist/Release/include/nspr
         ${SOURCE_DIR}/dist/public/nss
         )
     set(NSS_LIBRARIES
