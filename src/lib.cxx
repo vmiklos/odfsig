@@ -142,7 +142,7 @@ int read(void* context, char* buffer, int len)
     auto* zipFile = static_cast<zip::File*>(context);
     assert(zipFile);
 
-    return zipFile->read(buffer, len);
+    return static_cast<int>(zipFile->read(buffer, len));
 }
 
 int close(void* context)

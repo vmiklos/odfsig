@@ -47,7 +47,7 @@ class CngCrypto : public Crypto
                                std::vector<std::string> trustedDers) override;
 
     std::string getCertificateSubjectName(unsigned char* certificate,
-                                          int size) override;
+                                          size_t size) override;
 };
 
 bool CngCrypto::initialize(const std::string& cryptoConfig)
@@ -83,7 +83,7 @@ bool CngCrypto::initializeKeysManager(xmlSecKeysMngr* keysManager,
 }
 
 std::string CngCrypto::getCertificateSubjectName(unsigned char* certificate,
-                                                 int size)
+                                                 size_t size)
 {
     std::unique_ptr<const CERT_CONTEXT> context(
         CertCreateCertificateContext(X509_ASN_ENCODING, certificate, size));

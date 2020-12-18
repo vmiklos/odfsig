@@ -38,7 +38,7 @@ class Crypto
 
     /// Extracts the subject name of an X509 certificate.
     virtual std::string getCertificateSubjectName(unsigned char* certificate,
-                                                  int size) = 0;
+                                                  size_t size) = 0;
 
     static std::unique_ptr<Crypto> create();
 };

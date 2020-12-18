@@ -94,7 +94,7 @@ class NssCrypto : public Crypto
                                std::vector<std::string> trustedDers) override;
 
     std::string getCertificateSubjectName(unsigned char* certificate,
-                                          int size) override;
+                                          size_t size) override;
 };
 
 bool NssCrypto::initialize(const std::string& cryptoConfig)
@@ -135,7 +135,7 @@ bool NssCrypto::initializeKeysManager(xmlSecKeysMngr* keysManager,
 }
 
 std::string NssCrypto::getCertificateSubjectName(unsigned char* certificate,
-                                                 int size)
+                                                 size_t size)
 {
     SECItem certItem;
     certItem.data = certificate;
