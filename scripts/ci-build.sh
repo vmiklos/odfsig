@@ -6,6 +6,7 @@
 # Baseline: Ubuntu 18.04 and macOS 10.15.
 
 if [ -n "${GITHUB_JOB}" -a "$(uname -s)" == "Linux" ]; then
+    sudo apt-get update
     sudo apt-get install \
         clang-tidy \
         gyp \
