@@ -11,7 +11,7 @@ on:
       - 'private/**'
 jobs:
   linux-gcc-release:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - name: Run make check
@@ -24,28 +24,28 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   linux-clang-debug:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - name: Run make check
         run: |
           scripts/ci-build.sh
   linux-clang-asan-ubsan:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - name: Run make check
         run: |
           scripts/ci-build.sh
   linux-valgrind:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - name: Run make check
         run: |
           scripts/ci-build.sh
   linux-clang-tidy:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - name: Run make check
