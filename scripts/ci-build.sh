@@ -3,7 +3,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-# Baseline: Ubuntu 18.04 and macOS 10.15.
+# Baseline: Ubuntu 20.04 and macOS 10.15.
 
 if [ -n "${GITHUB_JOB}" -a "$(uname -s)" == "Linux" ]; then
     sudo apt-get update
