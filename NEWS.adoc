@@ -1,5 +1,9 @@
 = Version descriptions
 
+== master
+
+- Link bundled nss statically, which provides a self-contained executable on Linux and macOS
+
 == 7.0
 
 - Update bundled googletest, libxml2, libxmlsec, libzip, nss and xmlsec to latest versions
