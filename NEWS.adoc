@@ -1,6 +1,6 @@
 = Version descriptions
 
-== master
+== 7.1
 
 - Link bundled nss statically, which provides a self-contained executable on Linux and macOS
 
