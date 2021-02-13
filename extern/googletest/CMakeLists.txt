@@ -14,8 +14,6 @@ else ()
     ExternalProject_Add(extern-googletest-project
         URL https://github.com/google/googletest/archive/release-${GOOGLETEST_VERSION}.tar.gz
         URL_HASH SHA256=${GOOGLETEST_SHA256SUM}
-        PATCH_COMMAND ${PATCH_EXECUTABLE}
-            ${CMAKE_CURRENT_SOURCE_DIR}/msvc-debug.patch
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         CONFIGURE_COMMAND ${CMAKE_COMMAND}
             -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
@@ -24,19 +22,19 @@ else ()
         )
 
     ExternalProject_Get_Property(extern-googletest-project INSTALL_DIR)
+    add_library(gtest STATIC IMPORTED)
+    add_library(gtest_main STATIC IMPORTED)
     if (WIN32)
-        set(GTEST_LIBRARY ${INSTALL_DIR}/lib/gtest.lib)
-        set(GTEST_MAIN_LIBRARY ${INSTALL_DIR}/lib/gtest_main.lib)
+        set_property(TARGET gtest PROPERTY IMPORTED_LOCATION ${INSTALL_DIR}/lib/gtest.lib)
+        set_property(TARGET gtest PROPERTY IMPORTED_LOCATION_DEBUG ${INSTALL_DIR}/lib/gtestd.lib)
+        set_property(TARGET gtest_main PROPERTY IMPORTED_LOCATION ${INSTALL_DIR}/lib/gtest_main.lib)
+        set_property(TARGET gtest_main PROPERTY IMPORTED_LOCATION_DEBUG ${INSTALL_DIR}/lib/gtest_maind.lib)
     else ()
-        set(GTEST_LIBRARY ${INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}/libgtest.a)
-        set(GTEST_MAIN_LIBRARY ${INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}/libgtest_main.a)
+        set_property(TARGET gtest PROPERTY IMPORTED_LOCATION ${INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}/libgtest.a)
+        set_property(TARGET gtest_main PROPERTY IMPORTED_LOCATION ${INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}/libgtest_main.a)
     endif ()
 
-    add_library(gtest STATIC IMPORTED)
-    set_property(TARGET gtest PROPERTY IMPORTED_LOCATION ${GTEST_LIBRARY})
     add_dependencies(gtest extern-googletest-project)
-    add_library(gtest_main STATIC IMPORTED)
-    set_property(TARGET gtest_main PROPERTY IMPORTED_LOCATION ${GTEST_MAIN_LIBRARY})
     add_dependencies(gtest_main extern-googletest-project)
     set(GTEST_INCLUDE_DIRS ${INSTALL_DIR}/include)
     set(GTEST_BOTH_LIBRARIES gtest gtest_main ${CMAKE_THREAD_LIBS_INIT})
