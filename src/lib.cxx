@@ -522,7 +522,7 @@ std::string XmlSignature::getSubjectName() const
     std::vector<xmlChar> certificate;
     if (!getCertificateBinary(certificate))
     {
-        return std::string();
+        return {};
     }
 
     return _crypto.getCertificateSubjectName(certificate.data(),
@@ -537,14 +537,14 @@ std::string XmlSignature::getMethod() const
         signedInfoNode, xmlSecNodeSignatureMethod, xmlSecDSigNs);
     if (signatureMethodNode == nullptr)
     {
-        return std::string();
+        return {};
     }
 
     std::unique_ptr<xmlChar> href(
         xmlGetProp(signatureMethodNode, xmlSecAttrAlgorithm));
     if (!href)
     {
-        return std::string();
+        return {};
     }
 
     xmlSecTransformId id =
@@ -555,7 +555,7 @@ std::string XmlSignature::getMethod() const
         return fromXmlChar(href.get());
     }
 
-    return std::string(fromXmlChar(xmlSecTransformKlassGetName(id)));
+    return fromXmlChar(xmlSecTransformKlassGetName(id));
 }
 
 std::set<std::string> XmlSignature::getSignedStreams() const
@@ -600,10 +600,10 @@ std::string XmlSignature::getType() const
 {
     if (getCertDigestNode() != nullptr)
     {
-        return std::string("XAdES");
+        return "XAdES";
     }
 
-    return std::string("XML-DSig");
+    return "XML-DSig";
 }
 
 xmlNodePtr XmlSignature::getObjectCertDigestNode(xmlNode* objectNode)
@@ -673,7 +673,7 @@ std::string XmlSignature::getDate() const
         }
     }
 
-    return std::string();
+    return {};
 }
 
 std::string XmlSignature::getObjectDate(xmlNode* objectNode)
@@ -694,7 +694,7 @@ std::string XmlSignature::getObjectDate(xmlNode* objectNode)
         }
     }
 
-    return std::string();
+    return {};
 }
 
 std::string XmlSignature::getDateContent(xmlNode* dateNode)
@@ -702,10 +702,10 @@ std::string XmlSignature::getDateContent(xmlNode* dateNode)
     std::unique_ptr<xmlChar> content(xmlNodeGetContent(dateNode));
     if (!content)
     {
-        return std::string();
+        return {};
     }
 
-    return std::string(fromXmlChar(content.get()));
+    return fromXmlChar(content.get());
 }
 
 std::string
@@ -730,7 +730,7 @@ XmlSignature::getSignaturePropertiesDate(xmlNode* signaturePropertiesNode)
         }
     }
 
-    return std::string();
+    return {};
 }
 
 std::string
@@ -740,7 +740,7 @@ XmlSignature::getSignaturePropertyDate(xmlNode* signaturePropertyNode)
         xmlSecFindChild(signaturePropertyNode, dateNodeName, dateNsName);
     if (dateNode == nullptr)
     {
-        return std::string();
+        return {};
     }
 
     return getDateContent(dateNode);

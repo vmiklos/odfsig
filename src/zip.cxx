@@ -157,7 +157,7 @@ std::string ZipArchive::getName(int64_t index)
     const char* name = zip_get_name(_archive, index, 0);
     if (name == nullptr)
     {
-        return std::string();
+        return {};
     }
 
     return name;
