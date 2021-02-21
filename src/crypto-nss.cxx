@@ -53,7 +53,7 @@ std::string getFirefoxProfile(const std::string& cryptoConfig)
     std::ifstream profilesIni(firefoxPath + "profiles.ini");
     if (!profilesIni.good())
     {
-        return std::string();
+        return {};
     }
 
     std::string profilePath;
@@ -72,7 +72,7 @@ std::string getFirefoxProfile(const std::string& cryptoConfig)
         }
     }
 
-    return std::string();
+    return {};
 }
 } // namespace
 
@@ -145,10 +145,10 @@ std::string NssCrypto::getCertificateSubjectName(unsigned char* certificate,
         CERT_GetDefaultCertDB(), &certItem, nullptr, PR_FALSE, PR_TRUE));
     if (!cert || (cert->subjectName == nullptr))
     {
-        return std::string();
+        return {};
     }
 
-    return std::string(cert->subjectName);
+    return cert->subjectName;
 }
 
 std::unique_ptr<Crypto> Crypto::create()
