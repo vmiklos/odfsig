@@ -7,6 +7,7 @@
 #include <odfsig/crypto.hxx>
 
 #include <algorithm>
+#include <cstddef>
 #include <fstream>
 #include <memory>
 #include <sstream>

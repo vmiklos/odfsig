@@ -10,6 +10,7 @@ if [ -n "${GITHUB_JOB}" -a "$(uname -s)" == "Linux" ]; then
     sudo apt-get install \
         clang-tidy \
         gyp \
+        iwyu \
         ninja-build \
         valgrind \
 
@@ -38,6 +39,8 @@ elif [ "$GITHUB_JOB" == "linux-valgrind" ]; then
     CI_ARGS="--debug --werror --valgrind"
 elif [ "$GITHUB_JOB" == "linux-clang-tidy" ]; then
     CI_ARGS="--debug --werror --tidy"
+elif [ "$GITHUB_JOB" == "linux-gcc-iwyu" ]; then
+    CI_ARGS="--debug --werror --iwyu"
 elif [ "$GITHUB_JOB" == "macos-release" ]; then
     CI_ARGS="--werror"
 elif [ "$GITHUB_JOB" == "macos-debug" ]; then
