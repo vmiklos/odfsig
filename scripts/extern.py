@@ -25,7 +25,11 @@ releaseMonitoring = {
 def getActualVersion(name):
     name, homepage = releaseMonitoring[name]
     url = "https://release-monitoring.org/api/v2/projects/?name=" + name
-    sock = urllib.request.urlopen(url)
+    try:
+        sock = urllib.request.urlopen(url)
+    except urllib.error.HTTPError as http_error:
+        print("Failed to open URL %s: %s" % (url, http_error))
+        sys.exit(1)
     buf = sock.read()
     sock.close()
     doc = json.loads(buf.decode("utf-8"))
