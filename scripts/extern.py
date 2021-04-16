@@ -18,7 +18,7 @@ releaseMonitoring = {
     "libzip": ["libzip", "http://www.nih.at/libzip/"],
     "xmlsec": ["xmlsec1", "http://www.aleksey.com/xmlsec/download.html"],
     "zlib": ["zlib", "http://www.zlib.net/"],
-    "nss": ["nss", "http://ftp.mozilla.org/pub/mozilla.org/security/nss/releases/"],
+    "nss": ["nss", "https://ftp.mozilla.org/pub/security/nss/releases/"],
 }
 
 
@@ -33,7 +33,11 @@ def getActualVersion(name):
     buf = sock.read()
     sock.close()
     doc = json.loads(buf.decode("utf-8"))
-    project = [i for i in doc["items"] if i["homepage"] == homepage][0]
+    homepages = [i for i in doc["items"] if i["homepage"] == homepage]
+    if not len(homepages):
+        print("WARNING: '%s' contains no homepage '%s'" % (url, homepage))
+        return
+    project = homepages[0]
     return project["versions"][0]
 
 
@@ -54,6 +58,9 @@ def checkVersion(name, cmakeLists):
     sys.stdout.flush()
 
     actualVersion = getActualVersion(name)
+    if not actualVersion:
+        return False
+
     if actualVersion == expectedVersion:
         print(" up to date")
         return True
