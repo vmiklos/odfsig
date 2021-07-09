@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-set(LIBZIP_VERSION 1.7.3)
-set(LIBZIP_SHA256SUM 0e2276c550c5a310d4ebf3a2c3dfc43fb3b4602a072ff625842ad4f3238cb9cc)
+set(LIBZIP_VERSION 1.8.0)
+set(LIBZIP_SHA256SUM 30ee55868c0a698d3c600492f2bea4eb62c53849bcf696d21af5eb65f3f3839e)
 
 if (NOT ODFSIG_INTERNAL_LIBZIP)
     find_package(PkgConfig REQUIRED)
@@ -28,6 +28,7 @@ else ()
             -DENABLE_WINDOWS_CRYPTO=OFF
             -DENABLE_BZIP2=OFF
             -DENABLE_LZMA=OFF
+            -DENABLE_ZSTD=OFF
             ${ZLIB_ROOT}
             -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
             <SOURCE_DIR>
