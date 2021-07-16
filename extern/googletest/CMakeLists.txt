@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-set(GOOGLETEST_VERSION 1.10.0)
-set(GOOGLETEST_SHA256SUM 9dc9157a9a1551ec7a7e43daea9a694a0bb5fb8bec81235d8a1e6ef64c716dcb)
+set(GOOGLETEST_VERSION 1.11.0)
+set(GOOGLETEST_SHA256SUM b4870bf121ff7795ba20d20bcdd8627b8e088f2d1dab299a031c1034eddc93d5)
 
 if (NOT ODFSIG_INTERNAL_LIBGTEST)
     find_package(GTest REQUIRED)
