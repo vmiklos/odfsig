@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-set(NSS_VERSION 3.67)
-set(NSS_SHA256SUM 683a4fc92aad224fde8ba18d49bdbc6ef93716731167d4e85d5654765162f042)
+set(NSS_VERSION 3.68)
+set(NSS_SHA256SUM 8ce1e031da3c821f25d4207ec0350364de234f8651893b5fdfd2f2aa446b7948)
 
 if (NOT ODFSIG_INTERNAL_NSS)
     find_package(PkgConfig REQUIRED)
@@ -28,7 +28,7 @@ else ()
     endif ()
 
     ExternalProject_Add(extern-nss-project
-        URL https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_67_RTM/src/nss-${NSS_VERSION}-with-nspr-4.29.tar.gz
+        URL https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_68_RTM/src/nss-${NSS_VERSION}-with-nspr-4.32.tar.gz
         URL_HASH SHA256=${NSS_SHA256SUM}
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON
@@ -66,6 +66,7 @@ else ()
     add_nss_library(hw-acc-crypto-avx2 /dist/Release/lib/libhw-acc-crypto-avx2.a)
     add_nss_library(hw-acc-crypto-avx /dist/Release/lib/libhw-acc-crypto-avx.a)
     add_nss_library(gcm-aes-x86_c_lib /dist/Release/lib/libgcm-aes-x86_c_lib.a)
+    add_nss_library(sha-x86_c_lib /dist/Release/lib/libsha-x86_c_lib.a)
 
     set(NSS_INCLUDE_DIRS
         ${SOURCE_DIR}/dist/Release/include/nspr
@@ -91,6 +92,7 @@ else ()
         pkcs7
         plc4
         plds4
+        sha-x86_c_lib
         softokn_static
         sqlite
         ${END_GROUP}
