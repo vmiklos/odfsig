@@ -1,5 +1,11 @@
 = Version descriptions
 
+== 7.2
+
+- Fix a missing include
+- Update bundled externals
+- Use IMPORTED_LOCATION_<CONFIG> instead of patching for the zlib and googletest externals
+
 == 7.1
 
 - Link bundled nss statically, which provides a self-contained executable on Linux and macOS
