@@ -1,5 +1,10 @@
 = Version descriptions
 
+== master
+
+- Update bundled externals, including nss to fix
+  <https://www.mozilla.org/en-US/security/advisories/mfsa2021-51/>.
+
 == 7.2
 
 - Fix a missing include
