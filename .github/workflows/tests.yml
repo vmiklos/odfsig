@@ -51,7 +51,13 @@ jobs:
       - name: Run make check
         run: |
           scripts/ci-build.sh
-  #linux-gcc-iwyu:
+  linux-gcc-iwyu:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run make check
+        run: |
+          scripts/ci-build.sh
   macos-release:
     runs-on: macos-10.15
     steps:
