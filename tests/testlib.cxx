@@ -113,8 +113,8 @@ TEST(OdfsigTest, testTrustedDerCmdline)
     std::vector<const char*> args{"odfsig", "--trusted-der",
                                   "tests/keys/ca-chain.cert.der",
                                   "tests/data/good.odt"};
-    std::stringstream ss;
-    ASSERT_EQ(0, odfsig::main(args, ss));
+    std::stringstream stream;
+    ASSERT_EQ(0, odfsig::main(args, stream));
 }
 
 TEST(OdfsigTest, testInsecureCmdline)
@@ -122,32 +122,32 @@ TEST(OdfsigTest, testInsecureCmdline)
     // --insecure results in working validation.
     std::vector<const char*> args{"odfsig", "--insecure",
                                   "tests/data/good.odt"};
-    std::stringstream ss;
-    ASSERT_EQ(0, odfsig::main(args, ss));
+    std::stringstream stream;
+    ASSERT_EQ(0, odfsig::main(args, stream));
 }
 
 TEST(OdfsigTest, testCmdlineHelp)
 {
     // --help resulted in an error.
     std::vector<const char*> args{"odfsig", "--help"};
-    std::stringstream ss;
-    ASSERT_EQ(0, odfsig::main(args, ss));
+    std::stringstream stream;
+    ASSERT_EQ(0, odfsig::main(args, stream));
 }
 
 TEST(OdfsigTest, testCmdlineVersion)
 {
     // --version resulted in an error.
     std::vector<const char*> args{"odfsig", "--version"};
-    std::stringstream ss;
-    ASSERT_EQ(0, odfsig::main(args, ss));
+    std::stringstream stream;
+    ASSERT_EQ(0, odfsig::main(args, stream));
 }
 
 TEST(OdfsigTest, testCmdlineNoStream)
 {
     // No signatures stream.
     std::vector<const char*> args{"odfsig", "tests/data/no-stream.odt"};
-    std::stringstream ss;
-    ASSERT_EQ(1, odfsig::main(args, ss));
+    std::stringstream stream;
+    ASSERT_EQ(1, odfsig::main(args, stream));
 }
 
 TEST(OdfsigTest, testCmdlineBad)
@@ -156,8 +156,8 @@ TEST(OdfsigTest, testCmdlineBad)
     std::vector<const char*> args{"odfsig", "--trusted-der",
                                   "tests/keys/ca-chain.cert.der",
                                   "tests/data/bad.odt"};
-    std::stringstream ss;
-    ASSERT_EQ(1, odfsig::main(args, ss));
+    std::stringstream stream;
+    ASSERT_EQ(1, odfsig::main(args, stream));
 }
 
 TEST(OdfsigTest, testCmdlineBadMulti)
@@ -166,25 +166,25 @@ TEST(OdfsigTest, testCmdlineBadMulti)
     std::vector<const char*> args{"odfsig", "--trusted-der",
                                   "tests/keys/ca-chain.cert.der",
                                   "tests/data/bad.odt", "tests/data/good.odt"};
-    std::stringstream ss;
+    std::stringstream stream;
     // This failed, only the last file was verified.
-    ASSERT_EQ(1, odfsig::main(args, ss));
+    ASSERT_EQ(1, odfsig::main(args, stream));
 }
 
 TEST(OdfsigTest, testCmdlineBadPath)
 {
     // Non-existing path.
     std::vector<const char*> args{"odfsig", "tests/data/asdf.odt"};
-    std::stringstream ss;
-    ASSERT_EQ(1, odfsig::main(args, ss));
+    std::stringstream stream;
+    ASSERT_EQ(1, odfsig::main(args, stream));
 }
 
 TEST(OdfsigTest, testCmdlineNoArgs)
 {
     // No arguments.
     std::vector<const char*> args{"odfsig"};
-    std::stringstream ss;
-    ASSERT_EQ(1, odfsig::main(args, ss));
+    std::stringstream stream;
+    ASSERT_EQ(1, odfsig::main(args, stream));
 }
 
 TEST(OdfsigTest, testCmdlineBadArg)
@@ -193,25 +193,25 @@ TEST(OdfsigTest, testCmdlineBadArg)
     std::vector<const char*> args{"odfsig", "--trusted-derr",
                                   "tests/keys/ca-chain.cert.der",
                                   "tests/data/good.odt"};
-    std::stringstream ss;
+    std::stringstream stream;
     // This was 1, bad argument was just ignored silently.
-    ASSERT_EQ(2, odfsig::main(args, ss));
+    ASSERT_EQ(2, odfsig::main(args, stream));
 }
 
 TEST(OdfsigTest, testCmdlineDirArg)
 {
     // Directory argument.
     std::vector<const char*> args{"odfsig", "tests/data/"};
-    std::stringstream ss;
-    ASSERT_EQ(1, odfsig::main(args, ss));
+    std::stringstream stream;
+    ASSERT_EQ(1, odfsig::main(args, stream));
 }
 
 TEST(OdfsigTest, testCmdlineNonZip)
 {
     // Input is not a ZIP file: this used to crash.
     std::vector<const char*> args{"odfsig", "tests/data/non-zip.odt"};
-    std::stringstream ss;
-    ASSERT_EQ(1, odfsig::main(args, ss));
+    std::stringstream stream;
+    ASSERT_EQ(1, odfsig::main(args, stream));
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

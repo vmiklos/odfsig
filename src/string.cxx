@@ -16,7 +16,7 @@ bool starts_with(const std::string& big, const std::string& prefix)
 }
 
 void replace_all(std::string& str, const std::string& from,
-                 const std::string& to)
+                 const std::string& replacement)
 {
     size_t index = 0;
 
@@ -28,9 +28,9 @@ void replace_all(std::string& str, const std::string& from,
             break;
         }
 
-        str.replace(index, from.size(), to);
+        str.replace(index, from.size(), replacement);
 
-        index += to.size();
+        index += replacement.size();
     }
 }
 } // namespace odfsig
