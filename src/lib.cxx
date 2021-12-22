@@ -77,9 +77,9 @@ bool ends_with(const std::string& big, const std::string& suffix)
 }
 
 /// Converts from libxml char to normal char.
-const char* fromXmlChar(const xmlChar* s)
+const char* fromXmlChar(const xmlChar* string)
 {
-    return reinterpret_cast<const char*>(s);
+    return reinterpret_cast<const char*>(string);
 }
 } // namespace
 
@@ -261,7 +261,7 @@ class XmlSignature : public Signature
 
     static std::unique_ptr<xmlChar> getDigestAlgo(xmlNodePtr certDigest);
 
-    static bool hash(const std::vector<xmlChar>& in,
+    static bool hash(const std::vector<xmlChar>& input,
                      std::unique_ptr<xmlChar> algo,
                      std::vector<unsigned char>& out);
 
@@ -430,7 +430,7 @@ std::unique_ptr<xmlChar> XmlSignature::getDigestAlgo(xmlNodePtr certDigest)
     return algo;
 }
 
-bool XmlSignature::hash(const std::vector<xmlChar>& in,
+bool XmlSignature::hash(const std::vector<xmlChar>& input,
                         std::unique_ptr<xmlChar> algo,
                         std::vector<unsigned char>& out)
 {
@@ -455,8 +455,8 @@ bool XmlSignature::hash(const std::vector<xmlChar>& in,
     }
 
     hash->operation = xmlSecTransformOperationSign;
-    if (xmlSecTransformCtxBinaryExecute(transform.get(), in.data(), in.size()) <
-        0)
+    if (xmlSecTransformCtxBinaryExecute(transform.get(), input.data(),
+                                        input.size()) < 0)
     {
         return false;
     }
@@ -547,15 +547,15 @@ std::string XmlSignature::getMethod() const
         return {};
     }
 
-    xmlSecTransformId id =
+    xmlSecTransformId transformId =
         xmlSecTransformIdListFindByHref(xmlSecTransformIdsGet(), href.get(),
                                         xmlSecTransformUsageSignatureMethod);
-    if (id == xmlSecTransformIdUnknown)
+    if (transformId == xmlSecTransformIdUnknown)
     {
         return fromXmlChar(href.get());
     }
 
-    return fromXmlChar(xmlSecTransformKlassGetName(id));
+    return fromXmlChar(xmlSecTransformKlassGetName(transformId));
 }
 
 std::set<std::string> XmlSignature::getSignedStreams() const
@@ -890,10 +890,10 @@ bool ZipVerifier::parseSignatures()
     _zipFile = zip::File::create(_zipArchive.get(), _signaturesZipIndex);
     if (!_zipFile)
     {
-        std::stringstream ss;
-        ss << "Can't open file at index " << _signaturesZipIndex << ":"
-           << _zipArchive->getErrorString();
-        _errorString = ss.str();
+        std::stringstream stream;
+        stream << "Can't open file at index " << _signaturesZipIndex << ":"
+               << _zipArchive->getErrorString();
+        _errorString = stream.str();
         return false;
     }
 
@@ -908,10 +908,10 @@ bool ZipVerifier::parseSignatures()
     }
     if (readSize == -1)
     {
-        std::stringstream ss;
-        ss << "Can't read file at index " << _signaturesZipIndex << ": "
-           << _zipFile->getErrorString();
-        _errorString = ss.str();
+        std::stringstream stream;
+        stream << "Can't read file at index " << _signaturesZipIndex << ": "
+               << _zipFile->getErrorString();
+        _errorString = stream.str();
         return false;
     }
 

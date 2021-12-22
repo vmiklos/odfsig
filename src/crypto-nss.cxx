@@ -46,10 +46,10 @@ namespace
  */
 std::string getFirefoxProfile(const std::string& cryptoConfig)
 {
-    std::stringstream ss;
-    ss << cryptoConfig;
-    ss << "/.mozilla/firefox/";
-    const std::string firefoxPath = ss.str();
+    std::stringstream stream;
+    stream << cryptoConfig;
+    stream << "/.mozilla/firefox/";
+    const std::string firefoxPath = stream.str();
 
     std::ifstream profilesIni(firefoxPath + "profiles.ini");
     if (!profilesIni.good())
