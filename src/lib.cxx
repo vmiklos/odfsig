@@ -456,7 +456,8 @@ bool XmlSignature::hash(const std::vector<xmlChar>& input,
 
     hash->operation = xmlSecTransformOperationSign;
     if (xmlSecTransformCtxBinaryExecute(transform.get(), input.data(),
-                                        input.size()) < 0)
+                                        static_cast<xmlSecSize>(input.size())) <
+        0)
     {
         return false;
     }
