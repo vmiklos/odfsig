@@ -85,8 +85,8 @@ bool CngCrypto::initializeKeysManager(xmlSecKeysMngr* keysManager,
 std::string CngCrypto::getCertificateSubjectName(unsigned char* certificate,
                                                  size_t size)
 {
-    std::unique_ptr<const CERT_CONTEXT> context(
-        CertCreateCertificateContext(X509_ASN_ENCODING, certificate, size));
+    std::unique_ptr<const CERT_CONTEXT> context(CertCreateCertificateContext(
+        X509_ASN_ENCODING, certificate, static_cast<DWORD>(size)));
     if (context->pCertInfo == nullptr)
     {
         return std::string();
@@ -104,7 +104,7 @@ std::string CngCrypto::getCertificateSubjectName(unsigned char* certificate,
     subjectSize = CertNameToStrW(
         X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, &context->pCertInfo->Subject,
         CERT_X500_NAME_STR | CERT_NAME_STR_REVERSE_FLAG, subject.data(),
-        subject.size());
+        static_cast<DWORD>(subject.size()));
     if (subjectSize <= 0)
     {
         return std::string();
