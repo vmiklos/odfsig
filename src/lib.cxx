@@ -316,6 +316,12 @@ bool XmlSignature::verify()
             XMLSEC_KEYINFO_FLAGS_X509DATA_DONT_VERIFY_CERTS;
     }
 
+    if (!_crypto.initializeSignatureContext(dsigCtx.get()))
+    {
+        _errorString = "signature context crypto init failed";
+        return false;
+    }
+
     if (xmlSecDSigCtxVerify(dsigCtx.get(), _signatureNode) < 0)
     {
         _errorString = "DSig context verify failed";

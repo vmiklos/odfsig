@@ -10,6 +10,7 @@
 #include <vector>
 
 struct _xmlSecKeysMngr;
+struct _xmlSecDSigCtx;
 
 namespace odfsig
 {
@@ -35,6 +36,10 @@ class Crypto
     virtual bool
     initializeKeysManager(_xmlSecKeysMngr* keysManager,
                           std::vector<std::string> trustedDers) = 0;
+
+    /// Performs the crypto init of a signature context.
+    virtual bool
+    initializeSignatureContext(_xmlSecDSigCtx* signatureContext) = 0;
 
     /// Extracts the subject name of an X509 certificate.
     virtual std::string getCertificateSubjectName(unsigned char* certificate,

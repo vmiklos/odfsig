@@ -21,6 +21,8 @@
 #include <xmlsec/keysdata.h>
 #include <xmlsec/nss/app.h>
 #include <xmlsec/nss/crypto.h>
+#include <xmlsec/nss/x509.h>
+#include <xmlsec/xmldsig.h>
 #include <xmlsec/xmlsec.h>
 
 #include <odfsig/string.hxx>
@@ -94,6 +96,8 @@ class NssCrypto : public Crypto
     bool initializeKeysManager(xmlSecKeysMngr* keysManager,
                                std::vector<std::string> trustedDers) override;
 
+    bool initializeSignatureContext(_xmlSecDSigCtx* signatureContext) override;
+
     std::string getCertificateSubjectName(unsigned char* certificate,
                                           size_t size) override;
 };
@@ -133,6 +137,12 @@ bool NssCrypto::initializeKeysManager(xmlSecKeysMngr* keysManager,
                        });
 
     return true;
+}
+
+bool NssCrypto::initializeSignatureContext(xmlSecDSigCtx* signatureContext)
+{
+    return xmlSecPtrListAdd(&(signatureContext->keyInfoReadCtx.enabledKeyData),
+                            BAD_CAST xmlSecNssKeyDataX509GetKlass()) >= 0;
 }
 
 std::string NssCrypto::getCertificateSubjectName(unsigned char* certificate,
