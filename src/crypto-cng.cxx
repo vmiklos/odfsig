@@ -11,6 +11,8 @@
 #include <xmlsec/keysdata.h>
 #include <xmlsec/mscng/app.h>
 #include <xmlsec/mscng/crypto.h>
+#include <xmlsec/mscng/x509.h>
+#include <xmlsec/xmldsig.h>
 #include <xmlsec/xmlsec.h>
 
 #include <odfsig/string.hxx>
@@ -46,6 +48,8 @@ class CngCrypto : public Crypto
     bool initializeKeysManager(xmlSecKeysMngr* keysManager,
                                std::vector<std::string> trustedDers) override;
 
+    bool initializeSignatureContext(_xmlSecDSigCtx* signatureContext) override;
+
     std::string getCertificateSubjectName(unsigned char* certificate,
                                           size_t size) override;
 };
@@ -80,6 +84,12 @@ bool CngCrypto::initializeKeysManager(xmlSecKeysMngr* keysManager,
     }
 
     return true;
+}
+
+bool CngCrypto::initializeSignatureContext(xmlSecDSigCtx* signatureContext)
+{
+    return xmlSecPtrListAdd(&(signatureContext->keyInfoReadCtx.enabledKeyData),
+                            BAD_CAST xmlSecMSCngKeyDataX509GetKlass()) >= 0;
 }
 
 std::string CngCrypto::getCertificateSubjectName(unsigned char* certificate,
