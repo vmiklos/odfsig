@@ -16,9 +16,12 @@
 
 #include <cert.h>
 #include <certt.h>
+#include <libxml/xmlstring.h>
 #include <prtypes.h>
 #include <seccomon.h>
+#include <xmlsec/keyinfo.h>
 #include <xmlsec/keysdata.h>
+#include <xmlsec/list.h>
 #include <xmlsec/nss/app.h>
 #include <xmlsec/nss/crypto.h>
 #include <xmlsec/nss/x509.h>
@@ -139,7 +142,8 @@ bool NssCrypto::initializeKeysManager(xmlSecKeysMngr* keysManager,
     return true;
 }
 
-bool NssCrypto::initializeSignatureContext(xmlSecDSigCtx* signatureContext)
+bool NssCrypto::initializeSignatureContext(
+    struct _xmlSecDSigCtx* signatureContext)
 {
     return xmlSecPtrListAdd(&(signatureContext->keyInfoReadCtx.enabledKeyData),
                             BAD_CAST xmlSecNssKeyDataX509GetKlass()) >= 0;
