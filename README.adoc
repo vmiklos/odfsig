@@ -5,7 +5,7 @@ image:https://ci.appveyor.com/api/projects/status/l0wvhclvvo0hi46o/branch/master
 
 Open Document Format (ODF) digital signatures tool
 
-The latest version is v7.2, released on 2021-08-06.  See the
+The latest version is v7.3, released on 2022-02-01.  See the
 https://github.com/vmiklos/odfsig/blob/master/NEWS.adoc[release notes].
 
 == Description
