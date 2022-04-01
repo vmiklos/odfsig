@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-set(ZLIB_VERSION 1.2.11)
-set(ZLIB_SHA256SUM c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1)
+set(ZLIB_VERSION 1.2.12)
+set(ZLIB_SHA256SUM 91844808532e5ce316b3c010929493c0244f3d37593afd6de04f71821d5136d9)
 
 if (NOT ODFSIG_INTERNAL_ZLIB)
     find_package(ZLIB REQUIRED)

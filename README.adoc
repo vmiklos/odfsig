@@ -34,8 +34,8 @@ odfsig has been used on a variety of platforms:
 
 == Resources
 
-- http://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-part3.html#$$__RefHeading__752871_826425813$$[ODF
-  v1.2 digital signatures file spec]
+- https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part2-packages/OpenDocument-v1.3-os-part2-packages.html#$$__RefHeading__752871_826425813$$[ODF
+  v1.3 digital signatures file spec]
 
 == License
 

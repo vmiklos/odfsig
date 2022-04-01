@@ -17,16 +17,10 @@ if [ -n "${GITHUB_JOB}" -a "$(uname -s)" == "Linux" ]; then
 fi
 
 if [ -n "${GITHUB_JOB}" -a "$(uname -s)" == "Darwin" ]; then
-    git clone https://chromium.googlesource.com/external/gyp.git
-    cd gyp
-    python setup.py build
-    # See
-    # <https://stackoverflow.com/questions/4495120/combine-user-with-prefix-error-with-setup-py-install>
-    # on why '--prefix=' is necessary.
-    python setup.py install --user --prefix=
-    export PATH=$PATH:$HOME/Library/Python/2.7/bin
-    cd -
     brew install ninja
+    python3 -m pip install gyp-next
+    PYVERSION=$(python3 -c 'import platform; print(".".join(platform.python_version_tuple()[0:2]))')
+    export PATH=$PATH:$HOME/Library/Python/$PYVERSION/bin
 fi
 
 if [ "$GITHUB_JOB" == "linux-gcc-release" ]; then
