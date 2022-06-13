@@ -6,7 +6,7 @@
 # Baseline: see .github/workflows/tests.yml.
 
 if [ -n "${GITHUB_JOB}" -a "$(uname -s)" == "Linux" ]; then
-    if [ "$GITHUB_JOB" == "linux-gcc-release" -o "$GITHUB_JOB" == "linux-clang-debug" ]; then
+    if [ "$GITHUB_JOB" == "linux-gcc-release" -o "$GITHUB_JOB" == "linux-clang-debug" -o "$GITHUB_JOB" == "linux-clang-asan-ubsan" ]; then
         sudo apt-get update
         sudo apt-get install \
             clang-tidy \
