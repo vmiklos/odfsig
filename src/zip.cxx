@@ -49,11 +49,10 @@ class ZipSource : public Source
     zip_source_t* get();
 
   private:
-    zip_source_t* _source;
+    zip_source_t* _source = nullptr;
 };
 
 ZipSource::ZipSource(const void* data, size_t size, Error* error)
-    : _source(nullptr)
 {
     auto* zipError = dynamic_cast<zip::ZipError*>(error);
     if (zipError == nullptr)
@@ -99,10 +98,10 @@ class ZipArchive : public Archive
     zip_t* get();
 
   private:
-    zip_t* _archive;
+    zip_t* _archive = nullptr;
 };
 
-ZipArchive::ZipArchive(Source* source, Error* error) : _archive(nullptr)
+ZipArchive::ZipArchive(Source* source, Error* error)
 {
     auto* zipSource = dynamic_cast<zip::ZipSource*>(source);
     if (zipSource == nullptr)
@@ -193,10 +192,10 @@ class ZipFile : public File
     zip_file_t* get();
 
   private:
-    zip_file_t* _file;
+    zip_file_t* _file = nullptr;
 };
 
-ZipFile::ZipFile(Archive* archive, int64_t index) : _file(nullptr)
+ZipFile::ZipFile(Archive* archive, int64_t index)
 {
     auto* zipArchive = dynamic_cast<zip::ZipArchive*>(archive);
     if (zipArchive == nullptr)
