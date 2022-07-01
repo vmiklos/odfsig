@@ -6,25 +6,13 @@
 # Baseline: see .github/workflows/tests.yml.
 
 if [ -n "${GITHUB_JOB}" -a "$(uname -s)" == "Linux" ]; then
-    if [ "$GITHUB_JOB" == "linux-gcc-release" -o "$GITHUB_JOB" == "linux-clang-debug" -o "$GITHUB_JOB" == "linux-clang-asan-ubsan" -o "$GITHUB_JOB" == "linux-valgrind" -o "$GITHUB_JOB" == "linux-clang-tidy" ]; then
-        sudo apt-get update
-        sudo apt-get install \
-            clang-tidy \
-            gyp \
-            iwyu libclang-common-11-dev \
-            ninja-build \
-            valgrind \
-
-    else
-        sudo apt-get update
-        sudo apt-get install \
-            clang-tidy \
-            gyp \
-            iwyu libclang-common-9-dev \
-            ninja-build \
-            valgrind \
-
-    fi
+    sudo apt-get update
+    sudo apt-get install \
+        clang-tidy \
+        gyp \
+        iwyu libclang-common-11-dev \
+        ninja-build \
+        valgrind \
 
 fi
 
