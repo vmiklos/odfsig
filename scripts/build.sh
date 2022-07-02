@@ -28,36 +28,6 @@ do
         --iwyu)
             cmake_args+=" -DODFSIG_IWYU=ON"
             run_iwyu="y"
-
-            if [ -z "$(type -p include-what-you-use)" ]; then
-                CWD=$PWD
-                TARNAME="include-what-you-use-0.14.src.tar.gz"
-                TARPATH="$CWD/extern/tarballs/$TARNAME"
-                if [ ! -e $TARPATH ]; then
-                    mkdir -p extern/tarballs
-                    wget -O $TARPATH https://include-what-you-use.org/downloads/$TARNAME
-                fi
-                rm -rf iwyu
-                mkdir -p iwyu
-                cd iwyu
-                tar xvf $TARPATH
-                cd include-what-you-use
-                mkdir workdir
-                cd workdir
-                cmake \
-                    -DCMAKE_INSTALL_PREFIX=$CWD/iwyu/install \
-                    -DCMAKE_BUILD_TYPE=Release \
-                    -DCMAKE_PREFIX_PATH=/usr/lib/llvm-10 \
-                    -DCMAKE_C_COMPILER="clang-10" \
-                    -DCMAKE_CXX_COMPILER="clang++-10" \
-                    ..
-                make -j$(getconf _NPROCESSORS_ONLN)
-                make install
-                cd $CWD/iwyu/install
-                ln -s /usr/lib .
-                export PATH=$PATH:$CWD/iwyu/install/bin
-                cd $CWD
-            fi
             ;;
         --asan-ubsan)
 	    export ASAN_OPTIONS=detect_stack_use_after_return=1
