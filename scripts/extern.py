@@ -13,11 +13,11 @@ import sys
 import urllib.request
 
 releaseMonitoring = {
-    "googletest": ["googletest", "https://github.com/abseil/googletest"],
+    "googletest": ["googletest", "https://google.github.io/googletest/"],
     "libxml2": ["libxml2", "http://xmlsoft.org/"],
-    "libzip": ["libzip", "http://www.nih.at/libzip/"],
+    "libzip": ["libzip", "https://libzip.org/"],
     "xmlsec": ["xmlsec1", "http://www.aleksey.com/xmlsec/download.html"],
-    "zlib": ["zlib", "http://www.zlib.net/"],
+    "zlib": ["zlib", "https://www.zlib.net/"],
     "nss": ["nss", "https://ftp.mozilla.org/pub/security/nss/releases/"],
 }
 

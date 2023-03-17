@@ -20,7 +20,13 @@ if [ -n "${GITHUB_JOB}" -a "$(uname -s)" == "Darwin" ]; then
     brew install ninja
     python3 -m pip install gyp-next
     PYVERSION=$(python3 -c 'import platform; print(".".join(platform.python_version_tuple()[0:2]))')
-    export PATH=$PATH:$HOME/Library/Python/$PYVERSION/bin
+    # Patch in https://github.com/nodejs/gyp-next/pull/83 for now.
+    sed 's/if sys.platform == "zos":/if PY3 or sys.platform == "zos":/' \
+        /Library/Frameworks/Python.framework/Versions/$PYVERSION/lib/python$PYVERSION/site-packages/gyp/input.py \
+        > /Library/Frameworks/Python.framework/Versions/$PYVERSION/lib/python$PYVERSION/site-packages/gyp/input.py.new
+    mv /Library/Frameworks/Python.framework/Versions/$PYVERSION/lib/python$PYVERSION/site-packages/gyp/input.py.new \
+        /Library/Frameworks/Python.framework/Versions/$PYVERSION/lib/python$PYVERSION/site-packages/gyp/input.py
+    export PATH=$PATH:/Library/Frameworks/Python.framework/Versions/$PYVERSION/bin
 fi
 
 if [ "$GITHUB_JOB" == "linux-gcc-release" ]; then
