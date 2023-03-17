@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-set(NSS_VERSION 3.79)
-set(NSS_SHA256SUM 5369ed274a19f480ec94e1faef04da63e3cbac1a82e15bb1751e58b2f274b835)
+set(NSS_VERSION 3.89)
+set(NSS_SHA256SUM e40012df101331eadb87cfdb204969ab2a4b9a81735deba94fe5501aff12fd65)
 
 if (NOT ODFSIG_INTERNAL_NSS)
     find_package(PkgConfig REQUIRED)
@@ -28,13 +28,13 @@ else ()
     endif ()
 
     ExternalProject_Add(extern-nss-project
-        URL https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_79_RTM/src/nss-${NSS_VERSION}-with-nspr-4.34.tar.gz
+        URL https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_89_RTM/src/nss-${NSS_VERSION}-with-nspr-4.35.tar.gz
         URL_HASH SHA256=${NSS_SHA256SUM}
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON
         CONFIGURE_COMMAND ""
         BUILD_COMMAND
-	    ${ODFSIG_LINUX_CC} ${ODFSIG_LINUX_CXX} nss/build.sh --opt --static --disable-tests -Duse_system_sqlite=0
+	    ${ODFSIG_LINUX_CC} ${ODFSIG_LINUX_CXX} nss/build.sh -v --opt --static --disable-tests -Duse_system_sqlite=0
         INSTALL_COMMAND ""
         )
 
