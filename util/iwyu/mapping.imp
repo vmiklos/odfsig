@@ -8,7 +8,8 @@
   { symbol: [ "std::ifstream", private, "<fstream>", public ] },
 
   # gtest
-  { include: [ "\"gtest/gtest_pred_impl.h\"", private, "<gtest/gtest.h>", public ] }
+  { include: [ "\"gtest/gtest_pred_impl.h\"", private, "<gtest/gtest.h>", public ] },
+  { include: [ "\"gtest/gtest.h\"", private, "<gtest/gtest.h>", public ] }
 ]
 
 # vim: set ft=toml:

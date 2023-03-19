@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-set(GOOGLETEST_VERSION 1.11.0)
-set(GOOGLETEST_SHA256SUM b4870bf121ff7795ba20d20bcdd8627b8e088f2d1dab299a031c1034eddc93d5)
+set(GOOGLETEST_VERSION 1.13.0)
+set(GOOGLETEST_SHA256SUM ad7fdba11ea011c1d925b3289cf4af2c66a352e18d4c7264392fead75e919363)
 
 if (NOT ODFSIG_INTERNAL_LIBGTEST)
     find_package(GTest REQUIRED)
@@ -12,7 +12,7 @@ else ()
     include(GNUInstallDirs)
     find_package(Threads REQUIRED)
     ExternalProject_Add(extern-googletest-project
-        URL https://github.com/google/googletest/archive/release-${GOOGLETEST_VERSION}.tar.gz
+        URL https://github.com/google/googletest/archive/refs/tags/v${GOOGLETEST_VERSION}.tar.gz
         URL_HASH SHA256=${GOOGLETEST_SHA256SUM}
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         CONFIGURE_COMMAND ${CMAKE_COMMAND}
@@ -26,9 +26,7 @@ else ()
     add_library(gtest_main STATIC IMPORTED)
     if (WIN32)
         set_property(TARGET gtest PROPERTY IMPORTED_LOCATION ${INSTALL_DIR}/lib/gtest.lib)
-        set_property(TARGET gtest PROPERTY IMPORTED_LOCATION_DEBUG ${INSTALL_DIR}/lib/gtestd.lib)
         set_property(TARGET gtest_main PROPERTY IMPORTED_LOCATION ${INSTALL_DIR}/lib/gtest_main.lib)
-        set_property(TARGET gtest_main PROPERTY IMPORTED_LOCATION_DEBUG ${INSTALL_DIR}/lib/gtest_maind.lib)
     else ()
         set_property(TARGET gtest PROPERTY IMPORTED_LOCATION ${INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}/libgtest.a)
         set_property(TARGET gtest_main PROPERTY IMPORTED_LOCATION ${INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}/libgtest_main.a)
