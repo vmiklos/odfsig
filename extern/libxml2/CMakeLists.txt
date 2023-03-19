@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-set(LIBXML2_VERSION 2.9.14)
-set(LIBXML2_SHA256SUM 60d74a257d1ccec0475e749cba2f21559e48139efba6ff28224357c7c798dfee)
+set(LIBXML2_VERSION 2.10.3)
+set(LIBXML2_SHA256SUM 5d2cc3d78bec3dbe212a9d7fa629ada25a7da928af432c93060ff5c17ee28a9c)
 
 if (NOT ODFSIG_INTERNAL_LIBXML2)
     find_package(PkgConfig REQUIRED)
@@ -38,7 +38,7 @@ else ()
     endif()
 
     ExternalProject_Add(extern-libxml2-project
-        URL https://download.gnome.org/sources/libxml2/2.9/libxml2-${LIBXML2_VERSION}.tar.xz
+        URL https://download.gnome.org/sources/libxml2/2.10/libxml2-${LIBXML2_VERSION}.tar.xz
         URL_HASH SHA256=${LIBXML2_SHA256SUM}
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON

@@ -40,8 +40,15 @@ else ()
                 NSS_LIBS=-L${CMAKE_BINARY_DIR}/bin\ -lsmime3\ -lnss3\ -lnssutil3
             )
         endif ()
+        if (ODFSIG_INTERNAL_LIBXML2)
+            ExternalProject_Get_Property(extern-libxml2-project SOURCE_DIR)
+            set(ODFSIG_INTERNAL_XMLSEC_XML
+                LIBXML_CFLAGS=-I${SOURCE_DIR}/include/
+            )
+        endif ()
         set(CONFIGURE_COMMAND ./configure
             ${ODFSIG_INTERNAL_XMLSEC_NSS}
+            ${ODFSIG_INTERNAL_XMLSEC_XML}
             --prefix=<INSTALL_DIR>
             --with-pic
             --disable-shared
