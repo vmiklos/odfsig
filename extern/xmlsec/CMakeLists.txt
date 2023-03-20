@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-set(XMLSEC_VERSION 1.2.34)
-set(XMLSEC_SHA256SUM 52ced4943f35bd7d0818a38298c1528ca4ac8a54440fd71134a07d2d1370a262)
+set(XMLSEC_VERSION 1.2.37)
+set(XMLSEC_SHA256SUM 5f8dfbcb6d1e56bddd0b5ec2e00a3d0ca5342a9f57c24dffde5c796b2be2871c)
 
 if (NOT ODFSIG_INTERNAL_XMLSEC)
     find_package(PkgConfig REQUIRED)
