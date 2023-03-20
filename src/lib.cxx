@@ -349,10 +349,10 @@ bool XmlSignature::getCertificateBinary(std::vector<xmlChar>& certificate) const
     }
 
     // Decode the certificate in-place.
-    int certSize = xmlSecBase64Decode(certificateContent.get(),
-                                      (xmlSecByte*)certificateContent.get(),
-                                      xmlStrlen(certificateContent.get()));
-    if (certSize < 0)
+    xmlSecSize certSize;
+    if (xmlSecBase64Decode_ex(
+            certificateContent.get(), (xmlSecByte*)certificateContent.get(),
+            xmlStrlen(certificateContent.get()), &certSize) < 0)
     {
         return false;
     }
@@ -403,10 +403,11 @@ bool XmlSignature::getDigestValue(xmlNodePtr certDigest,
     }
 
     // Decode the expected hash in-place.
-    int expectedDigestSize = xmlSecBase64Decode(
-        digestValueNodeContent.get(), (xmlSecByte*)digestValueNodeContent.get(),
-        xmlStrlen(digestValueNodeContent.get()));
-    if (expectedDigestSize < 0)
+    xmlSecSize expectedDigestSize;
+    if (xmlSecBase64Decode_ex(digestValueNodeContent.get(),
+                              (xmlSecByte*)digestValueNodeContent.get(),
+                              xmlStrlen(digestValueNodeContent.get()),
+                              &expectedDigestSize) < 0)
     {
         return false;
     }
