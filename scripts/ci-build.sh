@@ -12,7 +12,6 @@ if [ -n "${GITHUB_JOB}" -a "$(uname -s)" == "Linux" ]; then
         gyp \
         iwyu libclang-common-11-dev \
         ninja-build \
-        valgrind \
 
 fi
 
@@ -35,8 +34,6 @@ elif [ "$GITHUB_JOB" == "linux-clang-debug" ]; then
     CI_ARGS="--debug --werror --clang"
 elif [ "$GITHUB_JOB" == "linux-clang-asan-ubsan" ]; then
     CI_ARGS="--debug --werror --asan-ubsan"
-elif [ "$GITHUB_JOB" == "linux-valgrind" ]; then
-    CI_ARGS="--debug --werror --valgrind"
 elif [ "$GITHUB_JOB" == "linux-clang-tidy" ]; then
     CI_ARGS="--debug --werror --tidy"
 elif [ "$GITHUB_JOB" == "linux-gcc-iwyu" ]; then

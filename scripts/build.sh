@@ -5,7 +5,6 @@
 
 cmake_args="-DCMAKE_INSTALL_PREFIX:PATH=$PWD/instdir"
 run_clang_tidy=""
-run_valgrind=""
 run_iwyu=""
 
 for arg in "$@"
@@ -55,10 +54,6 @@ do
             fi
             export CCACHE_CPP2=1
             ;;
-        --valgrind)
-            cmake_args+=" -DODFSIG_INTERNAL_XMLSEC=ON"
-            run_valgrind="y"
-            ;;
         *)
             cmake_args+=" $arg"
     esac
@@ -82,13 +77,7 @@ if [ "$(uname -s)" == "Linux" ]; then
     # Once we link NSS statically or fix the rpath on libnss3.so, this can be removed.
     export LD_LIBRARY_PATH=$PWD/bin
 fi
-if [ -n "$run_valgrind" ]; then
-    cd ..
-    valgrind --leak-check=full --error-exitcode=1 workdir/bin/odfsigtest
-    cd -
-else
-    make check
-fi
+make check
 make install
 cd ..
 ln -s workdir/compile_commands.json .
