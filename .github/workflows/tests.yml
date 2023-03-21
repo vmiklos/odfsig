@@ -37,13 +37,6 @@ jobs:
       - name: Run make check
         run: |
           scripts/ci-build.sh
-  linux-valgrind:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v2
-      - name: Run make check
-        run: |
-          scripts/ci-build.sh
   linux-clang-tidy:
     runs-on: ubuntu-22.04
     steps:
