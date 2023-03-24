@@ -2,7 +2,7 @@
 
 image:https://github.com/vmiklos/odfsig/workflows/tests/badge.svg["Build Status", link="https://github.com/vmiklos/odfsig/actions"]
 
-Open Document Format (ODF) digital signatures tool
+Open Document Format (ODF) digital signatures tool: currently can verify already created signatures.
 
 The latest version is v7.3, released on 2022-02-01.  See the
 https://github.com/vmiklos/odfsig/blob/master/NEWS.adoc[release notes].
