@@ -1,7 +1,6 @@
 = odfsig
 
 image:https://github.com/vmiklos/odfsig/workflows/tests/badge.svg["Build Status", link="https://github.com/vmiklos/odfsig/actions"]
-image:https://ci.appveyor.com/api/projects/status/l0wvhclvvo0hi46o/branch/master?svg=true["Build Status", link="https://ci.appveyor.com/project/MiklosVajna/odfsig/branch/master"]
 
 Open Document Format (ODF) digital signatures tool
 
