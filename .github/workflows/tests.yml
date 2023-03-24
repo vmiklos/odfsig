@@ -71,3 +71,17 @@ jobs:
       - name: Run make check
         run: |
           scripts/ci-build.sh
+  windows-release:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run make check
+        run: |
+          scripts/build.ps1 -config Release
+  windows-debug:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run make check
+        run: |
+          scripts/build.ps1 -config Debug
