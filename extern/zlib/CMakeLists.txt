@@ -15,7 +15,6 @@ else ()
         URL_HASH SHA256=${ZLIB_SHA256SUM}
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         CONFIGURE_COMMAND ${CMAKE_COMMAND}
-            -DCMAKE_DEBUG_POSTFIX=
             -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
             <SOURCE_DIR>
         )
