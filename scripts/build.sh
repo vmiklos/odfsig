@@ -73,10 +73,6 @@ if [ -n "$run_iwyu" ]; then
 else
     make -j$(getconf _NPROCESSORS_ONLN)
 fi
-if [ "$(uname -s)" == "Linux" ]; then
-    # Once we link NSS statically or fix the rpath on libnss3.so, this can be removed.
-    export LD_LIBRARY_PATH=$PWD/bin
-fi
 make check
 make install
 cd ..
