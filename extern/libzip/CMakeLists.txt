@@ -21,6 +21,7 @@ else ()
         URL_HASH SHA256=${LIBZIP_SHA256SUM}
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         CONFIGURE_COMMAND ${CMAKE_COMMAND}
+            -Wno-dev
             -DBUILD_SHARED_LIBS=OFF
             -DENABLE_GNUTLS=OFF
             -DENABLE_OPENSSL=OFF
