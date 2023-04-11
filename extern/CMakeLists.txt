@@ -1,6 +1,6 @@
-# Copyright 2018 Miklos Vajna. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the LICENSE file.
+# Copyright 2018 Miklos Vajna
+#
+# SPDX-License-Identifier: MIT
 
 # 'git apply' is more cross-platform than 'patch -p1 -i'.
 set(PATCH_EXECUTABLE git --work-tree=. --git-dir=.git apply --ignore-whitespace --whitespace=nowarn --verbose)

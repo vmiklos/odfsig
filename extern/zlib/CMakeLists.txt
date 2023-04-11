@@ -1,6 +1,6 @@
-# Copyright 2018 Miklos Vajna. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the LICENSE file.
+# Copyright 2018 Miklos Vajna
+#
+# SPDX-License-Identifier: MIT
 
 set(ZLIB_VERSION 1.2.13)
 set(ZLIB_SHA256SUM b3a24de97a8fdbc835b9833169501030b8977031bcb54b3b3ac13740f846ab30)
