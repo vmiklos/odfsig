@@ -1,6 +1,6 @@
-# Copyright 2019 Miklos Vajna. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the LICENSE file.
+# Copyright 2019 Miklos Vajna
+#
+# SPDX-License-Identifier: MIT
 
 set(LIBZIP_VERSION 1.9.2)
 set(LIBZIP_SHA256SUM fd6a7f745de3d69cf5603edc9cb33d2890f0198e415255d0987a0cf10d824c6f)

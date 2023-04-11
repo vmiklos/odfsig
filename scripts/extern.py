@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 #
-# Copyright 2018 Miklos Vajna. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the LICENSE file.
+# Copyright 2018 Miklos Vajna
+#
+# SPDX-License-Identifier: MIT
 #
 # Script that checks if newer versions of externals are available.
 #

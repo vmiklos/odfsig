@@ -1,6 +1,6 @@
-# Copyright 2018 Miklos Vajna. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the LICENSE file.
+# Copyright 2018 Miklos Vajna
+#
+# SPDX-License-Identifier: MIT
 
 set(NSS_VERSION 3.89)
 set(NSS_SHA256SUM e40012df101331eadb87cfdb204969ab2a4b9a81735deba94fe5501aff12fd65)
