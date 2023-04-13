@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-set(XMLSEC_VERSION 1.2.37)
-set(XMLSEC_SHA256SUM 5f8dfbcb6d1e56bddd0b5ec2e00a3d0ca5342a9f57c24dffde5c796b2be2871c)
+set(XMLSEC_VERSION 1.3.0)
+set(XMLSEC_SHA256SUM df3ad2548288411fc3d44c20879e4c4e90684a1a4fb76a06ae444f957171c9a6)
 
 if (NOT ODFSIG_INTERNAL_XMLSEC)
     find_package(PkgConfig REQUIRED)
@@ -113,7 +113,6 @@ else ()
         ${NSS_LIBRARIES}
         )
     set(XMLSEC_CFLAGS_OTHER
-        -DXMLSEC_NO_SIZE_T
         -DXMLSEC_NO_XSLT
         )
 endif ()
