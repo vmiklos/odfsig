@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-set(NSS_VERSION 3.89)
-set(NSS_SHA256SUM e40012df101331eadb87cfdb204969ab2a4b9a81735deba94fe5501aff12fd65)
+set(NSS_VERSION 3.89.1)
+set(NSS_SHA256SUM 7381c5524afc108dfcb66c72f12e85b8885b4af5250e516df9fb0a194e5b1ea3)
 
 if (NOT ODFSIG_INTERNAL_NSS)
     find_package(PkgConfig REQUIRED)
@@ -28,7 +28,7 @@ else ()
     endif ()
 
     ExternalProject_Add(extern-nss-project
-        URL https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_89_RTM/src/nss-${NSS_VERSION}-with-nspr-4.35.tar.gz
+        URL https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_89_1_RTM/src/nss-${NSS_VERSION}-with-nspr-4.35.tar.gz
         URL_HASH SHA256=${NSS_SHA256SUM}
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON
