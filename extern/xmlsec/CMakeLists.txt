@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-set(XMLSEC_VERSION 1.3.1-rc1)
-set(XMLSEC_SHA256SUM 0537a3e27b7d2e94bf6ccae07b6601d9f36db115e7abbea5ebd24eb7e90cc99a)
+set(XMLSEC_VERSION 1.3.1)
+set(XMLSEC_SHA256SUM 10f48384d4fd1afc05fea545b74fbf7c152582f0a895c189f164d55270400c63)
 
 if (NOT ODFSIG_INTERNAL_XMLSEC)
     find_package(PkgConfig REQUIRED)
@@ -71,7 +71,7 @@ else ()
         set(NSS_LIBRARIES nss)
     endif ()
     ExternalProject_Add(extern-xmlsec-project
-        URL http://www.aleksey.com/xmlsec/download/xmlsec1-${XMLSEC_VERSION}.tar.gz
+        URL https://www.aleksey.com/xmlsec/download/xmlsec1-${XMLSEC_VERSION}.tar.gz
         URL_HASH SHA256=${XMLSEC_SHA256SUM}
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON
