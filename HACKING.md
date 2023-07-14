@@ -1,4 +1,4 @@
-= Coding style
+# Coding style
 
 - Memory management: no manual delete. Use an `std::default_delete<>` template
   specialization when it comes to releasing resources with C library calls.
@@ -19,7 +19,7 @@
 - Whitespace formatting: install the git hook in `git-hooks/` to let
   `clang-format` handle formatting for you.
 
-== Checklist before release
+## Checklist before release
 
 Ideally CI checks everything before a commit hits master, but here are a few
 things which are not part of CI:
@@ -27,22 +27,22 @@ things which are not part of CI:
 - using system libraries: this works on latest stable openSUSE (Leap 15.3
   currently):
 
-----
+```
 scripts/build.sh
-----
+```
 
 NOTE: the lack of `--internal-libs` is the point of this exercise
 
 - version check of libraries:
 
-----
+```
 scripts/extern.py
-----
+```
 
 - fuzzing:
 
-----
+```
 workdir/bin/odfsigfuzz -max_len=16384 tests/data/
-----
+```
 
 NOTE: This requires a `--fuzz` build.
