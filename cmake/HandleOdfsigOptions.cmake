@@ -9,7 +9,7 @@ if (ODFSIG_ENABLE_CCACHE)
     endif ()
 endif ()
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 if (WIN32)
     # more or less equivalent of the below -Wall and -Wextra
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
