@@ -31,7 +31,6 @@
 #include <xmlsec/xmltree.h>
 
 #include <odfsig/crypto.hxx>
-#include <odfsig/string.hxx>
 
 #include "zip.hxx"
 
@@ -593,7 +592,7 @@ std::set<std::string> XmlSignature::getSignedStreams() const
         }
 
         std::string uri(fromXmlChar(uriProp.get()));
-        if (starts_with(uri, "#"))
+        if (uri.starts_with("#"))
         {
             continue;
         }

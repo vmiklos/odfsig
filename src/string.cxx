@@ -10,11 +10,6 @@
 
 namespace odfsig
 {
-bool starts_with(const std::string& big, const std::string& prefix)
-{
-    return big.compare(0, prefix.length(), prefix) == 0;
-}
-
 void replace_all(std::string& str, const std::string& from,
                  const std::string& replacement)
 {

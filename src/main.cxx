@@ -13,7 +13,6 @@
 #include <vector>
 
 #include <odfsig/lib.hxx>
-#include <odfsig/string.hxx>
 #include <odfsig/version.hxx>
 
 namespace
@@ -169,7 +168,7 @@ bool parseOptions(const std::vector<const char*>& args, Options& options,
         {
             options._version = true;
         }
-        else if (odfsig::starts_with(argString, "--"))
+        else if (argString.starts_with("--"))
         {
             ostream << "Error: unrecognized argument: " << argString
                     << std::endl;
