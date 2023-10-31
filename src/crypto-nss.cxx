@@ -28,8 +28,6 @@
 #include <xmlsec/xmldsig.h>
 #include <xmlsec/xmlsec.h>
 
-#include <odfsig/string.hxx>
-
 namespace std
 {
 template <> struct default_delete<CERTCertificate>
@@ -67,7 +65,7 @@ std::string getFirefoxProfile(const std::string& cryptoConfig)
     std::string line;
     while (std::getline(profilesIni, line))
     {
-        if (odfsig::starts_with(line, pathPrefix))
+        if (line.starts_with(pathPrefix))
         {
             // Path= is expected to be before Default=.
             profilePath = line.substr(pathPrefix.size());

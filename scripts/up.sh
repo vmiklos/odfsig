@@ -4,6 +4,8 @@
 # SPDX-License-Identifier: MIT
 
 #git pull -r
+export CC=gcc-12
+export CXX=g++-12
 scripts/build.sh --debug --werror "$@"
 
 # Exclude workdir automatically.
