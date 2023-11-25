@@ -73,6 +73,8 @@ else ()
     ExternalProject_Add(extern-xmlsec-project
         URL https://www.aleksey.com/xmlsec/download/xmlsec1-${XMLSEC_VERSION}.tar.gz
         URL_HASH SHA256=${XMLSEC_SHA256SUM}
+        PATCH_COMMAND ${PATCH_EXECUTABLE}
+            ${CMAKE_CURRENT_SOURCE_DIR}/fix-libxml2-v2.12.0-includes-729.patch
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON
         CONFIGURE_COMMAND ${CONFIGURE_COMMAND}
