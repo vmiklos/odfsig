@@ -1,14 +1,14 @@
-= odfsig(1)
+% odfsig(1)
 
-== NAME
+# NAME
 
 odfsig - Open Document Format (ODF) digital signatures tool
 
-== SYNOPSIS
+# SYNOPSIS
 
 odfsig [options] <ODF-file>...
 
-== DESCRIPTION
+# DESCRIPTION
 
 odfsig verifies the digital signatures in an ODF document.
 
@@ -19,31 +19,34 @@ following locations:
 
 - Additional certificate chains, provided using the `--trusted-der` option.
 
-== OPTIONS
+# OPTIONS
 
---help::
-	Display this manpage.
+--help
 
---insecure::
-	Disable certificate verification, only focus on digest mismatches.
+: Display this manpage.
 
---trusted-der <file>::
-	Load trusted (root) certificate (chain) from a DER file.
+--insecure
 
-== EXIT STATUS
+: Disable certificate verification, only focus on digest mismatches.
+
+--trusted-der <file>
+
+: Load trusted (root) certificate (chain) from a DER file.
+
+# EXIT STATUS
 
 The exit status is 0 if all signatures of all files are valid, 1 if at least
 one signature is invalid, and 2 if an error occurred.
 
-== LICENSE
+# LICENSE
 
 Use of this source code is governed by a BSD-style license that can be found in
 the LICENSE file.
 
-== REPORTING BUGS
+# REPORTING BUGS
 
 Patches welcome via <https://github.com/vmiklos/odfsig>.
 
-== SEE ALSO
+# SEE ALSO
 
-*pdfsig*(1)
+**pdfsig(1)**

@@ -2,11 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
-if (A2X)
+if (PANDOC)
     include(GNUInstallDirs)
     add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/odfsig.1
-        COMMAND ${A2X} -f manpage -D ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/odfsig.adoc
-        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/odfsig.adoc
+        COMMAND ${PANDOC} --standalone --to man -o ${CMAKE_CURRENT_BINARY_DIR}/odfsig.1 ${CMAKE_CURRENT_SOURCE_DIR}/odfsig.md
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/odfsig.md
         COMMENT "Building manpage"
         VERBATIM)
 
