@@ -1,0 +1,6 @@
+[book]
+title = "odfsig user guide"
+
+[output.html]
+edit-url-template = "https://github.com/vmiklos/odfsig/edit/master/guide/{path}"
+additional-js = ["matomo.js"]
