@@ -1,4 +1,6 @@
-# Coding style
+# Development notes
+
+## Coding style
 
 - Memory management: no manual delete. Use an `std::default_delete<>` template
   specialization when it comes to releasing resources with C library calls.

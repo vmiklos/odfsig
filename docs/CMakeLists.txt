@@ -17,4 +17,9 @@ if (PANDOC)
         )
 endif ()
 
+add_custom_target(run-guide
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/guide
+    COMMAND mdbook serve --hostname 127.0.0.1
+    )
+
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
