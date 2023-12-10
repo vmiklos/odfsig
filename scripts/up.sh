@@ -3,10 +3,12 @@
 #
 # SPDX-License-Identifier: MIT
 
+# Wrapper around build.sh, providing good settings for development.
+
 #git pull -r
 export CC=gcc-12
 export CXX=g++-12
-scripts/build.sh --debug --werror "$@"
+scripts/build.sh -DCMAKE_BUILD_TYPE=Debug -DODFSIG_ENABLE_WERROR=ON "$@"
 
 # Exclude workdir automatically.
 ctags --c++-kinds=+p --fields=+iaS --extra=+q -R --totals=yes $(git ls-files|grep /|sed 's|/.*||'|sort -u)
