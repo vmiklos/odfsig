@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-set(XMLSEC_VERSION 1.3.2)
-set(XMLSEC_SHA256SUM 4003c56b3d356d21b1db7775318540fad6bfedaf5f117e8f7c010811219be3cf)
+set(XMLSEC_VERSION 1.3.3-rc1)
+set(XMLSEC_SHA256SUM af90e947b1f4df2de73d831c4a3f3926e95417fab614f02dd17df23cf09ac3c8)
 
 if (NOT ODFSIG_INTERNAL_XMLSEC)
     find_package(PkgConfig REQUIRED)
@@ -77,8 +77,6 @@ else ()
     ExternalProject_Add(extern-xmlsec-project
         URL https://www.aleksey.com/xmlsec/download/xmlsec1-${XMLSEC_VERSION}.tar.gz
         URL_HASH SHA256=${XMLSEC_SHA256SUM}
-        PATCH_COMMAND ${PATCH_EXECUTABLE}
-            ${CMAKE_CURRENT_SOURCE_DIR}/fix-libxml2-v2.12.0-includes-729.patch
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON
         CONFIGURE_COMMAND ${CONFIGURE_COMMAND}
