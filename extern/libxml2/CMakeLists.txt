@@ -27,6 +27,7 @@ else ()
         endif ()
         set(CONFIGURE_COMMAND ./configure
             --prefix=<INSTALL_DIR>
+            --libdir=<INSTALL_DIR>/lib
             --disable-ipv6
             --without-python
             --without-zlib
@@ -58,11 +59,7 @@ else ()
     else ()
         ExternalProject_Get_Property(extern-libxml2-project INSTALL_DIR)
         set(LIBXML2_INCLUDE_DIRS ${INSTALL_DIR}/include/libxml2)
-        if (EXISTS "${INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}")
-            set(LIBXML2_LIBRARY ${INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}/libxml2.a)
-        else ()
-            set(LIBXML2_LIBRARY ${INSTALL_DIR}/lib/libxml2.a)
-        endif ()
+        set(LIBXML2_LIBRARY ${INSTALL_DIR}/lib/libxml2.a)
     endif ()
 
     add_library(xml2 STATIC IMPORTED)

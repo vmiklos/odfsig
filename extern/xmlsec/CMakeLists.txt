@@ -50,6 +50,7 @@ else ()
             ${ODFSIG_INTERNAL_XMLSEC_NSS}
             ${ODFSIG_INTERNAL_XMLSEC_XML}
             --prefix=<INSTALL_DIR>
+            --libdir=<INSTALL_DIR>/lib
             --with-pic
             --disable-shared
             --disable-crypto-dl
@@ -98,13 +99,8 @@ else ()
             DESTINATION ${CMAKE_INSTALL_BINDIR})
     else ()
         set(XMLSEC_INCLUDE_DIRS ${INSTALL_DIR}/include/xmlsec1)
-        if (EXISTS "${INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}")
-            set(XMLSEC_LIBRARY ${INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}/libxmlsec1.a)
-            set(XMLSEC_CRYPTO_LIBRARY ${INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}/libxmlsec1-nss.a)
-        else ()
-            set(XMLSEC_LIBRARY ${INSTALL_DIR}/lib/libxmlsec1.a)
-            set(XMLSEC_CRYPTO_LIBRARY ${INSTALL_DIR}/lib/libxmlsec1-nss.a)
-        endif ()
+        set(XMLSEC_LIBRARY ${INSTALL_DIR}/lib/libxmlsec1.a)
+        set(XMLSEC_CRYPTO_LIBRARY ${INSTALL_DIR}/lib/libxmlsec1-nss.a)
     endif ()
 
     add_library(xmlsec1 STATIC IMPORTED)
