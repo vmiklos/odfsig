@@ -13,7 +13,7 @@ jobs:
   linux-gcc-release:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4.1.1
       - name: Run make check
         run: |
           scripts/ci-build.sh
@@ -26,35 +26,35 @@ jobs:
   linux-clang-debug:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4.1.1
       - name: Run make check
         run: |
           scripts/ci-build.sh
   linux-clang-asan-ubsan:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4.1.1
       - name: Run make check
         run: |
           scripts/ci-build.sh
   linux-clang-tidy:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4.1.1
       - name: Run make check
         run: |
           scripts/ci-build.sh
   linux-gcc-iwyu:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4.1.1
       - name: Run make check
         run: |
           scripts/ci-build.sh
   macos-release:
     runs-on: macos-12
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4.1.1
       - name: Run make check
         run: |
           scripts/ci-build.sh
@@ -67,21 +67,21 @@ jobs:
   macos-debug:
     runs-on: macos-12
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4.1.1
       - name: Run make check
         run: |
           scripts/ci-build.sh
   windows-release:
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4.1.1
       - name: Run make check
         run: |
           scripts/build.ps1 -config Release
   windows-debug:
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4.1.1
       - name: Run make check
         run: |
           scripts/build.ps1 -config Debug
