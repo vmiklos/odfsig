@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-set(LIBXML2_VERSION 2.12.7)
-set(LIBXML2_SHA256SUM 24ae78ff1363a973e6d8beba941a7945da2ac056e19b53956aeb6927fd6cfb56)
+set(LIBXML2_VERSION 2.13.0)
+set(LIBXML2_SHA256SUM d5a2f36bea96e1fb8297c6046fb02016c152d81ed58e65f3d20477de85291bc9)
 
 if (NOT ODFSIG_INTERNAL_LIBXML2)
     find_package(PkgConfig REQUIRED)
@@ -39,8 +39,10 @@ else ()
     endif()
 
     ExternalProject_Add(extern-libxml2-project
-        URL https://download.gnome.org/sources/libxml2/2.12/libxml2-${LIBXML2_VERSION}.tar.xz
+        URL https://download.gnome.org/sources/libxml2/2.13/libxml2-${LIBXML2_VERSION}.tar.xz
         URL_HASH SHA256=${LIBXML2_SHA256SUM}
+        PATCH_COMMAND ${PATCH_EXECUTABLE}
+            ${CMAKE_CURRENT_SOURCE_DIR}/build.patch
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON
         CONFIGURE_COMMAND ${CONFIGURE_COMMAND}

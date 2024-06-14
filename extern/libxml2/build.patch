@@ -1,0 +1,10 @@
+--- a/win32/Makefile.msvc	2024-06-14 22:11:34.747419140 +0200
++++ b/win32/Makefile.msvc	2024-06-14 22:11:26.575210491 +0200
+@@ -81,6 +81,7 @@
+ !if "$(WITH_MODULES)" == "1"
+ LIBS = $(LIBS) kernel32.lib
+ !endif
++LIBS = $(LIBS) Bcrypt.lib
+ 
+ # The archiver and its options.
+ AR = lib.exe

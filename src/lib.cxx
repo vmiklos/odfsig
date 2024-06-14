@@ -16,6 +16,7 @@
 #include <utility>
 
 #include <libxml/parser.h>
+#include <libxml/tree.h>
 #include <libxml/xmlmemory.h>
 #include <libxml/xmlstring.h>
 #include <libxml/xmlversion.h>
