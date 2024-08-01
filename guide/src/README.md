@@ -3,8 +3,8 @@
 odfsig is an Open Document Format (ODF) digital signatures tool: currently can verify already
 created signatures.
 
-The latest version is v7.3, released on 2022-02-01.  See the
-[release notes](https://github.com/vmiklos/odfsig/blob/master/NEWS.md).
+The latest version is v24.8, released on 2024-08-01.  See the [release
+notes](http://vmiklos.hu/odfsig/news.html).
 
 ## Description
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 24.8
+
+- Maintenance release with up to date dependencies
+- the macOS port is now deprecated, CI & release binary will be removed in the next release
+
 ## 7.3
 
 - Update bundled externals, including nss to fix
