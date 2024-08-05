@@ -22,9 +22,6 @@ else ()
             COMMAND ${CMAKE_COMMAND} -E copy win32/bin.msvc/libxml2.dll ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/
             )
     else()
-        if (APPLE)
-            set(ICONV iconv)
-        endif ()
         set(CONFIGURE_COMMAND ./configure
             --prefix=<INSTALL_DIR>
             --libdir=<INSTALL_DIR>/lib
