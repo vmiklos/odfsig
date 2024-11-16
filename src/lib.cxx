@@ -910,8 +910,8 @@ bool ZipVerifier::parseSignatures()
     while ((readSize = _zipFile->read(readBuffer.data(), readBuffer.size())) >
            0)
     {
-        _signaturesBytes.insert(_signaturesBytes.end(), readBuffer.data(),
-                                readBuffer.data() + readSize);
+        _signaturesBytes.insert(_signaturesBytes.end(), readBuffer.begin(),
+                                readBuffer.begin() + readSize);
     }
     if (readSize == -1)
     {
