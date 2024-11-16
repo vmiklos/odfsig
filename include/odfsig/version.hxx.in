@@ -2,6 +2,6 @@
 
 #define ODFSIG_VERSION_MAJOR @ODFSIG_VERSION_MAJOR@
 #define ODFSIG_VERSION_MINOR @ODFSIG_VERSION_MINOR@
-#define ODFSIG_VERSION_GIT "@ODFSIG_VERSION_GIT@"
+#cmakedefine ODFSIG_VERSION_GIT "@ODFSIG_VERSION_GIT@"
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

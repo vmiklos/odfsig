@@ -5,7 +5,6 @@
  */
 
 #include <cstdlib>
-#include <cstring>
 #include <iostream>
 #include <memory>
 #include <set>
@@ -218,10 +217,9 @@ int main(const std::vector<const char*>& args, std::ostream& ostream)
     {
         ostream << "odfsig version " << ODFSIG_VERSION_MAJOR << "."
                 << ODFSIG_VERSION_MINOR;
-        if (std::strlen(ODFSIG_VERSION_GIT) > 0)
-        {
-            ostream << "-g" ODFSIG_VERSION_GIT;
-        }
+#ifdef ODFSIG_VERSION_GIT
+        ostream << "-g" ODFSIG_VERSION_GIT;
+#endif
         ostream << std::endl;
         return 0;
     }
