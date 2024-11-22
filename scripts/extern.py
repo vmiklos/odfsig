@@ -15,7 +15,7 @@ import urllib.request
 releaseMonitoring = {
     "googletest": ["googletest", "https://google.github.io/googletest/"],
     "libxml2": ["libxml2", "http://xmlsoft.org"],
-    "libzip": ["libzip", "https://libzip.org/"],
+    "libzip": ["libzip", "https://libzip.org"],
     "xmlsec": ["xmlsec1", "http://www.aleksey.com/xmlsec/download.html"],
     "zlib": ["zlib", "https://www.zlib.net"],
     "nss": ["nss", "https://ftp.mozilla.org/pub/security/nss/releases/"],
