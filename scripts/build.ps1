@@ -18,3 +18,8 @@ cmake --build . --config $config
 if (-not $?) { throw "error $?" }
 cmake --build . --config $config --target check
 if (-not $?) { throw "error $?" }
+
+if ($config -eq "Release") {
+    cmake --build . --config $config --target pack
+    if (-not $?) { throw "error $?" }
+}
