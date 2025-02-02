@@ -58,6 +58,12 @@ jobs:
       - name: Run make check
         run: |
           scripts/build.ps1 -config Release
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: workdir/dist/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   windows-debug:
     runs-on: windows-2022
     steps:

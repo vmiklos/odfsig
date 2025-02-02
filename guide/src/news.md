@@ -1,5 +1,9 @@
 # Changelog
 
+## 25.2
+
+- Maintenance release with up to date dependencies
+
 ## 24.8
 
 - Maintenance release with up to date dependencies
