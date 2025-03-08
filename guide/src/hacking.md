@@ -26,7 +26,7 @@
 Ideally CI checks everything before a commit hits master, but here are a few
 things which are not part of CI:
 
-- using system libraries: this works on latest stable openSUSE (Leap 15.3
+- using system libraries: this works on latest stable openSUSE (Leap 15.6
   currently):
 
 ```
@@ -40,6 +40,8 @@ NOTE: the lack of `--internal-libs` is the point of this exercise
 ```
 scripts/extern.py
 ```
+
+- update `.github/workflows/tests.yml` based on `github-outdated`
 
 - fuzzing:
 
