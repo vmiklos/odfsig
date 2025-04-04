@@ -76,7 +76,7 @@ else ()
         message(FATAL_ERROR "ODFSIG_INTERNAL_XMLSEC is ON but git is not found!")
     endif()
     ExternalProject_Add(extern-xmlsec-project
-        URL https://www.aleksey.com/xmlsec/download/xmlsec1-${XMLSEC_VERSION}.tar.gz
+        URL https://github.com/vmiklos/odfsig/releases/download/v25.2/xmlsec1-${XMLSEC_VERSION}.tar.gz
         URL_HASH SHA256=${XMLSEC_SHA256SUM}
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON
