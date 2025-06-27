@@ -59,6 +59,7 @@ else ()
             --without-gcrypt
             --disable-apps
             --disable-docs
+            --disable-pedantic
             --without-openssl)
         set(BUILD_COMMAND $(MAKE))
         set(INSTALL_COMMAND COMMAND $(MAKE) install)
