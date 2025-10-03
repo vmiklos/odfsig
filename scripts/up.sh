@@ -24,8 +24,6 @@
 # zypper in zlib-devel
 
 #git pull -r
-export CC=gcc-12
-export CXX=g++-12
 scripts/build.sh $(sed 's/#.*//' autogen.input) "$@"
 
 # Exclude workdir automatically.

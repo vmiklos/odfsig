@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-set(NSS_VERSION 3.116)
-set(NSS_SHA256SUM af6f21bae9f16534988842597871754450fd6cdbd786750e7cd069f8d231ce10)
+set(NSS_VERSION 3.117)
+set(NSS_SHA256SUM cda19ca82e3f4839b0cb72fc633545a83b3f73dd3385a24a176860c461773a70)
 
 if (NOT ODFSIG_INTERNAL_NSS)
     find_package(PkgConfig REQUIRED)
@@ -15,9 +15,9 @@ else ()
 
     if (WIN32)
     else ()
-        find_program(PYTHON_COMMAND NAMES python)
-        if(NOT PYTHON_COMMAND)
-            message(FATAL_ERROR "ODFSIG_INTERNAL_NSS is ON but python is not found!")
+        find_program(PYTHON3_COMMAND NAMES python3)
+        if(NOT PYTHON3_COMMAND)
+            message(FATAL_ERROR "ODFSIG_INTERNAL_NSS is ON but python3 is not found!")
         endif()
         find_program(GYP_COMMAND NAMES gyp)
         if(NOT GYP_COMMAND)
@@ -40,7 +40,7 @@ else ()
         BUILD_IN_SOURCE ON
         CONFIGURE_COMMAND ""
         BUILD_COMMAND
-	    ${ODFSIG_LINUX_CC} ${ODFSIG_LINUX_CXX} nss/build.sh -v --opt --static --disable-tests -Duse_system_sqlite=0
+	    ${ODFSIG_LINUX_CC} ${ODFSIG_LINUX_CXX} nss/build.sh -v --opt --static --disable-tests -Duse_system_sqlite=0 --python=python3
         INSTALL_COMMAND ""
         )
 
