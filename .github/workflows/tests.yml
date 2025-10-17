@@ -52,7 +52,7 @@ jobs:
         run: |
           scripts/ci-build.sh
   windows-release:
-    runs-on: windows-2022
+    runs-on: windows-2025
     steps:
       - uses: actions/checkout@v4.2.2
       - name: Run make check
@@ -65,7 +65,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   windows-debug:
-    runs-on: windows-2022
+    runs-on: windows-2025
     steps:
       - uses: actions/checkout@v4.2.2
       - name: Run make check
