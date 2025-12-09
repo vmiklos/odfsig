@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-set(NSS_VERSION 3.118.1)
-set(NSS_SHA256SUM 9e1f7da9f4e5e3bdfd73f7dc2c618d6125a12354aadaeedbb35af3699bc03e15)
+set(NSS_VERSION 3.119)
+set(NSS_SHA256SUM 8f12f61ef814662bf991a289bc6724d078cd79f135e09e260adbc35dfa9acaf3)
 
 if (NOT ODFSIG_INTERNAL_NSS)
     find_package(PkgConfig REQUIRED)
@@ -34,7 +34,7 @@ else ()
 
     string(REPLACE "." "_" NSS_URL_VERSION ${NSS_VERSION})
     ExternalProject_Add(extern-nss-project
-        URL https://ftp.mozilla.org/pub/security/nss/releases/NSS_${NSS_URL_VERSION}_RTM/src/nss-${NSS_VERSION}-with-nspr-4.37.tar.gz
+        URL https://ftp.mozilla.org/pub/security/nss/releases/NSS_${NSS_URL_VERSION}_RTM/src/nss-${NSS_VERSION}-with-nspr-4.38.2.tar.gz
         URL_HASH SHA256=${NSS_SHA256SUM}
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON
@@ -72,6 +72,8 @@ else ()
     add_nss_library(hw-acc-crypto-avx2 /dist/Release/lib/libhw-acc-crypto-avx2.a)
     add_nss_library(hw-acc-crypto-avx /dist/Release/lib/libhw-acc-crypto-avx.a)
     add_nss_library(gcm-aes-x86_c_lib /dist/Release/lib/libgcm-aes-x86_c_lib.a)
+    add_nss_library(intel-gcm-s_lib /dist/Release/lib/libintel-gcm-s_lib.a)
+    add_nss_library(intel-gcm-wrap_c_lib /dist/Release/lib/libintel-gcm-wrap_c_lib.a)
     add_nss_library(sha-x86_c_lib /dist/Release/lib/libsha-x86_c_lib.a)
 
     set(NSS_INCLUDE_DIRS
@@ -85,6 +87,8 @@ else ()
         cryptohi
         freebl
         gcm-aes-x86_c_lib
+        intel-gcm-s_lib
+        intel-gcm-wrap_c_lib
         hw-acc-crypto-avx
         hw-acc-crypto-avx2
         nspr4
