@@ -65,7 +65,7 @@ if [ -n "$run_iwyu" ]; then
     # simple '!' doesn't work with set -e.
     ! egrep 'should add|should remove' log || false
 else
-    make -j$(getconf _NPROCESSORS_ONLN)
+    make -j$(getconf _NPROCESSORS_ONLN) || make
 fi
 make check
 make install
