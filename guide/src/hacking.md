@@ -26,7 +26,7 @@
 Ideally CI checks everything before a commit hits master, but here are a few
 things which are not part of CI:
 
-- using system libraries: this works on latest stable openSUSE (Leap 15.6
+- using system libraries: this works on latest stable openSUSE (Leap 16.0
   currently):
 
 ```
