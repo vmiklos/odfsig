@@ -10,7 +10,7 @@ if [ -n "${GITHUB_JOB}" -a "$(uname -s)" == "Linux" ]; then
     sudo apt-get install \
         clang-tidy \
         gyp \
-        iwyu libclang-common-11-dev \
+        iwyu libclang-common-17-dev \
         ninja-build \
 
 fi
