@@ -2,6 +2,11 @@
 # modernize-use-trailing-return-type: more cost than benefit
 # bugprone-reserved-identifier produces errors for legit xmlsec code
 # readability-function-cognitive-complexity too noisy
+# new in clang-17:
+# - misc-const-correctness
+# - misc-header-include-cycle
+# - misc-include-cleaner
+# - performance-avoid-endl
 Checks: "clang-diagnostic-*,\
 performance-*,\
 unused-*,\
@@ -12,6 +17,10 @@ bugprone-*,\
 -bugprone-reserved-identifier,\
 readability-*,\
 -readability-function-cognitive-complexity,\
+-misc-const-correctness,\
+-misc-header-include-cycle,
+-misc-include-cleaner,\
+-performance-avoid-endl,\
 "
 WarningsAsErrors: '*'
 

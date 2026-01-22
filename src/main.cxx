@@ -4,7 +4,9 @@
  * SPDX-License-Identifier: MIT
  */
 
+#include <algorithm>
 #include <cstdlib>
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <set>
