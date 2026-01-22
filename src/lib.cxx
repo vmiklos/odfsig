@@ -107,7 +107,7 @@ int match(const char* uri)
 {
     assert(zipArchive);
 
-    int64_t signatureZipIndex = zipArchive->locateName(uri);
+    const int64_t signatureZipIndex = zipArchive->locateName(uri);
     if (signatureZipIndex < 0)
     {
         return 0;
@@ -120,7 +120,7 @@ void* open(const char* uri)
 {
     assert(zipArchive);
 
-    int64_t signatureZipIndex = zipArchive->locateName(uri);
+    const int64_t signatureZipIndex = zipArchive->locateName(uri);
     if (signatureZipIndex < 0)
     {
         return nullptr;
@@ -146,7 +146,7 @@ int read(void* context, char* buffer, int len)
 
 int close(void* context)
 {
-    std::unique_ptr<zip::File> zipFile(static_cast<zip::File*>(context));
+    const std::unique_ptr<zip::File> zipFile(static_cast<zip::File*>(context));
     assert(zipFile);
 
     return 0;
@@ -288,7 +288,7 @@ const std::string& XmlSignature::getErrorString() const { return _errorString; }
 
 bool XmlSignature::verify()
 {
-    std::unique_ptr<xmlSecKeysMngr> pKeysMngr(xmlSecKeysMngrCreate());
+    const std::unique_ptr<xmlSecKeysMngr> pKeysMngr(xmlSecKeysMngrCreate());
     if (!pKeysMngr)
     {
         _errorString = "Keys manager creation failed";
@@ -339,7 +339,7 @@ bool XmlSignature::getCertificateBinary(std::vector<xmlChar>& certificate) const
         return false;
     }
 
-    std::unique_ptr<xmlChar> certificateContent(
+    const std::unique_ptr<xmlChar> certificateContent(
         xmlNodeGetContent(x509Certificate));
     if (!certificateContent ||
         (xmlSecIsEmptyString(certificateContent.get()) != 0))
@@ -393,7 +393,7 @@ bool XmlSignature::getDigestValue(xmlNodePtr certDigest,
         return false;
     }
 
-    std::unique_ptr<xmlChar> digestValueNodeContent(
+    const std::unique_ptr<xmlChar> digestValueNodeContent(
         xmlNodeGetContent(digestValueNode));
     if (!digestValueNodeContent ||
         (xmlSecIsEmptyString(digestValueNodeContent.get()) != 0))
@@ -547,7 +547,7 @@ std::string XmlSignature::getMethod() const
         return {};
     }
 
-    std::unique_ptr<xmlChar> href(
+    const std::unique_ptr<xmlChar> href(
         xmlGetProp(signatureMethodNode, xmlSecAttrAlgorithm));
     if (!href)
     {
@@ -584,14 +584,14 @@ std::set<std::string> XmlSignature::getSignedStreams() const
             continue;
         }
 
-        std::unique_ptr<xmlChar> uriProp(
+        const std::unique_ptr<xmlChar> uriProp(
             xmlGetProp(signedInfoChild, xmlSecAttrURI));
         if (!uriProp)
         {
             continue;
         }
 
-        std::string uri(fromXmlChar(uriProp.get()));
+        const std::string uri(fromXmlChar(uriProp.get()));
         if (uri.starts_with("#"))
         {
             continue;
@@ -706,7 +706,7 @@ std::string XmlSignature::getObjectDate(xmlNode* objectNode)
 
 std::string XmlSignature::getDateContent(xmlNode* dateNode)
 {
-    std::unique_ptr<xmlChar> content(xmlNodeGetContent(dateNode));
+    const std::unique_ptr<xmlChar> content(xmlNodeGetContent(dateNode));
     if (!content)
     {
         return {};
@@ -957,7 +957,7 @@ std::vector<std::unique_ptr<Signature>>& ZipVerifier::getSignatures()
 std::set<std::string> ZipVerifier::getStreams() const
 {
     std::set<std::string> streams;
-    int64_t numEntries = _zipArchive->getNumEntries();
+    const int64_t numEntries = _zipArchive->getNumEntries();
     if (numEntries < 0)
     {
         return streams;
@@ -965,7 +965,7 @@ std::set<std::string> ZipVerifier::getStreams() const
 
     for (int64_t entry = 0; entry < numEntries; ++entry)
     {
-        std::string name = _zipArchive->getName(entry);
+        const std::string name = _zipArchive->getName(entry);
         if (ends_with(name, "/"))
         {
             continue;

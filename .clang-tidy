@@ -3,7 +3,6 @@
 # bugprone-reserved-identifier produces errors for legit xmlsec code
 # readability-function-cognitive-complexity too noisy
 # new in clang-17:
-# - misc-const-correctness
 # - misc-header-include-cycle
 # - misc-include-cleaner
 Checks: "clang-diagnostic-*,\
@@ -16,7 +15,6 @@ bugprone-*,\
 -bugprone-reserved-identifier,\
 readability-*,\
 -readability-function-cognitive-complexity,\
--misc-const-correctness,\
 -misc-header-include-cycle,
 -misc-include-cleaner,\
 "
