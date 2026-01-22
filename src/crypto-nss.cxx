@@ -105,7 +105,7 @@ class NssCrypto : public Crypto
 
 bool NssCrypto::initialize(const std::string& cryptoConfig)
 {
-    std::string firefoxProfile = getFirefoxProfile(cryptoConfig);
+    const std::string firefoxProfile = getFirefoxProfile(cryptoConfig);
     const char* nssDb = nullptr;
     if (!firefoxProfile.empty())
     {

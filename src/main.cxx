@@ -6,7 +6,6 @@
 
 #include <algorithm>
 #include <cstdlib>
-#include <functional>
 #include <iostream>
 #include <memory>
 #include <set>
@@ -36,33 +35,34 @@ bool printSignatures(
         odfsig::Signature* signature = signatures[signatureIndex].get();
         ostream << "Signature #" << (signatureIndex + 1) << ":\n";
 
-        std::string subjectName = signature->getSubjectName();
+        const std::string subjectName = signature->getSubjectName();
         if (!subjectName.empty())
         {
             ostream << "  - Signing Certificate Subject Name: " << subjectName
                     << '\n';
         }
 
-        std::string date = signature->getDate();
+        const std::string date = signature->getDate();
         if (!date.empty())
         {
             ostream << "  - Signing Date: " << date << '\n';
         }
 
-        std::string method = signature->getMethod();
+        const std::string method = signature->getMethod();
         if (!method.empty())
         {
             ostream << "  - Signature Method Algorithm: " << method
                     << '\n';
         }
 
-        std::string type = signature->getType();
+        const std::string type = signature->getType();
         if (!type.empty())
         {
             ostream << "  - Signature Type: " << type << '\n';
         }
 
-        std::set<std::string> signedStreams = signature->getSignedStreams();
+        const std::set<std::string> signedStreams =
+            signature->getSignedStreams();
         if (!signedStreams.empty())
         {
             ostream << "  - Signed Streams: ";
@@ -144,7 +144,7 @@ bool parseOptions(const std::vector<const char*>& args, Options& options,
             continue;
         }
 
-        std::string argString(arg);
+        const std::string argString(arg);
         if (argString == "--trusted-der")
         {
             inTrustedDer = true;
@@ -249,7 +249,7 @@ int main(const std::vector<const char*>& args, std::ostream& ostream)
             return 1;
         }
 
-        std::set<std::string> streams = verifier->getStreams();
+        const std::set<std::string> streams = verifier->getStreams();
         if (!printSignatures(odfPath, streams, verifier->getSignatures(),
                              ostream))
         {

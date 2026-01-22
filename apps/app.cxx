@@ -11,7 +11,7 @@
 
 int main(int argc, char** argv)
 {
-    std::vector<const char*> args(argv, argv + argc);
+    const std::vector<const char*> args(argv, argv + argc);
     return odfsig::main(args, std::cerr);
 }
 
