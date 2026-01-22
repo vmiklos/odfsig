@@ -6,7 +6,6 @@
 # - misc-const-correctness
 # - misc-header-include-cycle
 # - misc-include-cleaner
-# - performance-avoid-endl
 Checks: "clang-diagnostic-*,\
 performance-*,\
 unused-*,\
@@ -20,7 +19,6 @@ readability-*,\
 -misc-const-correctness,\
 -misc-header-include-cycle,
 -misc-include-cleaner,\
--performance-avoid-endl,\
 "
 WarningsAsErrors: '*'
 

@@ -25,42 +25,41 @@ bool printSignatures(
 {
     if (signatures.empty())
     {
-        ostream << "File '" << odfPath << "' does not contain any signatures."
-                << std::endl;
+        ostream << "File '" << odfPath << "' does not contain any signatures.\n";
         return false;
     }
 
-    ostream << "Digital Signature Info of: " << odfPath << std::endl;
+    ostream << "Digital Signature Info of: " << odfPath << '\n';
     for (size_t signatureIndex = 0; signatureIndex < signatures.size();
          ++signatureIndex)
     {
         odfsig::Signature* signature = signatures[signatureIndex].get();
-        ostream << "Signature #" << (signatureIndex + 1) << ":" << std::endl;
+        ostream << "Signature #" << (signatureIndex + 1) << ":\n";
 
         std::string subjectName = signature->getSubjectName();
         if (!subjectName.empty())
         {
             ostream << "  - Signing Certificate Subject Name: " << subjectName
-                    << std::endl;
+                    << '\n';
         }
 
         std::string date = signature->getDate();
         if (!date.empty())
         {
-            ostream << "  - Signing Date: " << date << std::endl;
+            ostream << "  - Signing Date: " << date << '\n';
         }
 
         std::string method = signature->getMethod();
         if (!method.empty())
         {
             ostream << "  - Signature Method Algorithm: " << method
-                    << std::endl;
+                    << '\n';
         }
 
         std::string type = signature->getType();
         if (!type.empty())
         {
-            ostream << "  - Signature Type: " << type << std::endl;
+            ostream << "  - Signature Type: " << type << '\n';
         }
 
         std::set<std::string> signedStreams = signature->getSignedStreams();
@@ -80,16 +79,16 @@ bool printSignatures(
                 }
                 ostream << signedStream;
             }
-            ostream << std::endl;
+            ostream << '\n';
         }
 
         if (signedStreams == streams)
         {
-            ostream << "  - Total document signed." << std::endl;
+            ostream << "  - Total document signed.\n";
         }
         else
         {
-            ostream << "  - Only part of the document is signed." << std::endl;
+            ostream << "  - Only part of the document is signed.\n";
             return false;
         }
 
@@ -98,26 +97,24 @@ bool printSignatures(
             if (!signature->getErrorString().empty())
             {
                 ostream << "Failed to verify signature: "
-                        << signature->getErrorString() << "." << std::endl;
+                        << signature->getErrorString() << ".\n";
                 return false;
             }
 
-            ostream << "  - Signature Verification: Failed." << std::endl;
+            ostream << "  - Signature Verification: Failed.\n";
             return false;
         }
 
-        ostream << "  - Signature Verification: Succeeded." << std::endl;
+        ostream << "  - Signature Verification: Succeeded.\n";
 
         if (type == "XAdES")
         {
             if (!signature->verifyXAdES())
             {
-                ostream << "  - Certificate Hash Verification: Failed."
-                        << std::endl;
+                ostream << "  - Certificate Hash Verification: Failed.\n";
                 return false;
             }
-            ostream << "  - Certificate Hash Verification: Succeeded."
-                    << std::endl;
+            ostream << "  - Certificate Hash Verification: Succeeded.\n";
         }
     }
 
@@ -171,8 +168,7 @@ bool parseOptions(const std::vector<const char*>& args, Options& options,
         }
         else if (argString.starts_with("--"))
         {
-            ostream << "Error: unrecognized argument: " << argString
-                    << std::endl;
+            ostream << "Error: unrecognized argument: " << argString << '\n';
             return false;
         }
         else
@@ -186,11 +182,10 @@ bool parseOptions(const std::vector<const char*>& args, Options& options,
 
 void usage(const std::string& self, std::ostream& ostream)
 {
-    ostream << "Usage: " << self << " [options] <ODF-file>" << std::endl;
+    ostream << "Usage: " << self << " [options] <ODF-file>\n";
     ostream << "--trusted-der <file>: load trusted (root) certificate from "
-               "DER file <file>"
-            << std::endl;
-    ostream << "--insecure: do not validate certificates" << std::endl;
+               "DER file <file>\n";
+    ostream << "--insecure: do not validate certificates\n";
 }
 } // namespace
 
@@ -222,7 +217,7 @@ int main(const std::vector<const char*>& args, std::ostream& ostream)
 #ifdef ODFSIG_VERSION_GIT
         ostream << "-g" ODFSIG_VERSION_GIT;
 #endif
-        ostream << std::endl;
+        ostream << '\n';
         return 0;
     }
 
@@ -243,14 +238,14 @@ int main(const std::vector<const char*>& args, std::ostream& ostream)
         if (!verifier->openZip(odfPath))
         {
             ostream << "Can't open zip archive '" << odfPath
-                    << "': " << verifier->getErrorString() << "." << std::endl;
+                    << "': " << verifier->getErrorString() << ".\n";
             return 1;
         }
 
         if (!verifier->parseSignatures())
         {
             ostream << "Failed to parse signatures: "
-                    << verifier->getErrorString() << "." << std::endl;
+                    << verifier->getErrorString() << ".\n";
             return 1;
         }
 
