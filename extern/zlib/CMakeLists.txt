@@ -11,7 +11,7 @@ else ()
     include(ExternalProject)
 
     ExternalProject_Add(extern-zlib-project
-        URL http://zlib.net/zlib-${ZLIB_VERSION}.tar.gz
+        URL https://github.com/vmiklos/odfsig/releases/download/v25.2/zlib-${ZLIB_VERSION}.tar.gz
         URL_HASH SHA256=${ZLIB_SHA256SUM}
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         CONFIGURE_COMMAND ${CMAKE_COMMAND}
