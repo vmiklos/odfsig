@@ -97,6 +97,8 @@ class XmlGuard
     ~XmlGuard() { xmlCleanupParser(); }
 };
 
+namespace
+{
 /// Provides libxmlsec IO callbacks.
 namespace XmlSecIO
 {
@@ -152,6 +154,7 @@ int close(void* context)
     return 0;
 }
 }; // namespace XmlSecIO
+};
 
 /// Performs libxmlsec init/deinit.
 class XmlSecGuard
