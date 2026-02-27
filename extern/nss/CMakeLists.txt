@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-set(NSS_VERSION 3.120)
-set(NSS_SHA256SUM fb5aa56fa35d963d4c65278328e2e9c99c2484c86f0e41537412477739dcf997)
+set(NSS_VERSION 3.121)
+set(NSS_SHA256SUM 76b9a1364bc4522abc652c4d676498d5062f502f64e38b32e9e2c7a3fff530f1)
 
 if (NOT ODFSIG_INTERNAL_NSS)
     find_package(PkgConfig REQUIRED)
@@ -71,8 +71,8 @@ else ()
     add_nss_library(sqlite /dist/Release/lib/libsqlite.a)
     add_nss_library(hw-acc-crypto-avx2 /dist/Release/lib/libhw-acc-crypto-avx2.a)
     add_nss_library(hw-acc-crypto-avx /dist/Release/lib/libhw-acc-crypto-avx.a)
-    add_nss_library(gcm-aes-x86_c_lib /dist/Release/lib/libgcm-aes-x86_c_lib.a)
-    add_nss_library(intel-gcm-s_lib /dist/Release/lib/libintel-gcm-s_lib.a)
+    add_nss_library(gcm /dist/Release/lib/libgcm.a)
+    add_nss_library(ghash-aes-x86_c_lib /dist/Release/lib/libghash-aes-x86_c_lib.a)
     add_nss_library(intel-gcm-wrap_c_lib /dist/Release/lib/libintel-gcm-wrap_c_lib.a)
     add_nss_library(sha-x86_c_lib /dist/Release/lib/libsha-x86_c_lib.a)
 
@@ -86,8 +86,8 @@ else ()
         certhi
         cryptohi
         freebl
-        gcm-aes-x86_c_lib
-        intel-gcm-s_lib
+        gcm
+        ghash-aes-x86_c_lib
         intel-gcm-wrap_c_lib
         hw-acc-crypto-avx
         hw-acc-crypto-avx2
