@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-set(XMLSEC_VERSION 1.3.9-rc1)
-set(XMLSEC_SHA256SUM 694ebddfa555ed248804d64e1eae739c37c4c68c09bf42ea4aab1cf8985b15fe)
+set(XMLSEC_VERSION 1.3.10-rc1)
+set(XMLSEC_SHA256SUM 8608b5b55f6e9f214b99d269789ba6226e0b79397baf9a32fadb01333140bbc5)
 
 if (NOT ODFSIG_INTERNAL_XMLSEC)
     find_package(PkgConfig REQUIRED)
@@ -77,7 +77,7 @@ else ()
         message(FATAL_ERROR "ODFSIG_INTERNAL_XMLSEC is ON but git is not found!")
     endif()
     ExternalProject_Add(extern-xmlsec-project
-        URL https://github.com/vmiklos/odfsig/releases/download/v25.2/xmlsec1-${XMLSEC_VERSION}.tar.gz
+        URL https://github.com/vmiklos/odfsig/releases/download/v26.2/xmlsec1-${XMLSEC_VERSION}.tar.gz
         URL_HASH SHA256=${XMLSEC_SHA256SUM}
         DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/extern/tarballs
         BUILD_IN_SOURCE ON
