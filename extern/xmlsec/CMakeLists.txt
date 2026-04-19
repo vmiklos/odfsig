@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-set(XMLSEC_VERSION 1.3.10)
-set(XMLSEC_SHA256SUM 5915590780566dae4b5d13d51a42fc0e34b30b26fda6f2c5f744ec31b363ee1a)
+set(XMLSEC_VERSION 1.3.11-rc1)
+set(XMLSEC_SHA256SUM ae260237b5a32006aad80a8a6defcd0fac137038e22ccdd4679e340a216d1143)
 
 if (NOT ODFSIG_INTERNAL_XMLSEC)
     find_package(PkgConfig REQUIRED)
@@ -15,7 +15,7 @@ else ()
     if (WIN32)
         ExternalProject_Get_Property(extern-libxml2-project SOURCE_DIR)
         set(CONFIGURE_COMMAND ${CMAKE_COMMAND} -E chdir win32
-            cscript /e:javascript configure.js
+            powershell -ExecutionPolicy Bypass -File configure.ps1
             crypto=mscng
             xslt=no
             iconv=no
@@ -42,8 +42,10 @@ else ()
         endif ()
         if (ODFSIG_INTERNAL_LIBXML2)
             ExternalProject_Get_Property(extern-libxml2-project SOURCE_DIR)
+            ExternalProject_Get_Property(extern-libxml2-project INSTALL_DIR)
             set(ODFSIG_INTERNAL_XMLSEC_XML
                 LIBXML_CFLAGS=-I${SOURCE_DIR}/include/
+                LIBXML_LIBS=-L${INSTALL_DIR}/lib\ -lxml2
             )
         endif ()
         set(CONFIGURE_COMMAND ./configure
