@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-set(NSS_VERSION 3.127)
-set(NSS_SHA256SUM 0281d5905b17b59caf556d4b2981953efd2b9f92312a9e8879d4deb4220d36cb)
+set(NSS_VERSION 3.128)
+set(NSS_SHA256SUM bfd84218ee9b0b24775723eb62bdf4590bf21a3818e8210d37de0b2c2db79750)
 
 if (NOT ODFSIG_INTERNAL_NSS)
     find_package(PkgConfig REQUIRED)
@@ -72,6 +72,8 @@ else ()
     add_nss_library(hw-acc-crypto-avx2 /dist/Release/lib/libhw-acc-crypto-avx2.a)
     add_nss_library(hw-acc-crypto-avx /dist/Release/lib/libhw-acc-crypto-avx.a)
     add_nss_library(gcm /dist/Release/lib/libgcm.a)
+    add_nss_library(pqcwrap_static /dist/Release/lib/libpqcwrap_static.a)
+    add_nss_library(crux /dist/Release/lib/libcrux.a)
     add_nss_library(ghash-aes-x86_c_lib /dist/Release/lib/libghash-aes-x86_c_lib.a)
     add_nss_library(intel-gcm-wrap_c_lib /dist/Release/lib/libintel-gcm-wrap_c_lib.a)
     add_nss_library(sha-x86_c_lib /dist/Release/lib/libsha-x86_c_lib.a)
@@ -102,6 +104,8 @@ else ()
         pkcs7
         plc4
         plds4
+        pqcwrap_static
+        crux
         sha-x86_c_lib
         softokn_static
         sqlite
