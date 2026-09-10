@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-set(NSS_VERSION 3.128)
-set(NSS_SHA256SUM bfd84218ee9b0b24775723eb62bdf4590bf21a3818e8210d37de0b2c2db79750)
+set(NSS_VERSION 3.129)
+set(NSS_SHA256SUM d389064d5e5ef09d597f8ae8dadc066f71e97b982bd7418b835686425fc3a189)
 
 if (NOT ODFSIG_INTERNAL_NSS)
     find_package(PkgConfig REQUIRED)
@@ -40,7 +40,7 @@ else ()
         BUILD_IN_SOURCE ON
         CONFIGURE_COMMAND ""
         BUILD_COMMAND
-	    ${ODFSIG_LINUX_CC} ${ODFSIG_LINUX_CXX} nss/build.sh -v --opt --static --disable-tests -Duse_system_sqlite=0 --python=python3
+	    ${ODFSIG_LINUX_CC} ${ODFSIG_LINUX_CXX} CONFIG_SITE=/dev/null nss/build.sh -v --opt --static --disable-tests -Duse_system_sqlite=0 --python=python3
         INSTALL_COMMAND ""
         )
 
@@ -54,7 +54,7 @@ else ()
 
     add_nss_library(nss_static dist/Release/lib/libnss_static.a)
     add_nss_library(certdb /dist/Release/lib/libcertdb.a)
-    add_nss_library(nspr4 /nspr/Release/dist/lib/libnspr4.a)
+    add_nss_library(nspr4 /dist/Release/lib/libnspr4.a)
     add_nss_library(pkcs12 /dist/Release/lib/libpkcs12.a)
     add_nss_library(pk11wrap_static /dist/Release/lib/libpk11wrap_static.a)
     add_nss_library(cryptohi /dist/Release/lib/libcryptohi.a)
@@ -62,8 +62,8 @@ else ()
     add_nss_library(nssutil /dist/Release/lib/libnssutil.a)
     add_nss_library(nssb /dist/Release/lib/libnssb.a)
     add_nss_library(nsspki /dist/Release/lib/libnsspki.a)
-    add_nss_library(plc4 /nspr/Release/dist/lib/libplc4.a)
-    add_nss_library(plds4 /nspr/Release/dist/lib/libplds4.a)
+    add_nss_library(plc4 /dist/Release/lib/libplc4.a)
+    add_nss_library(plds4 /dist/Release/lib/libplds4.a)
     add_nss_library(nssdev /dist/Release/lib/libnssdev.a)
     add_nss_library(pkcs7 /dist/Release/lib/libpkcs7.a)
     add_nss_library(softokn_static /dist/Release/lib/libsoftokn_static.a)
