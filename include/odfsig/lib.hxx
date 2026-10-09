@@ -29,6 +29,8 @@ class Signature
 
     [[nodiscard]] virtual std::string getSubjectName() const = 0;
 
+    [[nodiscard]] virtual std::string getIssuerName() const = 0;
+
     [[nodiscard]] virtual std::string getDate() const = 0;
 
     [[nodiscard]] virtual std::string getMethod() const = 0;

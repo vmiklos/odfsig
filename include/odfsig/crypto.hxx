@@ -45,6 +45,10 @@ class Crypto
     virtual std::string getCertificateSubjectName(unsigned char* certificate,
                                                   size_t size) = 0;
 
+    /// Extracts the issuer name of an X509 certificate.
+    virtual std::string getCertificateIssuerName(unsigned char* certificate,
+                                                 size_t size) = 0;
+
     static std::unique_ptr<Crypto> create();
 };
 } // namespace odfsig
