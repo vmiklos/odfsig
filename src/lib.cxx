@@ -232,6 +232,8 @@ class XmlSignature : public Signature
 
     [[nodiscard]] std::string getSubjectName() const override;
 
+    [[nodiscard]] std::string getIssuerName() const override;
+
     [[nodiscard]] std::string getDate() const override;
 
     [[nodiscard]] std::string getMethod() const override;
@@ -537,6 +539,18 @@ std::string XmlSignature::getSubjectName() const
 
     return _crypto.getCertificateSubjectName(certificate.data(),
                                              certificate.size());
+}
+
+std::string XmlSignature::getIssuerName() const
+{
+    std::vector<xmlChar> certificate;
+    if (!getCertificateBinary(certificate))
+    {
+        return {};
+    }
+
+    return _crypto.getCertificateIssuerName(certificate.data(),
+                                            certificate.size());
 }
 
 std::string XmlSignature::getMethod() const

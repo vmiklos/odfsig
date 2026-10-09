@@ -52,6 +52,9 @@ class CngCrypto : public Crypto
 
     std::string getCertificateSubjectName(unsigned char* certificate,
                                           size_t size) override;
+
+    std::string getCertificateIssuerName(unsigned char* certificate,
+                                         size_t size) override;
 };
 
 bool CngCrypto::initialize(const std::string& cryptoConfig)
@@ -122,6 +125,38 @@ std::string CngCrypto::getCertificateSubjectName(unsigned char* certificate,
 
     std::wstring_convert<std::codecvt_utf8<wchar_t>> convert;
     return convert.to_bytes(subject.data());
+}
+
+std::string CngCrypto::getCertificateIssuerName(unsigned char* certificate,
+                                                size_t size)
+{
+    std::unique_ptr<const CERT_CONTEXT> context(CertCreateCertificateContext(
+        X509_ASN_ENCODING, certificate, static_cast<DWORD>(size)));
+    if (context->pCertInfo == nullptr)
+    {
+        return std::string();
+    }
+
+    DWORD issuerSize = CertNameToStrW(
+        X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, &context->pCertInfo->Issuer,
+        CERT_X500_NAME_STR | CERT_NAME_STR_REVERSE_FLAG, nullptr, 0);
+    if (issuerSize <= 0)
+    {
+        return std::string();
+    }
+
+    std::vector<wchar_t> issuer(issuerSize);
+    issuerSize = CertNameToStrW(
+        X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, &context->pCertInfo->Issuer,
+        CERT_X500_NAME_STR | CERT_NAME_STR_REVERSE_FLAG, issuer.data(),
+        static_cast<DWORD>(issuer.size()));
+    if (issuerSize <= 0)
+    {
+        return std::string();
+    }
+
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> convert;
+    return convert.to_bytes(issuer.data());
 }
 
 std::unique_ptr<Crypto> Crypto::create()

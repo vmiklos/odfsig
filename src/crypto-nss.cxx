@@ -101,6 +101,9 @@ class NssCrypto : public Crypto
 
     std::string getCertificateSubjectName(unsigned char* certificate,
                                           size_t size) override;
+
+    std::string getCertificateIssuerName(unsigned char* certificate,
+                                         size_t size) override;
 };
 
 bool NssCrypto::initialize(const std::string& cryptoConfig)
@@ -163,6 +166,23 @@ std::string NssCrypto::getCertificateSubjectName(unsigned char* certificate,
     }
 
     return cert->subjectName;
+}
+
+std::string NssCrypto::getCertificateIssuerName(unsigned char* certificate,
+                                                size_t size)
+{
+    SECItem certItem;
+    certItem.data = certificate;
+    certItem.len = size;
+
+    std::unique_ptr<CERTCertificate> cert(CERT_NewTempCertificate(
+        CERT_GetDefaultCertDB(), &certItem, nullptr, PR_FALSE, PR_TRUE));
+    if (!cert || (cert->issuerName == nullptr))
+    {
+        return {};
+    }
+
+    return cert->issuerName;
 }
 
 std::unique_ptr<Crypto> Crypto::create()

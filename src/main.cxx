@@ -42,6 +42,13 @@ bool printSignatures(
                     << '\n';
         }
 
+        const std::string issuerName = signature->getIssuerName();
+        if (!issuerName.empty())
+        {
+            ostream << "  - Signing Certificate Issuer Name: " << issuerName
+                    << '\n';
+        }
+
         const std::string date = signature->getDate();
         if (!date.empty())
         {
