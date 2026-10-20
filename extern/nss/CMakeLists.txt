@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-set(NSS_VERSION 3.131)
-set(NSS_SHA256SUM 846b89c7132ed1d0fb382c9cac4f7badd2eca1cd4d8d794668e1c4ece8ea2785)
+set(NSS_VERSION 3.131.1)
+set(NSS_SHA256SUM 52408a28cc9edc1ca04a420c74a820b48b63a3390a59fe38c5ec77afc6e2fb1d)
 
 if (NOT ODFSIG_INTERNAL_NSS)
     find_package(PkgConfig REQUIRED)
