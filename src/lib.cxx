@@ -314,6 +314,9 @@ bool XmlSignature::verify()
         return false;
     }
 
+    // Allow one XML stream to reference other XML streams.
+    dsigCtx->enabledReferenceUris = xmlSecTransformUriTypeAny;
+
     if (_insecure)
     {
         dsigCtx->keyInfoReadCtx.flags |=
